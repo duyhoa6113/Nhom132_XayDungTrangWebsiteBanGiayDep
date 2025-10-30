@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - NiceSport</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+<div class="auth-wrapper">
+    <!-- Header -->
+    <header class="auth-navbar">
+        <div class="container-fluid px-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <a th:href="@{/Index}" class="auth-logo"> <i class="fas fa-running me-2"></i>
+                    NiceSport
+                </a>
+                <div class="auth-breadcrumb">
+                    <a th:href="@{/Index}">Trang chủ</a>
+                    <span class="mx-2">></span>
+                    <span>Đăng ký</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-container">
+        <div class="row g-0 h-100">
+            <!-- Left Side - Benefits Section -->
+            <div class="col-lg-5">
+                <div class="auth-left-panel">
+                    <div class="auth-illustration">
+                        <img src="https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=500"
+                             alt="Shopping" class="img-fluid">
+                    </div>
+
+                    <div class="auth-benefits-section">
+                        <h3 class="benefits-title">Lợi ích khi tạo tài khoản</h3>
+                        <ul class="benefits-list">
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span>Theo dõi đơn hàng nhanh chóng</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span>Nhận ưu đãi & tích điểm thành viên</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span>Lưu địa chỉ giao hàng, thanh toán tiện lợi</span>
+                            </li>
+                        </ul>
+
+                        <div class="privacy-notice">
+                            <h4>Chính sách bảo mật</h4>
+                            <p>Chúng tôi cam kết bảo mật thông tin khách hàng. Dữ liệu của bạn chỉ được sử dụng để xử lý đơn hàng và chăm sóc khách hàng.</p>
+                            <button type="button" class="btn-privacy">Xem chi tiết</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Registration Form -->
+            <div class="col-lg-7">
+                <div class="auth-right-panel">
+                    <div class="auth-form-container">
+                        <h2 class="auth-title">Đăng ký</h2>
+                        <p class="auth-subtitle">Tạo tài khoản mới để mua sắm nhanh hơn.</p>
+
+                        <!-- Social Login Buttons -->
+                        <div class="social-login-wrapper">
+                            <button type="button" class="btn-social-login">
+                                <i class="fab fa-google"></i>
+                                <span>Đăng ký với Google</span>
+                            </button>
+                            <button type="button" class="btn-social-login">
+                                <i class="fab fa-facebook-f"></i>
+                                <span>Facebook</span>
+                            </button>
+                            <button type="button" class="btn-social-login">
+                                <i class="fab fa-apple"></i>
+                                <span>Apple</span>
+                            </button>
+                        </div>
+
+                        <div class="auth-divider">
+                            <span>Hoặc điền thông tin bên dưới</span>
+                        </div>
+
+                        <!-- Error/Success Messages -->
+                        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <span th:text="${errorMessage}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <!-- Registration Form -->
+                        <form th:action="@{/auth/register}" th:object="${registerDTO}" method="post" class="auth-form">
+                            <!-- Họ và tên -->
+                            <div class="form-group">
+                                <label for="hoTen" class="form-label">Họ và tên</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="hoTen"
+                                       th:field="*{hoTen}"
+                                       placeholder="Ví dụ: Nguyễn Văn A"
+                                       th:classappend="${#fields.hasErrors('hoTen')} ? 'is-invalid'">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('hoTen')}" th:errors="*{hoTen}"></div>
+                            </div>
+
+                            <!-- Email và Số điện thoại -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email"
+                                               class="form-control"
+                                               id="email"
+                                               th:field="*{email}"
+                                               placeholder="you@example.com"
+                                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="sdt" class="form-label">Số điện thoại</label>
+                                        <input type="tel"
+                                               class="form-control"
+                                               id="sdt"
+                                               th:field="*{sdt}"
+                                               placeholder="0123 456 789"
+                                               th:classappend="${#fields.hasErrors('sdt')} ? 'is-invalid'">
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('sdt')}" th:errors="*{sdt}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mật khẩu và Nhập lại mật khẩu -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="matKhau" class="form-label">Mật khẩu</label>
+                                        <div class="password-input-wrapper">
+                                            <input type="password"
+                                                   class="form-control"
+                                                   id="matKhau"
+                                                   th:field="*{matKhau}"
+                                                   placeholder="Tối thiểu 8 ký tự"
+                                                   th:classappend="${#fields.hasErrors('matKhau')} ? 'is-invalid'">
+                                            <button type="button" class="btn-toggle-password" data-target="matKhau">
+                                                <i class="far fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('matKhau')}" th:errors="*{matKhau}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="xacNhanMatKhau" class="form-label">Nhập lại mật khẩu</label>
+                                        <div class="password-input-wrapper">
+                                            <input type="password"
+                                                   class="form-control"
+                                                   id="xacNhanMatKhau"
+                                                   th:field="*{xacNhanMatKhau}"
+                                                   placeholder="Nhập lại để xác nhận"
+                                                   th:classappend="${#fields.hasErrors('xacNhanMatKhau')} ? 'is-invalid'">
+                                            <button type="button" class="btn-toggle-password" data-target="xacNhanMatKhau">
+                                                <i class="far fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('xacNhanMatKhau')}" th:errors="*{xacNhanMatKhau}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Terms Checkbox -->
+                            <div class="form-check-wrapper">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="dongYDieuKhoan"
+                                       th:field="*{dongYDieuKhoan}"
+                                       th:classappend="${#fields.hasErrors('dongYDieuKhoan')} ? 'is-invalid'">
+                                <label class="form-check-label" for="dongYDieuKhoan">
+                                    Tôi đồng ý với
+                                    <a href="#" class="text-primary">Điều khoản</a> &
+                                    <a href="#" class="text-primary">Chính sách bảo mật</a>
+                                </label>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('dongYDieuKhoan')}" th:errors="*{dongYDieuKhoan}"></div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-submit">
+                                    Tạo tài khoản
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-cancel" onclick="window.location.href='/'">
+                                    Hủy
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Login Link -->
+                        <div class="auth-footer-link">
+                            <p>Đã có tài khoản? <a th:href="@{/auth/login}">Đăng nhập</a></p>
+                        </div>
+
+                        <!-- Additional Info -->
+                        <div class="auth-additional-info">
+                            <p>Bằng cách đăng ký, bạn đồng ý với Điều khoản & Chính sách bảo mật của NiceStore (có thể tắt bất cứ lúc nào).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="auth-footer">
+        <p>© 2025 NiceStore</p>
+    </footer>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS -->
+<script th:src="@{/js/auth.js}"></script>
+</body>
+</html>
