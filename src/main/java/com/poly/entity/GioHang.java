@@ -1,18 +1,20 @@
 package com.poly.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table(name = "GioHang")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class GioHang {
 
     @Id
@@ -24,12 +26,65 @@ public class GioHang {
     @JoinColumn(name = "KhachHangId", nullable = false)
     private KhachHang khachHang;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "VariantId", nullable = false)
+    private SanPhamChiTiet variant;
 
-    @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai = 0;  // 0: mở, 1: đã đặt hàng
+    @Column(name = "SoLuong", nullable = false)
+    private Integer soLuong;
 
-    @OneToMany(mappedBy = "gioHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<GioHangChiTiet> chiTietList;
+    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "UpdatedAt")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Tính thành tiền
+     */
+    @Transient
+    public BigDecimal getThanhTien() {
+        if (variant != null && variant.getGiaBan() != null && soLuong != null) {
+            return variant.getGiaBan().multiply(new BigDecimal(soLuong));
+        }
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * Format thành tiền
+     */
+    @Transient
+    public String getThanhTienFormatted() {
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return formatter.format(getThanhTien());
+    }
+
+    /**
+     * Lấy tên sản phẩm
+     */
+    @Transient
+    public String getTenSanPham() {
+        return variant != null && variant.getSanPham() != null ?
+                variant.getSanPham().getTen() : "";
+    }
+
+    /**
+     * Lấy hình ảnh
+     */
+    @Transient
+    public String getHinhAnh() {
+        return variant != null ? variant.getHinhAnh() : null;
+    }
 }

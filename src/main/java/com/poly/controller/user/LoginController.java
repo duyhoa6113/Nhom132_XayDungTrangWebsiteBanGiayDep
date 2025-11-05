@@ -1,5 +1,6 @@
 package com.poly.controller.user;
 
+import com.poly.dto.ResetPasswordDTO;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import com.poly.dto.RegisterDTO;
 import com.poly.entity.KhachHang;
 import com.poly.service.LoginService;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -189,30 +191,203 @@ public class LoginController {
     }
 
     /**
-     * Xử lý yêu cầu quên mật khẩu (gửi email)
+     * Xử lý yêu cầu quên mật khẩu (gửi OTP qua email)
      * POST /forgot-password
      */
     @PostMapping("/forgot-password")
     public String forgotPassword(@Valid @ModelAttribute ForgotPasswordDTO forgotPasswordDTO,
                                  BindingResult bindingResult,
                                  Model model,
-                                 RedirectAttributes redirectAttributes) {
+                                 HttpSession session) {
 
         if (bindingResult.hasErrors()) {
             return "user/forgot-password";
         }
 
         try {
-            // TODO: Implement forgot password logic
-            // loginService.sendResetPasswordEmail(forgotPasswordDTO.getEmail());
+            String email = forgotPasswordDTO.getEmail();
+
+            // Kiểm tra email có tồn tại không
+            if (!loginService.emailExists(email)) {
+                model.addAttribute("errorMessage", "Email không tồn tại trong hệ thống");
+                return "user/forgot-password";
+            }
+
+            // Tạo OTP 6 số ngẫu nhiên
+            String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+
+            // Lưu OTP và email vào session (có hiệu lực 5 phút)
+            session.setAttribute("resetPasswordOTP", otp);
+            session.setAttribute("resetPasswordEmail", email);
+            session.setAttribute("otpCreatedTime", System.currentTimeMillis());
+
+            // Gửi OTP qua email
+            loginService.sendOTPEmail(email, otp);
+
+            log.info("✅ Đã gửi OTP đến email: {}", email);
+
+            // Chuyển đến trang xác minh OTP
+            return "redirect:/verify-otp";
+
+        } catch (Exception e) {
+            log.error("❌ Lỗi khi gửi OTP: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Có lỗi xảy ra. Vui lòng thử lại sau!");
+            return "user/forgot-password";
+        }
+    }
+
+    /**
+     * Hiển thị trang xác minh OTP
+     * GET /verify-otp
+     */
+    @GetMapping("/verify-otp")
+    public String showVerifyOTPPage(HttpSession session, Model model) {
+        // Kiểm tra có email trong session không
+        if (session.getAttribute("resetPasswordEmail") == null) {
+            return "redirect:/forgot-password";
+        }
+
+        model.addAttribute("email", session.getAttribute("resetPasswordEmail"));
+        return "user/verify-otp";
+    }
+
+    /**
+     * Xử lý xác minh OTP
+     * POST /verify-otp
+     */
+    @PostMapping("/verify-otp")
+    public String verifyOTP(@RequestParam String otp,
+                            HttpSession session,
+                            Model model) {
+
+        String sessionOTP = (String) session.getAttribute("resetPasswordOTP");
+        String email = (String) session.getAttribute("resetPasswordEmail");
+        Long otpCreatedTime = (Long) session.getAttribute("otpCreatedTime");
+
+        // Kiểm tra OTP có tồn tại không
+        if (sessionOTP == null || email == null) {
+            model.addAttribute("errorMessage", "Phiên làm việc đã hết hạn. Vui lòng thử lại.");
+            model.addAttribute("email", email);
+            return "user/verify-otp";
+        }
+
+        // Kiểm tra OTP có hết hạn không (5 phút = 300000ms)
+        if (System.currentTimeMillis() - otpCreatedTime > 300000) {
+            model.addAttribute("errorMessage", "OTP đã hết hạn. Vui lòng yêu cầu OTP mới.");
+            model.addAttribute("email", email);
+            return "user/verify-otp";
+        }
+
+        // Kiểm tra OTP có đúng không
+        if (!otp.equals(sessionOTP)) {
+            model.addAttribute("errorMessage", "OTP không chính xác. Vui lòng thử lại.");
+            model.addAttribute("email", email);
+            return "user/verify-otp";
+        }
+
+        // OTP đúng - chuyển đến trang đặt lại mật khẩu
+        session.setAttribute("otpVerified", true);
+        log.info("✅ Xác minh OTP thành công cho email: {}", email);
+        return "redirect:/reset-password";
+    }
+
+    /**
+     * Hiển thị trang đặt lại mật khẩu
+     * GET /reset-password
+     */
+    @GetMapping("/reset-password")
+    public String showResetPasswordPage(HttpSession session, Model model) {
+        // Kiểm tra đã xác minh OTP chưa
+        Boolean otpVerified = (Boolean) session.getAttribute("otpVerified");
+        if (otpVerified == null || !otpVerified) {
+            return "redirect:/forgot-password";
+        }
+
+        model.addAttribute("resetPasswordDTO", new ResetPasswordDTO());
+        return "user/reset-password";
+    }
+
+    /**
+     * Xử lý đặt lại mật khẩu
+     * POST /reset-password
+     */
+    @PostMapping("/reset-password")
+    public String resetPassword(@Valid @ModelAttribute ResetPasswordDTO resetPasswordDTO,
+                                BindingResult bindingResult,
+                                HttpSession session,
+                                Model model,
+                                RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "user/reset-password";
+        }
+
+        // Kiểm tra mật khẩu khớp
+        if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getConfirmPassword())) {
+            model.addAttribute("errorMessage", "Mật khẩu xác nhận không khớp!");
+            return "user/reset-password";
+        }
+
+        try {
+            String email = (String) session.getAttribute("resetPasswordEmail");
+
+            if (email == null) {
+                return "redirect:/forgot-password";
+            }
+
+            // Đặt lại mật khẩu
+            loginService.resetPassword(email, resetPasswordDTO.getNewPassword());
+
+            // Xóa thông tin trong session
+            session.removeAttribute("resetPasswordOTP");
+            session.removeAttribute("resetPasswordEmail");
+            session.removeAttribute("otpCreatedTime");
+            session.removeAttribute("otpVerified");
+
+            log.info("✅ Đặt lại mật khẩu thành công cho email: {}", email);
 
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư!");
+                    "✅ Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.");
             return "redirect:/login";
 
-        } catch (RuntimeException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "user/forgot-password";
+        } catch (Exception e) {
+            log.error("❌ Lỗi khi đặt lại mật khẩu: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Có lỗi xảy ra. Vui lòng thử lại!");
+            return "user/reset-password";
+        }
+    }
+
+    /**
+     * API gửi lại OTP
+     * POST /api/resend-otp
+     */
+    @PostMapping("/api/resend-otp")
+    @ResponseBody
+    public Map<String, String> resendOTP(HttpSession session) {
+        try {
+            String email = (String) session.getAttribute("resetPasswordEmail");
+
+            if (email == null) {
+                return Map.of("status", "error", "message", "Không tìm thấy email");
+            }
+
+            // Tạo OTP mới
+            String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+
+            // Cập nhật session
+            session.setAttribute("resetPasswordOTP", otp);
+            session.setAttribute("otpCreatedTime", System.currentTimeMillis());
+
+            // Gửi OTP
+            loginService.sendOTPEmail(email, otp);
+
+            log.info("✅ Đã gửi lại OTP đến email: {}", email);
+
+            return Map.of("status", "success", "message", "OTP đã được gửi lại");
+
+        } catch (Exception e) {
+            log.error("❌ Lỗi khi gửi lại OTP: {}", e.getMessage());
+            return Map.of("status", "error", "message", e.getMessage());
         }
     }
 

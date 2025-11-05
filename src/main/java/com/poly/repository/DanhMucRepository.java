@@ -1,27 +1,25 @@
 package com.poly.repository;
 
+import com.poly.entity.DanhMuc;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.poly.entity.DanhMuc;
-
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DanhMucRepository extends JpaRepository<DanhMuc, Integer> {
 
-    // Lấy tất cả danh mục đang hoạt động
-    List<DanhMuc> findByTrangThaiOrderByTenAsc(Byte trangThai);
+    Optional<DanhMuc> findByTen(String ten);
 
-    // Đếm số sản phẩm trong mỗi danh mục
-    @Query("""
-        SELECT dm.danhMucId, dm.ten, COUNT(sp.sanPhamId)
-        FROM DanhMuc dm
-        LEFT JOIN dm.sanPhamList sp
-        WHERE dm.trangThai = 1
-        GROUP BY dm.danhMucId, dm.ten
-        ORDER BY dm.ten ASC
-    """)
-    List<Object[]> countProductsByCategory();
+    List<DanhMuc> findByTrangThai(Byte trangThai);
+
+    List<DanhMuc> findByTenContainingIgnoreCase(String keyword);
+
+    boolean existsByTen(String ten);
+
+    @Query("SELECT COUNT(sp) FROM SanPham sp WHERE sp.danhMuc.danhMucId = :danhMucId")
+    long countSanPhamByDanhMucId(@Param("danhMucId") Integer danhMucId);
 }

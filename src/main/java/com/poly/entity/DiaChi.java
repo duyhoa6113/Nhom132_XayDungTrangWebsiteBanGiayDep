@@ -2,22 +2,16 @@ package com.poly.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Entity cho bảng DiaChi
- * Lưu thông tin địa chỉ giao hàng của khách hàng
- */
 @Entity
 @Table(name = "DiaChi")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class DiaChi {
 
     @Id
@@ -35,7 +29,7 @@ public class DiaChi {
     @Column(name = "SdtNhan", nullable = false, length = 20)
     private String sdtNhan;
 
-    @Column(name = "DiaChi", nullable = false, length = 255)
+    @Column(name = "DiaChi", nullable = false, length = 500)
     private String diaChi;
 
     @Column(name = "PhuongXa", length = 150)
@@ -48,10 +42,13 @@ public class DiaChi {
     private String tinhTP;
 
     @Column(name = "MacDinh", nullable = false)
-    private Boolean macDinh = false;
+    private Boolean macDinh;
 
-    @Column(name = "CreatedAt", nullable = false)
+    @Column(name = "CreatedAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "UpdatedAt")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
@@ -63,11 +60,18 @@ public class DiaChi {
         }
     }
 
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
     /**
-     * Lấy địa chỉ đầy đủ dạng chuỗi
+     * Lấy địa chỉ đầy đủ
      */
+    @Transient
     public String getDiaChiDayDu() {
-        StringBuilder sb = new StringBuilder(diaChi);
+        StringBuilder sb = new StringBuilder();
+        sb.append(diaChi);
         if (phuongXa != null && !phuongXa.isEmpty()) {
             sb.append(", ").append(phuongXa);
         }

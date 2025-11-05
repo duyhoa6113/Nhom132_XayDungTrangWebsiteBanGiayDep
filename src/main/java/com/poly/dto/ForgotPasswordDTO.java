@@ -1,17 +1,17 @@
 package com.poly.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ForgotPasswordDTO {
 
-    @NotBlank(message = "Email không được để trống")
+    @NotBlank(message = "Vui lòng nhập email")
     @Email(message = "Email không hợp lệ")
     private String email;
 }
+
+
