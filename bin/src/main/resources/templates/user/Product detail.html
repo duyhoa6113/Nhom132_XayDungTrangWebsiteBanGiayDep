@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/css/Product}">
+    <link rel="stylesheet" th:href="@{/css/Product detail.css}">
 </head>
 <body>
 
@@ -60,7 +60,71 @@
                     <i class="fas fa-shopping-bag"></i>
                     <span class="cart-badge">0</span>
                 </a>
-                <a href="/login" class="btn btn-primary btn-sm px-4">
+                <div th:if="${session.khachHang != null}" class="dropdown">
+                    <button class="btn-user-dropdown" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="user-name d-none d-lg-inline" th:text="${session.khachHangTen}">User Name</span>
+                        <i class="fas fa-chevron-down ms-2 d-none d-lg-inline"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userDropdown">
+                        <li class="dropdown-header">
+                            <div class="user-info">
+                                <div class="user-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-details">
+                                    <div class="user-name-large" th:text="${session.khachHangTen}">Nguyễn Văn A</div>
+                                    <div class="user-email" th:text="${session.khachHang.email}">user@example.com</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/profile">
+                                <i class="fas fa-user me-2"></i>
+                                Tài khoản của tôi
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/orders">
+                                <i class="fas fa-box me-2"></i>
+                                Đơn hàng
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/wishlist">
+                                <i class="fas fa-heart me-2"></i>
+                                Yêu thích
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/addresses">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                Địa chỉ giao hàng
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/settings">
+                                <i class="fas fa-cog me-2"></i>
+                                Cài đặt
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/templates/logout}">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- NÚT ĐĂNG NHẬP - CHỈ HIỂN THỊ KHI CHƯA ĐĂNG NHẬP -->
+                <!-- ============================================ -->
+                <a th:if="${session.khachHang == null}" th:href="@{/login}" class="btn btn-primary btn-sm px-4">
                     Đăng nhập
                 </a>
             </div>
@@ -486,7 +550,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Custom JavaScript -->
-<script th:src="@{/js/Product}"></script>
+<script th:src="@{/js/Product detail.css}"></script>
 
 </body>
 </html>
