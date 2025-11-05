@@ -96,7 +96,7 @@ public class HomeController {
         if (search != null && !search.trim().isEmpty()) {
             return homeService.searchProducts(search.trim(), page, size);
         } else if (category != null) {
-            return homeService.getProductsByCategory(category, page, size);
+            return homeService.getProductsByCategory(category, page, size); 
         } else {
             return homeService.getAllProducts(page, size);
         }
@@ -122,6 +122,6 @@ public class HomeController {
 
     @GetMapping("/cart")
     public String cartPage() {
-        return "Cart-page";
+        return "user/Cart";
     }
 }
