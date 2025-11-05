@@ -41,7 +41,7 @@ public class LoginController {
         }
 
         model.addAttribute("registerDTO", new RegisterDTO());
-        return "register";
+        return "user/register";
     }
 
     /**
@@ -56,7 +56,7 @@ public class LoginController {
 
         // Kiểm tra validation errors
         if (bindingResult.hasErrors()) {
-            return "register";
+            return "user/register";
         }
 
         try {
@@ -72,7 +72,7 @@ public class LoginController {
             // Lỗi - hiển thị thông báo lỗi
             log.error("Lỗi khi đăng ký: {}", e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
-            return "register";
+            return "user/register";
         }
     }
 
@@ -92,7 +92,7 @@ public class LoginController {
         }
 
         model.addAttribute("loginDTO", new LoginDTO());
-        return "login";
+        return "user/login";
     }
 
     /**
@@ -108,7 +108,7 @@ public class LoginController {
 
         // Kiểm tra validation errors
         if (bindingResult.hasErrors()) {
-            return "login";
+            return "user/login";
         }
 
         try {
@@ -118,7 +118,7 @@ public class LoginController {
             if (khachHangOpt.isEmpty()) {
                 // Đăng nhập thất bại
                 model.addAttribute("errorMessage", "Email hoặc mật khẩu không chính xác");
-                return "login";
+                return "user/login";
             }
 
             // Đăng nhập thành công - lưu thông tin vào session
@@ -144,7 +144,7 @@ public class LoginController {
         } catch (Exception e) {
             log.error("Lỗi khi đăng nhập: {}", e.getMessage());
             model.addAttribute("errorMessage", "Có lỗi xảy ra. Vui lòng thử lại!");
-            return "login";
+            return "user/login";
         }
     }
 
@@ -185,7 +185,7 @@ public class LoginController {
     public String showForgotPasswordPage(Model model) {
         log.info("Displaying forgot password page");
         model.addAttribute("forgotPasswordDTO", new ForgotPasswordDTO());
-        return "forgot-password";
+        return "user/forgot-password";
     }
 
     /**
@@ -199,7 +199,7 @@ public class LoginController {
                                  RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            return "forgot-password";
+            return "user/forgot-password";
         }
 
         try {
@@ -212,7 +212,7 @@ public class LoginController {
 
         } catch (RuntimeException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "forgot-password";
+            return "user/forgot-password";
         }
     }
 

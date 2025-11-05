@@ -47,7 +47,7 @@ public class ProductController {
             // List<ProductHomeDTO> relatedProducts = productService.getRelatedProducts(id);
             // model.addAttribute("relatedProducts", relatedProducts);
 
-            return "Product detail";
+            return "user/Product detail";
 
         } catch (Exception e) {
             // Log error
