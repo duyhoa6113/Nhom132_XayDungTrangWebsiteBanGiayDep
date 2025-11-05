@@ -2,6 +2,7 @@ package com.poly.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ public class LoginService {
 
     private final KhachHangRepository khachHangRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final JavaMailSender mailSender;
     // ============================================
     // ĐĂNG KÝ - REGISTER
     // ============================================
@@ -208,28 +209,69 @@ public class LoginService {
         log.info("Đổi mật khẩu thành công cho khách hàng ID: {}", khachHangId);
     }
 
+
+
     // ============================================
-    // QUÊN MẬT KHẨU (TODO: Implement với Email Service)
+    // QUÊN MẬT KHẨU - OTP
     // ============================================
+
 
     /**
-     * Gửi email khôi phục mật khẩu
-     * TODO: Implement với Email Service
-     *
-     * @param email Email khách hàng
+     * Gửi OTP qua email
      */
-    public void sendResetPasswordEmail(String email) {
-        log.info("Gửi email khôi phục mật khẩu cho: {}", email);
+    public void sendOTPEmail(String email, String otp) throws jakarta.mail.MessagingException {
+        log.info("Gửi OTP đến email: {}", email);
 
-        Optional<KhachHang> khachHangOpt = getKhachHangByEmail(email);
-        if (khachHangOpt.isEmpty()) {
-            throw new RuntimeException("Email không tồn tại trong hệ thống");
-        }
+        jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
+        org.springframework.mail.javamail.MimeMessageHelper helper =
+                new org.springframework.mail.javamail.MimeMessageHelper(message, true, "UTF-8");
 
-        // TODO: Generate reset token
-        // TODO: Save token to database
-        // TODO: Send email with reset link
+        helper.setFrom("lyducq132@gmail.com");
+        helper.setTo(email);
+        helper.setSubject("🔐 Mã OTP Đặt Lại Mật Khẩu - NiceSport");
 
-        log.warn("Chức năng gửi email chưa được implement");
+        String htmlContent = """
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+                    .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 10px; }
+                    .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .otp-code { font-size: 36px; font-weight: bold; color: #667eea; text-align: center; padding: 20px; background: #f0f4ff; border-radius: 10px; margin: 20px 0; letter-spacing: 5px; }
+                    .content { padding: 30px; color: #333; }
+                    .warning { color: #f44336; font-weight: bold; margin-top: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>🔐 Xác Minh OTP</h1>
+                    </div>
+                    <div class="content">
+                        <p>Mã OTP của bạn là:</p>
+                        <div class="otp-code">%s</div>
+                        <p class="warning">⚠️ Mã OTP chỉ có hiệu lực trong 5 phút.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(otp);
+
+        helper.setText(htmlContent, true);
+        mailSender.send(message);
+    }
+
+    /**
+     * Đặt lại mật khẩu
+     */
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        log.info("Đặt lại mật khẩu cho email: {}", email);
+
+        KhachHang khachHang = khachHangRepository.findByEmail(email.toLowerCase().trim())
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
+
+        khachHang.setMatKhauHash(passwordEncoder.encode(newPassword));
+        khachHangRepository.save(khachHang);
     }
 }
