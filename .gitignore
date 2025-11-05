@@ -1,33 +1,56 @@
-HELP.md
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+*.log
+*.hprof
+hs_err_pid*
+replay_pid*
+
+# Build outputs (all modules)
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+**/target/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+**/build/
+out/
+**/out/
+bin/
+**/bin/
 
-### VS Code ###
+# Maven
+.mvn/timing.properties
+# keep wrapper files – KHÔNG ignore các file này
+!mvnw
+!mvnw.cmd
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+gradle.lockfile
+
+# Spring Boot logs/tmp
+logs/
+spring.log
+tmp/
+*.pid
+
+# Config/Secrets
+# application-*.local.properties
+# application-*.local.yml
+# application-local.properties
+# application-local.yml
+# .env
+# .env.*
+# secrets/**
+
+# IDEs
+.idea/
+*.iml
+.project
+.classpath
+.settings/
 .vscode/
