@@ -10,10 +10,6 @@ import java.util.Optional;
 @Repository
 public interface KhachHangRepository extends JpaRepository<KhachHang, Integer> {
 
-    // ============================================
-    // CÁC PHƯƠNG THỨC CƠ BẢN
-    // ============================================
-
     /**
      * Tìm khách hàng theo email
      */

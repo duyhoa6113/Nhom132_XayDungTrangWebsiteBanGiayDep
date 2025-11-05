@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - NiceSport</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <script th:src="@{/js/login.js}"></script>
+</head>
+<body>
+<div class="login-container">
+    <!-- Left Side - Welcome -->
+    <div class="login-left">
+        <div class="decorative-circles">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+        </div>
+
+        <div style="position: relative; z-index: 1;">
+            <div class="brand-logo">
+                <i class="fas fa-running"></i>
+                <span>NiceSport</span>
+            </div>
+
+            <div class="welcome-content">
+                <h1>
+                    Chào mừng trở lại!
+                    <span class="highlight">Nice to see you 👋</span>
+                </h1>
+                <p>
+                    Đăng nhập để tiếp tục mua sắm và trải nghiệm những sản phẩm
+                    thể thao chất lượng cao với ưu đãi hấp dẫn.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="feature-text">
+                            Miễn phí ship cho đơn 500K+
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="feature-text">
+                            Ưu đãi độc quyền thành viên
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="feature-text">
+                            Tích điểm mỗi đơn hàng
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="feature-text">
+                            Hỗ trợ 24/7
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <p>"Sản phẩm chất lượng, giao hàng nhanh. Tôi rất hài lòng với trải nghiệm mua sắm tại NiceSport!"</p>
+                    <div class="author">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>- Nguyễn Văn A, Khách hàng thân thiết</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="login-right">
+        <a th:href="@{/Index}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Về trang chủ
+        </a>
+
+        <div class="login-header">
+            <h2>Đăng nhập</h2>
+            <p>Nhập thông tin đăng nhập của bạn</p>
+        </div>
+
+        <!-- Social Login -->
+        <div class="social-login">
+            <button type="button" class="social-btn google" onclick="socialLogin('google')">
+                <i class="fab fa-google"></i>
+            </button>
+            <button type="button" class="social-btn facebook" onclick="socialLogin('facebook')">
+                <i class="fab fa-facebook-f"></i>
+            </button>
+            <button type="button" class="social-btn apple" onclick="socialLogin('apple')">
+                <i class="fab fa-apple"></i>
+            </button>
+        </div>
+
+        <div class="divider">
+            <span>Hoặc đăng nhập bằng email</span>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Login Form -->
+        <form th:action="@{/login}" th:object="${loginDTO}" method="post" id="loginForm">
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email"
+                       class="form-control"
+                       id="email"
+                       name="email"
+                       th:field="*{email}"
+                       placeholder="your@email.com"
+                       required
+                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="matKhau" class="form-label">Mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password"
+                           class="form-control"
+                           id="matKhau"
+                           name="matKhau"
+                           th:field="*{matKhau}"
+                           placeholder="••••••••"
+                           required
+                           th:classappend="${#fields.hasErrors('matKhau')} ? 'is-invalid'">
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('matKhau')}" th:errors="*{matKhau}"></div>
+            </div>
+
+            <!-- Remember & Forgot -->
+            <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox"
+                           id="ghiNhoDangNhap"
+                           name="ghiNhoDangNhap"
+                           th:field="*{ghiNhoDangNhap}">
+                    <label for="ghiNhoDangNhap">Ghi nhớ đăng nhập</label>
+                </div>
+                <a th:href="@{/forgot-password}" class="forgot-link">Quên mật khẩu?</a>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="btn-text">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Đăng nhập
+                    </span>
+                <span class="btn-loading">
+                        <i class="fas fa-spinner"></i>
+                        Đang xử lý...
+                    </span>
+            </button>
+
+            <!-- Register Link -->
+            <div class="register-link">
+                Chưa có tài khoản? <a th:href="@{/register}">Đăng ký ngay</a>
+            </div>
+
+            <!-- Security Badge -->
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>Bảo mật thông tin với mã hóa SSL 256-bit</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

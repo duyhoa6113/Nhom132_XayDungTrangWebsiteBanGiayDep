@@ -1,46 +1,33 @@
 package com.poly.repository;
 
+import com.poly.entity.GioHangChiTiet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.poly.entity.GioHangChiTiet;
-
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository cho entity GioHangChiTiet
+ */
 @Repository
 public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, Integer> {
 
     /**
-     * Tìm tất cả items trong một giỏ hàng
+     * Tìm chi tiết giỏ hàng theo giỏ hàng và variant
      */
-    List<GioHangChiTiet> findByGioHang_GioHangId(Integer gioHangId);
-
-    /**
-     * Tìm một item cụ thể trong giỏ hàng
-     */
-    Optional<GioHangChiTiet> findByGioHang_GioHangIdAndVariant_VariantId(
-            Integer gioHangId,
-            Integer variantId
+    @Query("SELECT ct FROM GioHangChiTiet ct " +
+            "WHERE ct.gioHang.gioHangId = :gioHangId " +
+            "AND ct.variant.variantId = :variantId")
+    Optional<GioHangChiTiet> findByGioHangIdAndVariantId(
+            @Param("gioHangId") Integer gioHangId,
+            @Param("variantId") Integer variantId
     );
 
     /**
-     * Đếm số items trong giỏ hàng
+     * Xóa tất cả chi tiết của một giỏ hàng
      */
-    @Query("SELECT COUNT(ghct) FROM GioHangChiTiet ghct WHERE ghct.gioHang.gioHangId = :gioHangId")
-    Long countByGioHangId(@Param("gioHangId") Integer gioHangId);
-
-    /**
-     * Tính tổng tiền trong giỏ hàng
-     */
-    @Query("SELECT COALESCE(SUM(ghct.thanhTien), 0) FROM GioHangChiTiet ghct WHERE ghct.gioHang.gioHangId = :gioHangId")
-    BigDecimal getTotalAmount(@Param("gioHangId") Integer gioHangId);
-
-    /**
-     * Xóa tất cả items trong giỏ hàng
-     */
-    void deleteByGioHang_GioHangId(Integer gioHangId);
+    @Query("DELETE FROM GioHangChiTiet ct WHERE ct.gioHang.gioHangId = :gioHangId")
+    void deleteAllByGioHangId(@Param("gioHangId") Integer gioHangId);
 }

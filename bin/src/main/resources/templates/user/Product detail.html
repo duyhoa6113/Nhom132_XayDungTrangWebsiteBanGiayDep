@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.ten} + ' - NiceSport'">Chi tiết sản phẩm - NiceSport</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/Product}">
+</head>
+<body>
+
+<!-- Header / Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
+            <div class="logo-icon">
+                <i class="fas fa-running"></i>
+            </div>
+            <span class="logo-text ms-2">NiceSport</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/static">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/static#products">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/static#categories">Danh mục</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/static#contact">Liên hệ</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-icon">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a href="#" class="btn-icon position-relative">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="/cart" class="btn-icon position-relative">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge">0</span>
+                </a>
+                <a href="/login" class="btn btn-primary btn-sm px-4">
+                    Đăng nhập
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/static">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/static#products">Sản phẩm</a></li>
+                <li class="breadcrumb-item" th:if="${product.danhMucId != null}">
+                    <a th:href="@{/(category=${product.danhMucId})}"
+                       th:text="${product.danhMucTen}">Danh mục</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${product.ten}">Sản phẩm</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Product Detail Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Product Images -->
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="product-gallery">
+                    <!-- Main Image -->
+                    <div class="main-image-wrapper">
+                        <div class="product-badges">
+                            <span class="badge bg-danger" th:if="${product.tyLeGiamGia > 0}">
+                                -<span th:text="${product.tyLeGiamGia}">15</span>%
+                            </span>
+                            <span class="badge bg-success" th:if="${product.soLuongTon > 0}">
+                                Còn hàng
+                            </span>
+                            <span class="badge bg-secondary" th:if="${product.soLuongTon == 0}">
+                                Hết hàng
+                            </span>
+                        </div>
+
+                        <img th:if="${product.hinhAnhChinh != null}"
+                             th:src="${product.hinhAnhChinh}"
+                             th:alt="${product.ten}"
+                             class="main-product-image"
+                             id="">
+                        <img th:if="${product.hinhAnhChinh == null}"
+                             src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
+                             alt="Product"
+                             class="main-product-image"
+                             id="">
+
+                        <!-- Zoom Icon -->
+                        <button class="btn-zoom" data-bs-toggle="modal" data-bs-target="#imageModal">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Thumbnail Images -->
+                    <div class="thumbnail-images">
+                        <div class="thumbnail-wrapper">
+                            <img th:if="${product.hinhAnhChinh != null}"
+                                 th:src="${product.hinhAnhChinh}"
+                                 th:alt="${product.ten}"
+                                 class="thumbnail-image active"
+                                 onclick="changeMainImage(this.src)">
+                            <img th:if="${product.hinhAnhChinh == null}"
+                                 src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200"
+                                 class="thumbnail-image active"
+                                 onclick="changeMainImage(this.src)">
+                        </div>
+
+                        <!-- Ảnh phụ -->
+                        <div class="thumbnail-wrapper" th:each="img : ${product.hinhAnhPhu}">
+                            <img th:src="${img}"
+                                 th:alt="${product.ten}"
+                                 class="thumbnail-image"
+                                 onclick="changeMainImage(this.src)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-lg-6">
+                <div class="product-info">
+                    <!-- Brand & Rating -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="product-brand-badge" th:text="${product.thuongHieuTen}">Nike</span>
+                        <div class="product-rating">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                            <span class="text-muted ms-2">(4.5/5)</span>
+                        </div>
+                    </div>
+
+                    <!-- Product Title -->
+                    <h1 class="product-title mb-3" th:text="${product.ten}">Nike Air Max 270</h1>
+
+                    <!-- Product Code & Status -->
+                    <div class="product-meta mb-3">
+                        <span class="me-3">
+                            <i class="fas fa-barcode me-1"></i>
+                            Mã: <span th:text="${product.sanPhamId}">SP001</span>
+                        </span>
+                        <span class="me-3" th:if="${product.soLuongTon > 0}">
+                            <i class="fas fa-check-circle text-success me-1"></i>
+                            Còn <span th:text="${product.soLuongTon}">50</span> sản phẩm
+                        </span>
+                        <span th:if="${product.soLuongTon == 0}">
+                            <i class="fas fa-times-circle text-danger me-1"></i>
+                            Hết hàng
+                        </span>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="product-price-section mb-4">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <span class="product-price-large" id="currentPrice" th:text="${product.giaMinFormatted} + '₫'">2,890,000₫</span>
+                            <span class="product-price-old-large"
+                                  th:if="${product.giaGocMin != null}"
+                                  th:text="${product.giaGocMinFormatted} + '₫'">3,490,000₫</span>
+                        </div>
+                        <div class="price-save" th:if="${product.tyLeGiamGia > 0}">
+                            <i class="fas fa-tag me-1"></i>
+                            Tiết kiệm: <span th:text="${product.tienTietKiem}">600,000</span>₫
+                            (<span th:text="${product.tyLeGiamGia}">17</span>%)
+                        </div>
+                    </div>
+
+                    <!-- Color Selection -->
+                    <div class="color-selection mb-4">
+                        <label class="form-label mb-2 fw-bold">Màu sắc:</label>
+                        <div class="color-options" id="colorOptions">
+                            <!-- Loop qua các màu duy nhất -->
+                            <div th:each="color : ${uniqueColors}"
+                                 class="color-option"
+                                 th:attr="data-color=${color}"
+                                 onclick="selectColor(this)">
+                                <span th:text="${color}">Đen</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Size Selection -->
+                    <div class="size-selection mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label mb-0 fw-bold">Chọn size:</label>
+                            <a href="#" class="size-guide-link" data-bs-toggle="modal" data-bs-target="#sizeGuideModal">
+                                <i class="fas fa-ruler me-1"></i>Hướng dẫn chọn size
+                            </a>
+                        </div>
+                        <div class="size-options" id="sizeOptions">
+                            <!-- Loop qua các size từ database -->
+                            <div th:each="variant : ${product.variants}"
+                                 class="size-option"
+                                 th:classappend="${variant.soLuongTon == 0} ? 'disabled' : ''"
+                                 th:attr="data-variant-id=${variant.variantId},
+                                          data-size=${variant.kichThuocTen},
+                                          data-color=${variant.mauSacTen},
+                                          data-price=${variant.giaBan},
+                                          data-price-formatted=${variant.giaBanFormatted},
+                                          data-stock=${variant.soLuongTon}"
+                                 style="display: none;"
+                                 onclick="selectVariant(this)">
+                                <span th:text="${variant.kichThuocTen}">40</span>
+                            </div>
+                        </div>
+                        <small class="text-muted" id="sizeHint">Vui lòng chọn màu sắc trước</small>
+                    </div>
+
+                    <!-- Quantity Selection -->
+                    <div class="quantity-selection mb-4">
+                        <label class="form-label fw-bold mb-3">Số lượng:</label>
+                        <div class="quantity-input">
+                            <button type="button" class="btn-quantity" onclick="decreaseQuantity()">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" class="form-control" id="quantity" value="1" min="1" max="99" readonly>
+                            <button type="button" class="btn-quantity" onclick="increaseQuantity()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons mb-4">
+                        <button class="btn btn-primary btn-lg btn-add-cart"
+                                id="addToCartBtn"
+                                onclick="addToCart()"
+                                disabled>
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            <span>Thêm vào giỏ hàng</span>
+                        </button>
+                        <button class="btn btn-outline-danger btn-lg btn-wishlist" onclick="addToWishlist()">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+
+                    <!-- Buy Now Button -->
+                    <button class="btn btn-dark btn-lg w-100 mb-4"
+                            id="buyNowBtn"
+                            onclick="buyNow()"
+                            disabled>
+                        <i class="fas fa-bolt me-2"></i>Mua ngay
+                    </button>
+
+                    <!-- Product Features -->
+                    <div class="product-features">
+                        <div class="feature-item">
+                            <i class="fas fa-shipping-fast text-primary"></i>
+                            <div>
+                                <strong>Miễn phí vận chuyển</strong>
+                                <p class="text-muted small mb-0">Cho đơn hàng trên 500K</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt text-success"></i>
+                            <div>
+                                <strong>Bảo hành chính hãng</strong>
+                                <p class="text-muted small mb-0">12 tháng đổi trả</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-undo-alt text-info"></i>
+                            <div>
+                                <strong>Đổi trả miễn phí</strong>
+                                <p class="text-muted small mb-0">Trong vòng 7 ngày</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle text-warning"></i>
+                            <div>
+                                <strong>Hàng chính hãng 100%</strong>
+                                <p class="text-muted small mb-0">Cam kết hàng real</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details Tabs -->
+        <div class="product-tabs mt-5">
+            <ul class="nav nav-tabs nav-tabs-custom mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
+                            data-bs-target="#description" type="button" role="tab">
+                        <i class="fas fa-align-left me-2"></i>Mô tả sản phẩm
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="specifications-tab" data-bs-toggle="tab"
+                            data-bs-target="#specifications" type="button" role="tab">
+                        <i class="fas fa-list me-2"></i>Chi Tiết Sản Phẩm
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="shipping-tab" data-bs-toggle="tab"
+                            data-bs-target="#shipping" type="button" role="tab">
+                        <i class="fas fa-truck me-2"></i>Vận chuyển & Đổi trả
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Description Tab -->
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <div class="tab-content-box">
+                        <h4 class="mb-3">Mô tả sản phẩm</h4>
+                        <div th:utext="${product.moTa}">
+                            <p>Mô tả chi tiết sản phẩm từ database...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specifications Tab -->
+                <div class="tab-pane fade" id="specifications" role="tabpanel">
+                    <div class="tab-content-box">
+                        <h4 class="mb-4">Thông số kỹ thuật</h4>
+                        <table class="table table-bordered specifications-table">
+                            <tr>
+                                <td class="fw-bold" style="width: 200px;">Thương hiệu</td>
+                                <td th:text="${product.thuongHieuTen}">Nike</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Danh mục</td>
+                                <td th:text="${product.danhMucTen}">Giày chạy bộ</td>
+                            </tr>
+                            <tr th:if="${product.chatLieuTen != null}">
+                                <td class="fw-bold">Chất liệu</td>
+                                <td th:text="${product.chatLieuTen}">Vải mesh thoáng khí</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Shipping Tab -->
+                <div class="tab-pane fade" id="shipping" role="tabpanel">
+                    <div class="tab-content-box">
+                        <h4 class="mb-4">Chính sách vận chuyển & Đổi trả</h4>
+
+                        <div class="mb-4">
+                            <h5><i class="fas fa-shipping-fast text-primary me-2"></i>Vận chuyển</h5>
+                            <ul>
+                                <li>Miễn phí vận chuyển cho đơn hàng từ 500.000₫</li>
+                                <li>Giao hàng toàn quốc</li>
+                                <li>Thời gian giao hàng: 2-5 ngày làm việc</li>
+                                <li>Hỗ trợ giao hàng nhanh trong nội thành</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5><i class="fas fa-undo-alt text-info me-2"></i>Chính sách đổi trả</h5>
+                            <ul>
+                                <li>Đổi trả trong vòng 7 ngày kể từ ngày nhận hàng</li>
+                                <li>Sản phẩm còn nguyên tem, mác, chưa qua sử dụng</li>
+                                <li>Miễn phí đổi trả cho sản phẩm lỗi</li>
+                                <li>Hoàn tiền trong 5-7 ngày làm việc</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h5><i class="fas fa-shield-alt text-success me-2"></i>Bảo hành</h5>
+                            <ul>
+                                <li>Bảo hành 12 tháng đối với lỗi nhà sản xuất</li>
+                                <li>Hỗ trợ bảo hành tại các chi nhánh toàn quốc</li>
+                                <li>Cam kết hàng chính hãng 100%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img th:src="${product.hinhAnhChinh}"
+                     th:alt="${product.ten}"
+                     class="img-fluid"
+                     style="max-height: 80vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Size Guide Modal -->
+<div class="modal fade" id="sizeGuideModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hướng dẫn chọn size</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <img src="https://via.placeholder.com/800x500?text=Size+Guide"
+                     class="img-fluid"
+                     alt="Size Guide">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="logo-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <span class="logo-text ms-2">NiceSport</span>
+                </div>
+                <p class="text-muted">Cửa hàng giày thể thao chính hãng, uy tín hàng đầu Việt Nam</p>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h6 class="footer-title">Sản Phẩm</h6>
+                <ul class="footer-links">
+                    <li><a href="/static#products">Giày Nam</a></li>
+                    <li><a href="/static#products">Giày Nữ</a></li>
+                    <li><a href="/static#products">Giày Chạy Bộ</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h6 class="footer-title">Hỗ Trợ</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="#">Chính sách đổi trả</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <h6 class="footer-title">Liên Hệ</h6>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-phone me-2"></i> Hotline: 1900-xxxx</li>
+                    <li><i class="fas fa-envelope me-2"></i> support@nicesport.vn</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+        <div class="text-center text-muted">
+            <p class="mb-0">© 2025 NiceSport. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script th:src="@{/js/Product}"></script>
+
+</body>
+</html>

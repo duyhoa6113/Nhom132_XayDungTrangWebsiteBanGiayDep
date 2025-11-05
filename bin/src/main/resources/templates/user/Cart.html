@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng - Shop Online</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" th:href="@{/css/Cart.css}">
+    <script th:src="@{/js/Cart.js}"></script>
+</head>
+<body>
+<!-- Header -->
+<header th:replace="~{fragments/header :: header}"></header>
+
+<!-- Main Content -->
+<div class="cart-container">
+    <!-- Header -->
+    <div class="cart-header">
+        <h1>Giỏ hàng của bạn</h1>
+        <button class="btn-clear-cart">
+            <i class="fas fa-trash"></i> Xóa tất cả
+        </button>
+    </div>
+
+    <!-- Cart Items -->
+    <div id="cart-items-container">
+        <!-- Items sẽ được render bằng JavaScript -->
+        <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i> Đang tải...
+        </div>
+    </div>
+
+    <!-- Cart Summary -->
+    <div id="cart-summary" style="display: none;">
+        <h3>Tổng kết đơn hàng</h3>
+
+        <div class="summary-row">
+            <span class="summary-label">Số lượng sản phẩm:</span>
+            <span class="summary-value" id="total-items">0</span>
+        </div>
+
+        <div class="summary-row discount">
+            <span class="summary-label">Tiết kiệm:</span>
+            <span class="summary-value" id="total-discount">0đ</span>
+        </div>
+
+        <div class="summary-row total">
+            <span class="summary-label">Tổng cộng:</span>
+            <span class="summary-value" id="total-price">0đ</span>
+        </div>
+
+        <button class="btn-checkout" onclick="window.location.href='/checkout'">
+            <i class="fas fa-shopping-bag"></i> Tiến hành đặt hàng
+        </button>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/products" style="color: #666; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="/js/cart.js"></script>
+</body>
+</html>

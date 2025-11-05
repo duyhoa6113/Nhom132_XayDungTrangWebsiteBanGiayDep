@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "KhuyenMaiVariant", schema = "dbo",
+@Table(name = "KhuyenMai_Variant", schema = "dbo",
         uniqueConstraints = @UniqueConstraint(name="UQ_KM_Variant", columnNames = {"KhuyenMaiId","VariantId"}))
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class KhuyenMaiVariant {
