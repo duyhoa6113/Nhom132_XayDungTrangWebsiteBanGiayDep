@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>NiceSport • Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/index.css}" rel="stylesheet">
+    <link th:href="@{/css/admin/index.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div id="adminShell" class="admin-shell">
+        <!-- Sidebar -->
+        <div th:replace="~{/components/adminSidebar.html}"></div>
+
+        <!-- Main content -->
+        <main class="admin-content">
+            <div class="content-header">
+                <div class="title" id="pageTitle">Dashboard</div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/Index}" class="btn btn-outline-dark btn-sm"><i
+                            class="fa-solid fa-house me-2"></i>Trang chính</a>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="tab-toolbar" id="tabToolbar">
+                    <!-- Sẽ thay theo module: List / Form -->
+                    <button class="btn btn-primary btn-sm" data-tab="list"><i
+                            class="fa-regular fa-rectangle-list me-1"></i>Danh sách</button>
+                    <button class="btn btn-outline-secondary btn-sm" data-tab="form"><i
+                            class="fa-solid fa-plus me-1"></i>Thêm / Sửa</button>
+                    <div class="ms-auto small text-muted" id="tabHint">Chọn module ở sidebar</div>
+                </div>
+                <div class="content-body">
+                    <!-- vùng chứa nội dung động -->
+                    <div id="tabContainer">
+                        <!-- mặc định hiển thị dashboard -->
+                        <div id="pane-dashboard">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded-3 border" style="background:var(--light-bg)">
+                                        <div class="fw-bold">Doanh thu hôm nay</div>
+                                        <div class="fs-3 mt-1">₫0</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded-3 border" style="background:var(--light-bg)">
+                                        <div class="fw-bold">Đơn hàng</div>
+                                        <div class="fs-3 mt-1">0</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 rounded-3 border" style="background:var(--light-bg)">
+                                        <div class="fw-bold">Sản phẩm</div>
+                                        <div class="fs-3 mt-1">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Các pane động (products/categories/orders/account/role) sẽ được inject -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const state = {
+            module: 'dashboard',
+            tab: 'list',
+            payload: null
+        };
+
+        const pageTitle = document.getElementById('pageTitle');
+        const tabContainer = document.getElementById('tabContainer');
+        const tabHint = document.getElementById('tabHint');
+
+        const partials = (m) => ({
+            list: `/admin/${m}/_list.html`,
+            form: `/admin/${m}/_form.html`,
+            index: `/admin/${m}/index.html`
+        });
+
+        async function renderModule() {
+            tabHint.textContent = '';
+            pageTitle.textContent = titleOf(state.module);
+
+            if (state.module === 'dashboard') {
+                tabContainer.innerHTML = document.getElementById('pane-dashboard').outerHTML;
+                return;
+            }
+
+            const urls = partials(state.module);
+
+            tabContainer.innerHTML = `
+        <div id="pane-list" class="${state.tab === 'list' ? '' : 'hidden'}"></div>
+        <div id="pane-form" class="${state.tab === 'form' ? '' : 'hidden'}"></div>
+      `;
+
+            try {
+                const resL = await fetch(urls.list, { headers: { 'X-Requested-With': 'fetch' } });
+                document.getElementById('pane-list').innerHTML = await resL.text();
+            } catch { document.getElementById('pane-list').innerHTML = `<div class="text-muted">Chưa có _list.html</div>`; }
+
+            try {
+                const resF = await fetch(urls.form, { headers: { 'X-Requested-With': 'fetch' } });
+                document.getElementById('pane-form').innerHTML = await resF.text();
+            } catch { document.getElementById('pane-form').innerHTML = `<div class="text-muted">Chưa có _form.html</div>`; }
+
+            if (state.payload) {
+                window.dispatchEvent(new CustomEvent('admin:form:load', { detail: state.payload }));
+                state.payload = null;
+            }
+        }
+
+        function titleOf(m) {
+            switch (m) {
+                case 'products': return 'Quản lý Sản phẩm';
+                case 'categories': return 'Quản lý Danh mục';
+                case 'orders': return 'Quản lý Đơn hàng';
+                case 'account': return 'Quản lý Tài khoản';
+                case 'role': return 'Phân quyền';
+                default: return 'Dashboard';
+            }
+        }
+
+        window.addEventListener('admin:navigate', (e) => {
+            state.module = e.detail.target || 'dashboard';
+            state.tab = (state.module === 'dashboard') ? 'list' : 'list';
+            renderModule();
+        });
+
+        // Toolbar: đổi tab
+        document.getElementById('tabToolbar').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-tab]');
+            if (!btn) return;
+            state.tab = btn.getAttribute('data-tab');
+            const listPane = document.getElementById('pane-list');
+            const formPane = document.getElementById('pane-form');
+            if (listPane && formPane) {
+                listPane.classList.toggle('hidden', state.tab !== 'list');
+                formPane.classList.toggle('hidden', state.tab !== 'form');
+            }
+            document.querySelectorAll('#tabToolbar [data-tab]').forEach(b => {
+                if (b.getAttribute('data-tab') === state.tab) b.classList.replace('btn-outline-secondary', 'btn-primary');
+                else b.classList.replace('btn-primary', 'btn-outline-secondary');
+            });
+        });
+
+        window.addEventListener('admin:edit', (e) => {
+            state.tab = 'form';
+            state.payload = e.detail;
+            document.querySelector('#tabToolbar [data-tab="form"]').click();
+            const isFormReady = !!document.getElementById('pane-form');
+            if (isFormReady) {
+                window.dispatchEvent(new CustomEvent('admin:form:load', { detail: state.payload }));
+                state.payload = null;
+            }
+        });
+
+        renderModule();
+    </script>
+</body>
+
+</html>

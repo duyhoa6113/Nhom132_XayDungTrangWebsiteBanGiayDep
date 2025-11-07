@@ -1,0 +1,104 @@
+.admin-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.admin-sidebar {
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+}
+
+.admin-brand .logo-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.admin-nav {
+  margin-top: 1rem;
+}
+
+.admin-nav .nav-item {
+  list-style: none;
+}
+
+.admin-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0.25rem 0;
+  color: var(--text-primary);
+  border-radius: 12px;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.admin-nav .nav-link:hover {
+  background: var(--light-bg);
+  color: var(--primary-color);
+  transform: translateX(2px);
+}
+
+.admin-nav .nav-link.active {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.admin-nav .nav-link i {
+  width: 20px;
+  text-align: center;
+}
+
+.admin-footer {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+}
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  font-weight: 600;
+  transition: var(--transition);
+  gap: 0.5rem;
+}
+
+.sidebar-toggle:hover {
+  background: var(--light-bg);
+}
+
+/* Collapsed */
+.admin-shell.collapsed {
+  grid-template-columns: 84px 1fr;
+}
+
+.admin-shell.collapsed .admin-brand .logo-text,
+.admin-shell.collapsed .admin-nav .text,
+.admin-shell.collapsed .admin-footer .text {
+  display: none;
+}
+
+.admin-shell.collapsed .admin-nav .nav-link {
+  justify-content: center;
+}

@@ -26,7 +26,7 @@ public class HomeController {
     private final HomeService homeService;
     private final YeuThichService yeuThichService;
 
-    @GetMapping({ "/Index"})
+    @GetMapping({"/", "/Index"})
     public String index(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
