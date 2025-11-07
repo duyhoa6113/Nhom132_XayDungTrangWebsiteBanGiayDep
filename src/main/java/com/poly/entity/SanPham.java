@@ -1,28 +1,31 @@
 package com.poly.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
+/**
+ * Entity cho bảng SanPham
+ *
+ * @author Nhóm 132
+ */
 @Entity
 @Table(name = "SanPham")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class SanPham {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SanPhamId")
     private Integer sanPhamId;
+
+    // ============================================
+    // RELATIONSHIPS
+    // ============================================
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DanhMucId", nullable = false)
@@ -36,6 +39,13 @@ public class SanPham {
     @JoinColumn(name = "ChatLieuId")
     private ChatLieu chatLieu;
 
+    @OneToMany(mappedBy = "sanPham", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SanPhamChiTiet> variants;
+
+    // ============================================
+    // BASIC FIELDS
+    // ============================================
+
     @Column(name = "Ten", nullable = false, length = 200)
     private String ten;
 
@@ -43,31 +53,21 @@ public class SanPham {
     private String moTa;
 
     @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai;
+    private int trangThai = 1;
 
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SanPhamChiTiet> sanPhamChiTiets;
-
-    @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<YeuThich> yeuThichs;
-
-    @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<DanhGia> danhGias;
+    // ============================================
+    // LIFECYCLE CALLBACKS
+    // ============================================
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (trangThai == null) {
-            trangThai = 1;
-        }
+        createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
@@ -75,7 +75,94 @@ public class SanPham {
         updatedAt = LocalDateTime.now();
     }
 
-    // ==================== TRANSIENT FIELDS ====================
+    // ============================================
+    // TRANSIENT METHODS - ✅ ĐÃ SỬA LỖI BigDecimal
+    // ============================================
+
+    /**
+     * Lấy hình ảnh chính của sản phẩm (từ variant đầu tiên)
+     */
+    @Transient
+    public String getHinhAnhChinh() {
+        if (variants != null && !variants.isEmpty()) {
+            for (SanPhamChiTiet variant : variants) {
+                if (variant.getHinhAnh() != null && !variant.getHinhAnh().isEmpty()) {
+                    return variant.getHinhAnh();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Lấy giá thấp nhất của sản phẩm
+     * ✅ FIX: Dùng BigDecimal thay vì mapToDouble
+     */
+    @Transient
+    public Double getGiaMin() {
+        if (variants != null && !variants.isEmpty()) {
+            Optional<BigDecimal> min = variants.stream()
+                    .filter(v -> v.getTrangThai() == 1)
+                    .map(SanPhamChiTiet::getGiaBan)
+                    .filter(price -> price != null)
+                    .min(Comparator.naturalOrder());
+
+            return min.map(BigDecimal::doubleValue).orElse(0.0);
+        }
+        return 0.0;
+    }
+
+    /**
+     * Lấy giá gốc thấp nhất (trước khi giảm)
+     * ✅ FIX: Dùng BigDecimal thay vì mapToDouble
+     */
+    @Transient
+    public Double getGiaGocMin() {
+        if (variants != null && !variants.isEmpty()) {
+            Optional<BigDecimal> min = variants.stream()
+                    .filter(v -> v.getTrangThai() == 1 && v.getGiaGoc() != null)
+                    .map(SanPhamChiTiet::getGiaGoc)
+                    .min(Comparator.naturalOrder());
+
+            return min.map(BigDecimal::doubleValue).orElse(null);
+        }
+        return null;
+    }
+
+    /**
+     * Format giá hiển thị (ví dụ: 1.500.000)
+     */
+    @Transient
+    public String getGiaMinFormatted() {
+        Double giaMin = getGiaMin();
+        if (giaMin == null || giaMin == 0.0) return "0";
+        return String.format("%,.0f", giaMin).replace(',', '.');
+    }
+
+    /**
+     * Format giá gốc hiển thị
+     */
+    @Transient
+    public String getGiaGocMinFormatted() {
+        Double giaGoc = getGiaGocMin();
+        if (giaGoc != null) {
+            return String.format("%,.0f", giaGoc).replace(',', '.');
+        }
+        return null;
+    }
+
+    /**
+     * Tính tỷ lệ giảm giá (%)
+     */
+    @Transient
+    public Integer getTyLeGiamGia() {
+        Double giaGoc = getGiaGocMin();
+        Double giaBan = getGiaMin();
+        if (giaGoc != null && giaGoc > 0 && giaBan < giaGoc) {
+            return (int) Math.round(((giaGoc - giaBan) / giaGoc) * 100);
+        }
+        return 0;
+    }
 
     /**
      * Lấy tên thương hiệu
@@ -101,367 +188,117 @@ public class SanPham {
         return chatLieu != null ? chatLieu.getTen() : "";
     }
 
-    /**
-     * Lấy hình ảnh chính (từ biến thể đầu tiên)
-     */
-    @Transient
-    public String getHinhAnhChinh() {
-        if (sanPhamChiTiets != null && !sanPhamChiTiets.isEmpty()) {
-            for (SanPhamChiTiet spct : sanPhamChiTiets) {
-                if (spct.getHinhAnh() != null && !spct.getHinhAnh().isEmpty()) {
-                    return spct.getHinhAnh();
-                }
-            }
-        }
-        return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600";
+    // ============================================
+    // GETTERS AND SETTERS
+    // ============================================
+
+    public Integer getSanPhamId() {
+        return sanPhamId;
     }
 
-    /**
-     * Lấy danh sách hình ảnh từ các biến thể
-     */
-    @Transient
-    public List<String> getDanhSachHinhAnh() {
-        if (sanPhamChiTiets != null) {
-            return sanPhamChiTiets.stream()
-                    .map(SanPhamChiTiet::getHinhAnh)
-                    .filter(img -> img != null && !img.isEmpty())
-                    .distinct()
-                    .limit(5)
-                    .toList();
-        }
-        return List.of();
+    public void setSanPhamId(Integer sanPhamId) {
+        this.sanPhamId = sanPhamId;
     }
 
-    /**
-     * Lấy giá thấp nhất
-     */
-    @Transient
-    public BigDecimal getGiaMin() {
-        if (sanPhamChiTiets != null && !sanPhamChiTiets.isEmpty()) {
-            return sanPhamChiTiets.stream()
-                    .filter(spct -> spct.getTrangThai() == 1)
-                    .map(SanPhamChiTiet::getGiaBan)
-                    .min(BigDecimal::compareTo)
-                    .orElse(BigDecimal.ZERO);
-        }
-        return BigDecimal.ZERO;
+    public DanhMuc getDanhMuc() {
+        return danhMuc;
     }
 
-    /**
-     * Lấy giá gốc thấp nhất
-     */
-    @Transient
-    public BigDecimal getGiaGocMin() {
-        if (sanPhamChiTiets != null && !sanPhamChiTiets.isEmpty()) {
-            return sanPhamChiTiets.stream()
-                    .filter(spct -> spct.getTrangThai() == 1 && spct.getGiaGoc() != null)
-                    .map(SanPhamChiTiet::getGiaGoc)
-                    .filter(gia -> gia.compareTo(BigDecimal.ZERO) > 0)
-                    .min(BigDecimal::compareTo)
-                    .orElse(null);
-        }
-        return null;
+    public void setDanhMuc(DanhMuc danhMuc) {
+        this.danhMuc = danhMuc;
     }
 
-    /**
-     * Lấy giá cao nhất
-     */
-    @Transient
-    public BigDecimal getGiaMax() {
-        if (sanPhamChiTiets != null && !sanPhamChiTiets.isEmpty()) {
-            return sanPhamChiTiets.stream()
-                    .filter(spct -> spct.getTrangThai() == 1)
-                    .map(SanPhamChiTiet::getGiaBan)
-                    .max(BigDecimal::compareTo)
-                    .orElse(BigDecimal.ZERO);
-        }
-        return BigDecimal.ZERO;
+    public ThuongHieu getThuongHieu() {
+        return thuongHieu;
     }
 
-    /**
-     * Lấy tổng số lượng tồn kho
-     */
-    @Transient
-    public Integer getSoLuongTonKho() {
-        if (sanPhamChiTiets != null && !sanPhamChiTiets.isEmpty()) {
-            return sanPhamChiTiets.stream()
-                    .filter(spct -> spct.getTrangThai() == 1)
-                    .mapToInt(SanPhamChiTiet::getSoLuongTon)
-                    .sum();
-        }
-        return 0;
+    public void setThuongHieu(ThuongHieu thuongHieu) {
+        this.thuongHieu = thuongHieu;
     }
 
-    /**
-     * Tính tỷ lệ giảm giá
-     */
-    @Transient
-    public Integer getTyLeGiamGia() {
-        BigDecimal giaGoc = getGiaGocMin();
-        BigDecimal giaBan = getGiaMin();
-
-        if (giaGoc != null && giaGoc.compareTo(BigDecimal.ZERO) > 0
-                && giaBan.compareTo(giaGoc) < 0) {
-            BigDecimal giam = giaGoc.subtract(giaBan);
-            BigDecimal tyLe = giam.divide(giaGoc, 4, BigDecimal.ROUND_HALF_UP)
-                    .multiply(new BigDecimal("100"));
-            return tyLe.intValue();
-        }
-        return 0;
+    public ChatLieu getChatLieu() {
+        return chatLieu;
     }
 
-    /**
-     * Format giá thấp nhất
-     */
-    @Transient
-    public String getGiaMinFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(getGiaMin());
+    public void setChatLieu(ChatLieu chatLieu) {
+        this.chatLieu = chatLieu;
     }
 
-    /**
-     * Format giá gốc thấp nhất
-     */
-    @Transient
-    public String getGiaGocMinFormatted() {
-        BigDecimal giaGoc = getGiaGocMin();
-        if (giaGoc != null) {
-            NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-            return formatter.format(giaGoc);
-        }
-        return null;
+    public List<SanPhamChiTiet> getVariants() {
+        return variants;
     }
 
-    /**
-     * Format giá cao nhất
-     */
-    @Transient
-    public String getGiaMaxFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(getGiaMax());
+    public void setVariants(List<SanPhamChiTiet> variants) {
+        this.variants = variants;
     }
 
-    /**
-     * Lấy khoảng giá
-     */
-    @Transient
-    public String getKhoangGia() {
-        BigDecimal min = getGiaMin();
-        BigDecimal max = getGiaMax();
-
-        if (min.compareTo(max) == 0) {
-            return getGiaMinFormatted() + "₫";
-        } else {
-            return getGiaMinFormatted() + "₫ - " + getGiaMaxFormatted() + "₫";
-        }
+    public String getTen() {
+        return ten;
     }
 
-    /**
-     * Kiểm tra có đang giảm giá không
-     */
-    @Transient
-    public boolean isDangGiamGia() {
-        return getTyLeGiamGia() > 0;
+    public void setTen(String ten) {
+        this.ten = ten;
     }
 
-    /**
-     * Kiểm tra còn hàng không
-     */
-    @Transient
-    public boolean isConHang() {
-        return getSoLuongTonKho() > 0;
+    public String getMoTa() {
+        return moTa;
     }
 
-    /**
-     * Kiểm tra sắp hết hàng
-     */
-    @Transient
-    public boolean isSapHetHang() {
-        Integer tonKho = getSoLuongTonKho();
-        return tonKho > 0 && tonKho <= 10;
+    public void setMoTa(String moTa) {
+        this.moTa = moTa;
     }
 
-    /**
-     * Lấy trạng thái tồn kho
-     */
-    @Transient
-    public String getTrangThaiTonKho() {
-        Integer tonKho = getSoLuongTonKho();
-        if (tonKho == 0) {
-            return "Hết hàng";
-        } else if (tonKho <= 10) {
-            return "Sắp hết";
-        } else {
-            return "Còn hàng";
-        }
+    public int getTrangThai() {
+        return trangThai;
     }
 
-    /**
-     * Lấy màu badge tồn kho
-     */
-    @Transient
-    public String getColorBadgeTonKho() {
-        Integer tonKho = getSoLuongTonKho();
-        if (tonKho == 0) {
-            return "danger";
-        } else if (tonKho <= 10) {
-            return "warning";
-        } else {
-            return "success";
-        }
+    public void setTrangThai(int trangThai) {
+        this.trangThai = trangThai;
     }
 
-    /**
-     * Tính điểm đánh giá trung bình
-     */
-    @Transient
-    public Double getDiemDanhGiaTrungBinh() {
-        if (danhGias != null && !danhGias.isEmpty()) {
-            return danhGias.stream()
-                    .filter(dg -> dg.getTrangThai() == 1)
-                    .mapToInt(DanhGia::getDiemSao)
-                    .average()
-                    .orElse(0.0);
-        }
-        return 0.0;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    /**
-     * Đếm số lượng đánh giá
-     */
-    @Transient
-    public long getSoLuongDanhGia() {
-        if (danhGias != null) {
-            return danhGias.stream()
-                    .filter(dg -> dg.getTrangThai() == 1)
-                    .count();
-        }
-        return 0;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    /**
-     * Render sao đánh giá
-     */
-    @Transient
-    public String renderStars() {
-        Double diem = getDiemDanhGiaTrungBinh();
-        StringBuilder stars = new StringBuilder();
-
-        for (int i = 1; i <= 5; i++) {
-            if (i <= diem) {
-                stars.append("<i class='fas fa-star text-warning'></i>");
-            } else if (i - 0.5 <= diem) {
-                stars.append("<i class='fas fa-star-half-alt text-warning'></i>");
-            } else {
-                stars.append("<i class='far fa-star text-warning'></i>");
-            }
-        }
-
-        return stars.toString();
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    /**
-     * Format ngày tạo
-     */
-    @Transient
-    public String getCreatedAtFormatted() {
-        if (createdAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            return createdAt.format(formatter);
-        }
-        return "";
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    /**
-     * Format ngày cập nhật
-     */
-    @Transient
-    public String getUpdatedAtFormatted() {
-        if (updatedAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            return updatedAt.format(formatter);
-        }
-        return "";
+    // ============================================
+    // EQUALS AND HASHCODE
+    // ============================================
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SanPham sanPham = (SanPham) o;
+        return sanPhamId != null && sanPhamId.equals(sanPham.sanPhamId);
     }
 
-    /**
-     * Lấy tên trạng thái
-     */
-    @Transient
-    public String getTenTrangThai() {
-        return trangThai == 1 ? "Hoạt động" : "Ngừng hoạt động";
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
-    /**
-     * Lấy màu badge trạng thái
-     */
-    @Transient
-    public String getColorBadgeTrangThai() {
-        return trangThai == 1 ? "success" : "secondary";
-    }
+    // ============================================
+    // TO STRING
+    // ============================================
 
-    /**
-     * Kiểm tra sản phẩm mới (trong vòng 30 ngày)
-     */
-    @Transient
-    public boolean isSanPhamMoi() {
-        if (createdAt == null) return false;
-        return createdAt.isAfter(LocalDateTime.now().minusDays(30));
-    }
-
-    /**
-     * Lấy số lượng biến thể
-     */
-    @Transient
-    public int getSoLuongBienThe() {
-        return sanPhamChiTiets != null ? sanPhamChiTiets.size() : 0;
-    }
-
-    /**
-     * Lấy danh sách màu sắc có sẵn
-     */
-    @Transient
-    public List<MauSac> getDanhSachMauSac() {
-        if (sanPhamChiTiets != null) {
-            return sanPhamChiTiets.stream()
-                    .filter(spct -> spct.getTrangThai() == 1)
-                    .map(SanPhamChiTiet::getMauSac)
-                    .distinct()
-                    .toList();
-        }
-        return List.of();
-    }
-
-    /**
-     * Lấy danh sách kích thước có sẵn
-     */
-    @Transient
-    public List<KichThuoc> getDanhSachKichThuoc() {
-        if (sanPhamChiTiets != null) {
-            return sanPhamChiTiets.stream()
-                    .filter(spct -> spct.getTrangThai() == 1)
-                    .map(SanPhamChiTiet::getKichThuoc)
-                    .distinct()
-                    .toList();
-        }
-        return List.of();
-    }
-
-    /**
-     * Kiểm tra có mô tả không
-     */
-    @Transient
-    public boolean isCoMoTa() {
-        return moTa != null && !moTa.trim().isEmpty();
-    }
-
-    /**
-     * Lấy mô tả ngắn gọn
-     */
-    @Transient
-    public String getMoTaNgan(int maxLength) {
-        if (!isCoMoTa()) return "";
-        if (moTa.length() <= maxLength) return moTa;
-        return moTa.substring(0, maxLength) + "...";
+    @Override
+    public String toString() {
+        return "SanPham{" +
+                "sanPhamId=" + sanPhamId +
+                ", ten='" + ten + '\'' +
+                ", trangThai=" + trangThai +
+                '}';
     }
 }

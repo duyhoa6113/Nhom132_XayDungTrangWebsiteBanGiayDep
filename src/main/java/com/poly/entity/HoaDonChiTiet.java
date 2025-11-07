@@ -51,14 +51,7 @@ public class HoaDonChiTiet {
 
     // ==================== TRANSIENT FIELDS ====================
 
-    /**
-     * Lấy tên sản phẩm
-     */
-    @Transient
-    public String getTenSanPham() {
-        return variant != null && variant.getSanPham() != null ?
-                variant.getSanPham().getTen() : "";
-    }
+
 
     /**
      * Lấy hình ảnh

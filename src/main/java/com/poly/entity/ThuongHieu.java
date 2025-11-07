@@ -1,19 +1,10 @@
 package com.poly.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Entity
 @Table(name = "ThuongHieu")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ThuongHieu {
 
     @Id
@@ -28,67 +19,29 @@ public class ThuongHieu {
     private String moTa;
 
     @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai;
+    private int trangThai = 1;  // ✅ QUAN TRỌNG: Phải là int hoặc Integer
 
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "thuongHieu", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SanPham> sanPhams;
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (trangThai == null) {
-            trangThai = 1;
-        }
+        createdAt = LocalDateTime.now();
     }
 
-    // ==================== TRANSIENT FIELDS ====================
+    // Getters and Setters
+    public Integer getThuongHieuId() { return thuongHieuId; }
+    public void setThuongHieuId(Integer thuongHieuId) { this.thuongHieuId = thuongHieuId; }
 
-    /**
-     * Format ngày tạo
-     */
-    @Transient
-    public String getCreatedAtFormatted() {
-        if (createdAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            return createdAt.format(formatter);
-        }
-        return "";
-    }
+    public String getTen() { return ten; }
+    public void setTen(String ten) { this.ten = ten; }
 
-    /**
-     * Lấy tên trạng thái
-     */
-    @Transient
-    public String getTenTrangThai() {
-        return trangThai == 1 ? "Hoạt động" : "Ngừng hoạt động";
-    }
+    public String getMoTa() { return moTa; }
+    public void setMoTa(String moTa) { this.moTa = moTa; }
 
-    /**
-     * Kiểm tra đang hoạt động
-     */
-    @Transient
-    public boolean isDangHoatDong() {
-        return trangThai == 1;
-    }
+    public int getTrangThai() { return trangThai; }
+    public void setTrangThai(int trangThai) { this.trangThai = trangThai; }
 
-    /**
-     * Đếm số sản phẩm
-     */
-    @Transient
-    public int getSoLuongSanPham() {
-        return sanPhams != null ? sanPhams.size() : 0;
-    }
-
-    /**
-     * Lấy màu badge trạng thái
-     */
-    @Transient
-    public String getColorBadge() {
-        return trangThai == 1 ? "success" : "secondary";
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

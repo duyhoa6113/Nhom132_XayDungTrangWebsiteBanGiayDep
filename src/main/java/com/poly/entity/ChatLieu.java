@@ -1,19 +1,16 @@
 package com.poly.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Entity cho bảng ChatLieu
+ *
+ * @author Nhóm 132
+ */
 @Entity
 @Table(name = "ChatLieu")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ChatLieu {
 
     @Id
@@ -25,67 +22,101 @@ public class ChatLieu {
     private String ten;
 
     @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai;
+    private int trangThai = 1;
 
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "chatLieu", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // ============================================
+    // RELATIONSHIP - Quan hệ ngược với SanPham
+    // ============================================
+    /**
+     * Một chất liệu có thể được sử dụng cho nhiều sản phẩm
+     * mappedBy = "chatLieu" phải khớp với field name trong SanPham entity
+     */
+    @OneToMany(mappedBy = "chatLieu", fetch = FetchType.LAZY)
     private List<SanPham> sanPhams;
+
+    // ============================================
+    // LIFECYCLE CALLBACK
+    // ============================================
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (trangThai == null) {
-            trangThai = 1;
-        }
+        createdAt = LocalDateTime.now();
     }
 
-    // ==================== TRANSIENT FIELDS ====================
+    // ============================================
+    // GETTERS AND SETTERS
+    // ============================================
 
-    /**
-     * Format ngày tạo
-     */
-    @Transient
-    public String getCreatedAtFormatted() {
-        if (createdAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            return createdAt.format(formatter);
-        }
-        return "";
+    public Integer getChatLieuId() {
+        return chatLieuId;
     }
 
-    /**
-     * Lấy tên trạng thái
-     */
-    @Transient
-    public String getTenTrangThai() {
-        return trangThai == 1 ? "Hoạt động" : "Ngừng hoạt động";
+    public void setChatLieuId(Integer chatLieuId) {
+        this.chatLieuId = chatLieuId;
     }
 
-    /**
-     * Kiểm tra đang hoạt động
-     */
-    @Transient
-    public boolean isDangHoatDong() {
-        return trangThai == 1;
+    public String getTen() {
+        return ten;
     }
 
-    /**
-     * Đếm số sản phẩm
-     */
-    @Transient
-    public int getSoLuongSanPham() {
-        return sanPhams != null ? sanPhams.size() : 0;
+    public void setTen(String ten) {
+        this.ten = ten;
     }
 
-    /**
-     * Lấy màu badge trạng thái
-     */
-    @Transient
-    public String getColorBadge() {
-        return trangThai == 1 ? "success" : "secondary";
+    public int getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(int trangThai) {
+        this.trangThai = trangThai;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<SanPham> getSanPhams() {
+        return sanPhams;
+    }
+
+    public void setSanPhams(List<SanPham> sanPhams) {
+        this.sanPhams = sanPhams;
+    }
+
+    // ============================================
+    // EQUALS AND HASHCODE
+    // ============================================
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChatLieu chatLieu = (ChatLieu) o;
+        return chatLieuId != null && chatLieuId.equals(chatLieu.chatLieuId);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    // ============================================
+    // TO STRING
+    // ============================================
+
+    @Override
+    public String toString() {
+        return "ChatLieu{" +
+                "chatLieuId=" + chatLieuId +
+                ", ten='" + ten + '\'' +
+                ", trangThai=" + trangThai +
+                '}';
     }
 }

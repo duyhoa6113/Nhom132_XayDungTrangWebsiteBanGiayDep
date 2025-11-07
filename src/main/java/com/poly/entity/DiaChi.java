@@ -41,6 +41,10 @@ public class DiaChi {
     @Column(name = "TinhTP", length = 150)
     private String tinhTP;
 
+    /**
+     * MacDinh: BIT trong SQL Server tương thích với Boolean trong JPA
+     * 0 = false, 1 = true
+     */
     @Column(name = "MacDinh", nullable = false)
     private Boolean macDinh;
 
@@ -82,5 +86,13 @@ public class DiaChi {
             sb.append(", ").append(tinhTP);
         }
         return sb.toString();
+    }
+
+    /**
+     * Kiểm tra có phải địa chỉ mặc định không
+     */
+    @Transient
+    public boolean isDiaChinMacDinh() {
+        return macDinh != null && macDinh;
     }
 }

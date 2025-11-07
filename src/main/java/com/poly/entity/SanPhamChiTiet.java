@@ -6,12 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Entity cho bảng SanPhamChiTiet (Product Variant)
+ *
+ * @author Nhóm 132
+ */
 @Entity
 @Table(name = "SanPhamChiTiet")
 @Data
@@ -24,58 +29,108 @@ public class SanPhamChiTiet {
     @Column(name = "VariantId")
     private Integer variantId;
 
+    /**
+     * Quan hệ Many-to-One với SanPham
+     * Nhiều variant thuộc một sản phẩm
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SanPhamId", nullable = false)
     private SanPham sanPham;
 
+    /**
+     * Quan hệ Many-to-One với MauSac
+     * Variant có một màu sắc
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "MauSacId", nullable = false)
     private MauSac mauSac;
 
+    /**
+     * Quan hệ Many-to-One với KichThuoc
+     * Variant có một kích thước
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "KichThuocId", nullable = false)
     private KichThuoc kichThuoc;
 
-    @Column(name = "SKU", nullable = false, unique = true, length = 64)
-    private String sku;
-
-    @Column(name = "Barcode", unique = true, length = 64)
-    private String barcode;
-
-    @Column(name = "GiaBan", nullable = false, precision = 18, scale = 2)
-    private BigDecimal giaBan;
-
-    @Column(name = "GiaGoc", precision = 18, scale = 2)
-    private BigDecimal giaGoc;
-
-    @Column(name = "SoLuongTon", nullable = false)
-    private Integer soLuongTon;
-
-    @Column(name = "HinhAnh", length = 512)
-    private String hinhAnh;
-
-    @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai;
-
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "UpdatedAt")
-    private LocalDateTime updatedAt;
-
+    /**
+     * Quan hệ One-to-Many với GioHang
+     * Một variant có thể có trong nhiều giỏ hàng
+     */
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<GioHang> gioHangs;
 
+    /**
+     * Quan hệ One-to-Many với HoaDonChiTiet
+     * Một variant có thể có trong nhiều đơn hàng
+     */
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<HoaDonChiTiet> hoaDonChiTiets;
 
+    /**
+     * Stock Keeping Unit - Mã định danh unique cho variant
+     */
+    @Column(name = "SKU", nullable = false, unique = true, length = 64)
+    private String sku;
+
+    /**
+     * Mã vạch sản phẩm (optional)
+     */
+    @Column(name = "Barcode", unique = true, length = 64)
+    private String barcode;
+
+    /**
+     * Giá bán hiện tại (sau giảm giá)
+     */
+    @Column(name = "GiaBan", nullable = false, precision = 18, scale = 2)
+    private BigDecimal giaBan;
+
+    /**
+     * Giá gốc (trước giảm giá)
+     */
+    @Column(name = "GiaGoc", precision = 18, scale = 2)
+    private BigDecimal giaGoc;
+
+    /**
+     * Số lượng tồn kho
+     */
+    @Column(name = "SoLuongTon", nullable = false)
+    private Integer soLuongTon = 0;
+
+    /**
+     * URL hình ảnh của variant
+     */
+    @Column(name = "HinhAnh", length = 512)
+    private String hinhAnh;
+
+    /**
+     * Trạng thái: 1 = Active, 0 = Inactive
+     * TINYINT trong SQL Server → int trong Java
+     */
+    @Column(name = "TrangThai", nullable = false)
+    private int trangThai = 1;
+
+    /**
+     * Thời gian tạo
+     */
+    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    /**
+     * Thời gian cập nhật
+     */
+    @Column(name = "UpdatedAt")
+    private LocalDateTime updatedAt;
+
+    // ============================================
+    // LIFECYCLE CALLBACKS
+    // ============================================
+
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (trangThai == null) {
-            trangThai = 1;
+        createdAt = LocalDateTime.now();
+        if (trangThai == 0) {
+            trangThai = 1; // Default active
         }
         if (soLuongTon == null) {
             soLuongTon = 0;
@@ -87,14 +142,86 @@ public class SanPhamChiTiet {
         updatedAt = LocalDateTime.now();
     }
 
-    // ==================== TRANSIENT FIELDS ====================
+    // ============================================
+    // TRANSIENT METHODS
+    // ============================================
 
     /**
-     * Lấy tên sản phẩm
+     * Format giá bán hiển thị (VD: 1.500.000₫)
      */
     @Transient
-    public String getTenSanPham() {
-        return sanPham != null ? sanPham.getTen() : "";
+    public String getGiaBanFormatted() {
+        if (giaBan == null) return "0₫";
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return formatter.format(giaBan) + "₫";
+    }
+
+    /**
+     * Format giá gốc hiển thị
+     */
+    @Transient
+    public String getGiaGocFormatted() {
+        if (giaGoc == null) return null;
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return formatter.format(giaGoc) + "₫";
+    }
+
+    /**
+     * Tính % giảm giá
+     * ✅ ĐÃ SỬA - Fix lỗi BigDecimal to double conversion
+     */
+    @Transient
+    public Integer getTyLeGiamGia() {
+        if (giaGoc == null || giaGoc.compareTo(BigDecimal.ZERO) == 0) {
+            return 0;
+        }
+        if (giaBan.compareTo(giaGoc) >= 0) {
+            return 0;
+        }
+        // Tính discount
+        BigDecimal discount = giaGoc.subtract(giaBan);
+
+        // Tính % = (discount / giaGoc) * 100
+        BigDecimal percentage = discount
+                .multiply(BigDecimal.valueOf(100))
+                .divide(giaGoc, 2, RoundingMode.HALF_UP);  // ✅ FIX: Dùng RoundingMode thay vì deprecated constant
+
+        return percentage.intValue();
+    }
+
+    /**
+     * Kiểm tra còn hàng
+     */
+    @Transient
+    public boolean isInStock() {
+        return soLuongTon != null && soLuongTon > 0;
+    }
+
+    /**
+     * Kiểm tra active
+     */
+    @Transient
+    public boolean isActive() {
+        return trangThai == 1;
+    }
+
+    /**
+     * Lấy tên đầy đủ của variant
+     * VD: "Nike Air Max - Đỏ - 42"
+     */
+    @Transient
+    public String getTenDayDu() {
+        StringBuilder sb = new StringBuilder();
+        if (sanPham != null) {
+            sb.append(sanPham.getTen());
+        }
+        if (mauSac != null) {
+            sb.append(" - ").append(mauSac.getTen());
+        }
+        if (kichThuoc != null) {
+            sb.append(" - ").append(kichThuoc.getTen());
+        }
+        return sb.toString();
     }
 
     /**
@@ -118,273 +245,38 @@ public class SanPhamChiTiet {
      */
     @Transient
     public String getMaHexMauSac() {
-        return mauSac != null ? mauSac.getMaHexOrDefault() : "#CCCCCC";
+        return mauSac != null ? mauSac.getMaHex() : "";
     }
 
-    /**
-     * Lấy tên đầy đủ (Tên SP - Màu - Size)
-     */
-    @Transient
-    public String getTenDayDu() {
-        return String.format("%s - %s - Size %s",
-                getTenSanPham(), getTenMauSac(), getTenKichThuoc());
+    // ============================================
+    // EQUALS AND HASHCODE
+    // ============================================
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SanPhamChiTiet that = (SanPhamChiTiet) o;
+        return variantId != null && variantId.equals(that.variantId);
     }
 
-    /**
-     * Format giá bán
-     */
-    @Transient
-    public String getGiaBanFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(giaBan);
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
-    /**
-     * Format giá gốc
-     */
-    @Transient
-    public String getGiaGocFormatted() {
-        if (giaGoc != null && giaGoc.compareTo(BigDecimal.ZERO) > 0) {
-            NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-            return formatter.format(giaGoc);
-        }
-        return null;
-    }
+    // ============================================
+    // TO STRING
+    // ============================================
 
-    /**
-     * Tính tỷ lệ giảm giá
-     */
-    @Transient
-    public Integer getTyLeGiamGia() {
-        if (giaGoc != null && giaGoc.compareTo(BigDecimal.ZERO) > 0
-                && giaBan.compareTo(giaGoc) < 0) {
-            BigDecimal giam = giaGoc.subtract(giaBan);
-            BigDecimal tyLe = giam.divide(giaGoc, 4, BigDecimal.ROUND_HALF_UP)
-                    .multiply(new BigDecimal("100"));
-            return tyLe.intValue();
-        }
-        return 0;
-    }
-
-    /**
-     * Tính số tiền giảm
-     */
-    @Transient
-    public BigDecimal getSoTienGiam() {
-        if (giaGoc != null && giaGoc.compareTo(BigDecimal.ZERO) > 0
-                && giaBan.compareTo(giaGoc) < 0) {
-            return giaGoc.subtract(giaBan);
-        }
-        return BigDecimal.ZERO;
-    }
-
-    /**
-     * Format số tiền giảm
-     */
-    @Transient
-    public String getSoTienGiamFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(getSoTienGiam());
-    }
-
-    /**
-     * Kiểm tra còn hàng không
-     */
-    @Transient
-    public boolean isConHang() {
-        return soLuongTon != null && soLuongTon > 0 && trangThai == 1;
-    }
-
-    /**
-     * Kiểm tra sắp hết hàng
-     */
-    @Transient
-    public boolean isSapHetHang() {
-        return soLuongTon != null && soLuongTon > 0 && soLuongTon <= 5;
-    }
-
-    /**
-     * Kiểm tra hết hàng
-     */
-    @Transient
-    public boolean isHetHang() {
-        return soLuongTon == null || soLuongTon == 0;
-    }
-
-    /**
-     * Lấy trạng thái tồn kho
-     */
-    @Transient
-    public String getTrangThaiTonKho() {
-        if (isHetHang()) {
-            return "Hết hàng";
-        } else if (isSapHetHang()) {
-            return "Sắp hết";
-        } else {
-            return "Còn " + soLuongTon;
-        }
-    }
-
-    /**
-     * Lấy màu badge tồn kho
-     */
-    @Transient
-    public String getColorBadgeTonKho() {
-        if (isHetHang()) {
-            return "danger";
-        } else if (isSapHetHang()) {
-            return "warning";
-        } else {
-            return "success";
-        }
-    }
-
-    /**
-     * Kiểm tra có đang giảm giá không
-     */
-    @Transient
-    public boolean isDangGiamGia() {
-        return getTyLeGiamGia() > 0;
-    }
-
-    /**
-     * Lấy hình ảnh hoặc mặc định
-     */
-    @Transient
-    public String getHinhAnhOrDefault() {
-        if (hinhAnh != null && !hinhAnh.trim().isEmpty()) {
-            return hinhAnh;
-        }
-        return "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600";
-    }
-
-    /**
-     * Format ngày tạo
-     */
-    @Transient
-    public String getCreatedAtFormatted() {
-        if (createdAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            return createdAt.format(formatter);
-        }
-        return "";
-    }
-
-    /**
-     * Format ngày cập nhật
-     */
-    @Transient
-    public String getUpdatedAtFormatted() {
-        if (updatedAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            return updatedAt.format(formatter);
-        }
-        return "";
-    }
-
-    /**
-     * Lấy tên trạng thái
-     */
-    @Transient
-    public String getTenTrangThai() {
-        return trangThai == 1 ? "Hoạt động" : "Ngừng hoạt động";
-    }
-
-    /**
-     * Lấy màu badge trạng thái
-     */
-    @Transient
-    public String getColorBadgeTrangThai() {
-        return trangThai == 1 ? "success" : "secondary";
-    }
-
-    /**
-     * Kiểm tra có thể mua không
-     */
-    @Transient
-    public boolean isCoTheMua() {
-        return trangThai == 1 && isConHang();
-    }
-
-    /**
-     * Lấy thông báo trạng thái
-     */
-    @Transient
-    public String getThongBaoTrangThai() {
-        if (!isCoTheMua()) {
-            if (trangThai == 0) {
-                return "Sản phẩm ngừng kinh doanh";
-            } else if (isHetHang()) {
-                return "Sản phẩm tạm hết hàng";
-            }
-        } else if (isSapHetHang()) {
-            return "Chỉ còn " + soLuongTon + " sản phẩm";
-        }
-        return "";
-    }
-
-    /**
-     * Tính giá trị tồn kho
-     */
-    @Transient
-    public BigDecimal getGiaTriTonKho() {
-        if (soLuongTon != null && giaBan != null) {
-            return giaBan.multiply(new BigDecimal(soLuongTon));
-        }
-        return BigDecimal.ZERO;
-    }
-
-    /**
-     * Format giá trị tồn kho
-     */
-    @Transient
-    public String getGiaTriTonKhoFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(getGiaTriTonKho());
-    }
-
-    /**
-     * Lấy thương hiệu
-     */
-    @Transient
-    public String getThuongHieu() {
-        return sanPham != null && sanPham.getThuongHieu() != null ?
-                sanPham.getThuongHieu().getTen() : "";
-    }
-
-    /**
-     * Lấy danh mục
-     */
-    @Transient
-    public String getDanhMuc() {
-        return sanPham != null && sanPham.getDanhMuc() != null ?
-                sanPham.getDanhMuc().getTen() : "";
-    }
-
-    /**
-     * Kiểm tra có barcode không
-     */
-    @Transient
-    public boolean isCoBarcode() {
-        return barcode != null && !barcode.trim().isEmpty();
-    }
-
-    /**
-     * Render color box
-     */
-    @Transient
-    public String renderColorBox() {
-        return String.format(
-                "<div style='width: 25px; height: 25px; background-color: %s; border: 1px solid #ddd; border-radius: 4px; display: inline-block;'></div>",
-                getMaHexMauSac()
-        );
-    }
-
-    /**
-     * Lấy label size
-     */
-    @Transient
-    public String getSizeLabel() {
-        return "Size " + getTenKichThuoc();
+    @Override
+    public String toString() {
+        return "SanPhamChiTiet{" +
+                "variantId=" + variantId +
+                ", sku='" + sku + '\'' +
+                ", giaBan=" + giaBan +
+                ", soLuongTon=" + soLuongTon +
+                ", trangThai=" + trangThai +
+                '}';
     }
 }

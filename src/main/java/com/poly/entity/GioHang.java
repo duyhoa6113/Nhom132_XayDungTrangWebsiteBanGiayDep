@@ -71,14 +71,7 @@ public class GioHang {
         return formatter.format(getThanhTien());
     }
 
-    /**
-     * Lấy tên sản phẩm
-     */
-    @Transient
-    public String getTenSanPham() {
-        return variant != null && variant.getSanPham() != null ?
-                variant.getSanPham().getTen() : "";
-    }
+
 
     /**
      * Lấy hình ảnh

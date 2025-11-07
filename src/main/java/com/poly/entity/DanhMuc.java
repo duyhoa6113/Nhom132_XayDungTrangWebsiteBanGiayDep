@@ -1,19 +1,10 @@
 package com.poly.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Entity
 @Table(name = "DanhMuc")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class DanhMuc {
 
     @Id
@@ -28,21 +19,29 @@ public class DanhMuc {
     private String moTa;
 
     @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai;
+    private int trangThai = 1;  // ✅ QUAN TRỌNG: Phải là int hoặc Integer
 
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "danhMuc", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SanPham> sanPhams;
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (trangThai == null) {
-            trangThai = 1;
-        }
+        createdAt = LocalDateTime.now();
     }
+
+    // Getters and Setters
+    public Integer getDanhMucId() { return danhMucId; }
+    public void setDanhMucId(Integer danhMucId) { this.danhMucId = danhMucId; }
+
+    public String getTen() { return ten; }
+    public void setTen(String ten) { this.ten = ten; }
+
+    public String getMoTa() { return moTa; }
+    public void setMoTa(String moTa) { this.moTa = moTa; }
+
+    public int getTrangThai() { return trangThai; }
+    public void setTrangThai(int trangThai) { this.trangThai = trangThai; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

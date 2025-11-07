@@ -5,10 +5,6 @@ GO
 USE nhom132_shoponline;
 GO
 
-SET ANSI_NULLS ON;
-SET QUOTED_IDENTIFIER ON;
-GO
-
 /* =============== LOOKUP TABLES =============== */
 
 -- DanhMuc
@@ -360,717 +356,404 @@ CREATE TABLE dbo.Newsletter
 CREATE INDEX IX_Newsletter_Email ON dbo.Newsletter(Email);
 CREATE INDEX IX_Newsletter_IsActive ON dbo.Newsletter(IsActive);
 
--- Xóa constraint UNIQUE trên Barcode
-IF EXISTS (
-    SELECT * FROM sys.indexes 
-    WHERE name = 'UQ__SanPhamC__177800D39BA9E2E3' 
-    AND object_id = OBJECT_ID('dbo.SanPhamChiTiet')
-)
+-- ==================== VAI TRÒ ====================
+PRINT N'Đang thêm Vai Trò...';
+
+INSERT INTO dbo.VaiTro (VaiTroId, TenVaiTro, MoTa) VALUES
+(1, N'Admin', N'Quản trị viên hệ thống'),
+(2, N'NhanVien', N'Nhân viên bán hàng'),
+(3, N'QuanLy', N'Quản lý cửa hàng');
+GO
+
+-- ==================== DANH MỤC ====================
+PRINT N'Đang thêm Danh Mục...';
+
+INSERT INTO dbo.DanhMuc (Ten, MoTa, TrangThai) VALUES
+(N'Giày Thể Thao', N'Giày chạy bộ, tập gym, thể thao', 1),
+(N'Giày Sneakers', N'Giày thời trang, casual', 1),
+(N'Giày Sandals', N'Giày dép, sandals nam nữ', 1),
+(N'Giày Boot', N'Giày cao cổ, boot', 1),
+(N'Giày Công Sở', N'Giày tây, giày da công sở', 1);
+GO
+
+GO
+
+-- ==================== THƯƠNG HIỆU ====================
+PRINT N'Đang thêm Thương Hiệu...';
+
+INSERT INTO dbo.ThuongHieu (Ten, MoTa, TrangThai) VALUES
+(N'Nike', N'Thương hiệu thể thao hàng đầu thế giới', 1),
+(N'Adidas', N'Thương hiệu thể thao Đức', 1),
+(N'Puma', N'Thương hiệu thể thao quốc tế', 1),
+(N'Vans', N'Thương hiệu giày lifestyle', 1),
+(N'Converse', N'Thương hiệu giày thời trang Mỹ', 1),
+(N'New Balance', N'Thương hiệu giày chạy bộ', 1),
+(N'Biti''s Hunter', N'Thương hiệu Việt Nam', 1),
+(N'Reebok', N'Thương hiệu thể thao Anh', 1);
+
+GO
+
+-- ==================== MÀU SẮC ====================
+PRINT N'Đang thêm Màu Sắc...';
+
+INSERT INTO dbo.MauSac (Ten, MaHex, TrangThai) VALUES
+(N'Đen', N'#000000', 1),
+(N'Trắng', N'#FFFFFF', 1),
+(N'Xám', N'#808080', 1),
+(N'Xanh Dương', N'#0000FF', 1),
+(N'Đỏ', N'#FF0000', 1),
+(N'Xanh Lá', N'#00FF00', 1),
+(N'Vàng', N'#FFFF00', 1),
+(N'Cam', N'#FFA500', 1),
+(N'Hồng', N'#FFC0CB', 1),
+(N'Nâu', N'#A52A2A', 1);
+GO
+
+GO
+
+-- ==================== KÍCH THƯỚC ====================
+PRINT N'Đang thêm Kích Thước...';
+
+INSERT INTO dbo.KichThuoc (Ten, TrangThai) VALUES
+(N'35', 1), (N'36', 1), (N'37', 1), (N'38', 1), (N'39', 1),
+(N'40', 1), (N'41', 1), (N'42', 1), (N'43', 1), (N'44', 1),
+(N'45', 1), (N'46', 1);
+GO
+
+GO
+
+-- ==================== CHẤT LIỆU ====================
+PRINT N'Đang thêm Chất Liệu...';
+
+INSERT INTO dbo.ChatLieu (Ten, TrangThai) VALUES
+(N'Da thật', 1),
+(N'Da tổng hợp', 1),
+(N'Vải canvas', 1),
+(N'Vải lưới', 1),
+(N'Nhựa', 1),
+(N'Cao su', 1),
+(N'Vải dệt kim', 1);
+GO
+
+GO
+
+-- ==================== SẢN PHẨM ====================
+PRINT N'Đang thêm Sản Phẩm...';
+
+-- Lấy ID của các bảng lookup để đảm bảo đúng
+DECLARE @DanhMucTheThao INT = (SELECT DanhMucId FROM dbo.DanhMuc WHERE Ten = N'Giày Thể Thao');
+DECLARE @DanhMucSneakers INT = (SELECT DanhMucId FROM dbo.DanhMuc WHERE Ten = N'Giày Sneakers');
+DECLARE @ThuongHieuNike INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Ten = N'Nike');
+DECLARE @ThuongHieuAdidas INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Ten = N'Adidas');
+DECLARE @ThuongHieuPuma INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Ten = N'Puma');
+DECLARE @ThuongHieuVans INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Ten = N'Vans');
+DECLARE @ThuongHieuConverse INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Ten = N'Converse');
+DECLARE @ThuongHieuNewBalance INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Ten = N'New Balance');
+DECLARE @ThuongHieuBitis INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Ten = N'Biti''s Hunter');
+DECLARE @ChatLieuDaTongHop INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Da tổng hợp');
+DECLARE @ChatLieuVaiLuoi INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Vải lưới');
+DECLARE @ChatLieuVaiCanvas INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Vải canvas');
+
+INSERT INTO dbo.SanPham (DanhMucId, ThuongHieuId, ChatLieuId, Ten, MoTa, TrangThai) VALUES
+-- Nike
+(@DanhMucTheThao, @ThuongHieuNike, @ChatLieuDaTongHop, N'Nike Air Zoom Pegasus 40', 
+    N'Giày chạy bộ cao cấp với công nghệ Air Zoom giúp tăng độ êm ái và phản hồi tốt. Thiết kế lưới thoáng khí, đế ngoài bền bỉ.', 1),
+(@DanhMucTheThao, @ThuongHieuNike, @ChatLieuVaiLuoi, N'Nike React Infinity Run', 
+    N'Giày chạy marathon với đệm React foam, giảm chấn thương. Phù hợp chạy đường dài.', 1),
+(@DanhMucSneakers, @ThuongHieuNike, @ChatLieuDaTongHop, N'Nike Air Force 1', 
+    N'Giày sneaker kinh điển, biểu tượng văn hóa đường phố. Thiết kế vượt thời gian.', 1),
+
+-- Adidas
+(@DanhMucTheThao, @ThuongHieuAdidas, @ChatLieuDaTongHop, N'Adidas Ultraboost 23', 
+    N'Giày thể thao với đế Boost êm ái nhất. Công nghệ Primeknit ôm chân tự nhiên.', 1),
+(@DanhMucSneakers, @ThuongHieuAdidas, @ChatLieuVaiLuoi, N'Adidas Stan Smith', 
+    N'Giày tennis huyền thoại, thiết kế tối giản. Phong cách cổ điển không bao giờ lỗi thời.', 1),
+(@DanhMucTheThao, @ThuongHieuAdidas, @ChatLieuDaTongHop, N'Adidas Solarboost', 
+    N'Giày chạy bộ với công nghệ Solar Propulsion, tăng tốc độ mỗi bước chạy.', 1),
+
+-- Puma
+(@DanhMucSneakers, @ThuongHieuPuma, @ChatLieuDaTongHop, N'Puma RS-X', 
+    N'Giày sneaker phong cách retro, màu sắc táo bạo. Thiết kế chunky đang hot.', 1),
+(@DanhMucTheThao, @ThuongHieuPuma, @ChatLieuVaiLuoi, N'Puma Velocity Nitro', 
+    N'Giày chạy bộ với công nghệ Nitro foam nhẹ và êm. Phù hợp runner nghiệp dư.', 1),
+
+-- Vans
+(@DanhMucSneakers, @ThuongHieuVans, @ChatLieuVaiCanvas, N'Vans Old Skool', 
+    N'Giày skateboard cổ điển với sọc đặc trưng. Đế waffle chống trượt tốt.', 1),
+(@DanhMucSneakers, @ThuongHieuVans, @ChatLieuVaiCanvas, N'Vans Authentic', 
+    N'Thiết kế low-top đơn giản, dễ phối đồ. Chất liệu canvas bền bỉ.', 1),
+
+-- Converse
+(@DanhMucSneakers, @ThuongHieuConverse, @ChatLieuVaiCanvas, N'Converse Chuck Taylor All Star', 
+    N'Giày canvas cổ điển, phong cách đường phố. Biểu tượng văn hóa Mỹ.', 1),
+(@DanhMucSneakers, @ThuongHieuConverse, @ChatLieuVaiCanvas, N'Converse Chuck 70', 
+    N'Phiên bản cao cấp của Chuck Taylor với đệm êm hơn, chất liệu tốt hơn.', 1),
+
+-- New Balance
+(@DanhMucTheThao, @ThuongHieuNewBalance, @ChatLieuDaTongHop, N'New Balance 990v6', 
+    N'Giày chạy bộ cao cấp Made in USA. Chất lượng tốt nhất trong dòng 99X.', 1),
+(@DanhMucTheThao, @ThuongHieuNewBalance, @ChatLieuVaiLuoi, N'New Balance Fresh Foam 1080', 
+    N'Đệm Fresh Foam cực êm, phù hợp chạy đường dài. Thiết kế thoáng khí.', 1),
+
+-- Biti's Hunter
+(@DanhMucSneakers, @ThuongHieuBitis, @ChatLieuVaiLuoi, N'Biti''s Hunter Street', 
+    N'Giày thương hiệu Việt, chất lượng quốc tế. Thiết kế trẻ trung, năng động.', 1),
+(@DanhMucTheThao, @ThuongHieuBitis, @ChatLieuVaiLuoi, N'Biti''s Hunter Running', 
+    N'Giày chạy bộ với công nghệ đệm Foam Clouds. Giá cả phải chăng, chất lượng tốt.', 1);
+GO
+
+GO
+
+-- ==================== CHI TIẾT SẢN PHẨM ====================
+PRINT N'Đang thêm Chi Tiết Sản Phẩm (Variants)...';
+
+-- Lấy ID của sản phẩm để đảm bảo chính xác
+DECLARE @NikePegasusId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Pegasus%');
+DECLARE @NikeReactId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%React Infinity%');
+DECLARE @NikeAF1Id INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Air Force 1%');
+DECLARE @AdidasUBId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Ultraboost%');
+DECLARE @AdidasStanId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Stan Smith%');
+DECLARE @PumaRSXId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%RS-X%');
+DECLARE @VansOSId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Old Skool%');
+DECLARE @ConverseCTId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Chuck Taylor All Star%');
+DECLARE @NewBalance990Id INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%990v6%');
+DECLARE @BitisStreetId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Biti''s Hunter Street%');
+
+-- Lấy ID màu sắc
+DECLARE @MauDen INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Đen');
+DECLARE @MauTrang INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Trắng');
+DECLARE @MauXam INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xám');
+DECLARE @MauXanhDuong INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xanh Dương');
+DECLARE @MauDo INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Đỏ');
+DECLARE @MauXanhLa INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xanh Lá');
+
+-- Lấy ID kích thước
+DECLARE @Size40 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'40');
+DECLARE @Size41 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'41');
+DECLARE @Size42 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'42');
+
+-- Nike Air Zoom Pegasus 40
+IF @NikePegasusId IS NOT NULL
 BEGIN
-    ALTER TABLE dbo.SanPhamChiTiet 
-    DROP CONSTRAINT UQ__SanPhamC__177800D39BA9E2E3;
-    PRINT 'Đã xóa UNIQUE constraint trên Barcode';
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@NikePegasusId, @MauDen, @Size40, N'NIKE-PEG40-BLK-40', N'8001000001', 3200000, 3500000, 50, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@NikePegasusId, @MauDen, @Size41, N'NIKE-PEG40-BLK-41', N'8001000002', 3200000, 3500000, 45, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@NikePegasusId, @MauDen, @Size42, N'NIKE-PEG40-BLK-42', N'8001000003', 3200000, 3500000, 40, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@NikePegasusId, @MauTrang, @Size40, N'NIKE-PEG40-WHT-40', N'8001000004', 3200000, 3500000, 35, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@NikePegasusId, @MauTrang, @Size41, N'NIKE-PEG40-WHT-41', N'8001000005', 3200000, 3500000, 30, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@NikePegasusId, @MauXam, @Size40, N'NIKE-PEG40-GRY-40', N'8001000006', 3200000, 3500000, 25, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1);
+END
+
+-- Nike React Infinity Run
+IF @NikeReactId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@NikeReactId, @MauDen, @Size40, N'NIKE-REACT-BLK-40', N'8002000001', 3800000, 4200000, 40, N'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600', 1),
+    (@NikeReactId, @MauDen, @Size41, N'NIKE-REACT-BLK-41', N'8002000002', 3800000, 4200000, 35, N'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600', 1),
+    (@NikeReactId, @MauXanhDuong, @Size40, N'NIKE-REACT-BLU-40', N'8002000003', 3800000, 4200000, 30, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@NikeReactId, @MauTrang, @Size41, N'NIKE-REACT-WHT-41', N'8002000004', 3800000, 4200000, 25, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1);
+END
+
+-- Nike Air Force 1
+IF @NikeAF1Id IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@NikeAF1Id, @MauTrang, @Size40, N'NIKE-AF1-WHT-40', N'8003000001', 2800000, 3000000, 60, N'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600', 1),
+    (@NikeAF1Id, @MauTrang, @Size41, N'NIKE-AF1-WHT-41', N'8003000002', 2800000, 3000000, 55, N'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600', 1),
+    (@NikeAF1Id, @MauTrang, @Size42, N'NIKE-AF1-WHT-42', N'8003000003', 2800000, 3000000, 50, N'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600', 1),
+    (@NikeAF1Id, @MauDen, @Size40, N'NIKE-AF1-BLK-40', N'8003000004', 2800000, 3000000, 45, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@NikeAF1Id, @MauDen, @Size41, N'NIKE-AF1-BLK-41', N'8003000005', 2800000, 3000000, 40, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1);
+END
+
+-- Adidas Ultraboost 23
+IF @AdidasUBId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@AdidasUBId, @MauDen, @Size40, N'ADIDAS-UB23-BLK-40', N'8004000001', 4500000, 5000000, 60, N'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600', 1),
+    (@AdidasUBId, @MauDen, @Size41, N'ADIDAS-UB23-BLK-41', N'8004000002', 4500000, 5000000, 55, N'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600', 1),
+    (@AdidasUBId, @MauDen, @Size42, N'ADIDAS-UB23-BLK-42', N'8004000003', 4500000, 5000000, 50, N'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600', 1),
+    (@AdidasUBId, @MauTrang, @Size40, N'ADIDAS-UB23-WHT-40', N'8004000004', 4500000, 5000000, 45, N'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=600', 1),
+    (@AdidasUBId, @MauTrang, @Size41, N'ADIDAS-UB23-WHT-41', N'8004000005', 4500000, 5000000, 40, N'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=600', 1),
+    (@AdidasUBId, @MauXanhDuong, @Size40, N'ADIDAS-UB23-NVY-40', N'8004000006', 4500000, 5000000, 35, N'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600', 1);
+END
+
+-- Adidas Stan Smith
+IF @AdidasStanId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@AdidasStanId, @MauTrang, @Size40, N'ADIDAS-STAN-WHT-40', N'8005000001', 2200000, 2500000, 70, N'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600', 1),
+    (@AdidasStanId, @MauTrang, @Size41, N'ADIDAS-STAN-WHT-41', N'8005000002', 2200000, 2500000, 65, N'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600', 1),
+    (@AdidasStanId, @MauTrang, @Size42, N'ADIDAS-STAN-WHT-42', N'8005000003', 2200000, 2500000, 60, N'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600', 1),
+    (@AdidasStanId, @MauXanhLa, @Size40, N'ADIDAS-STAN-GRN-40', N'8005000004', 2200000, 2500000, 30, N'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600', 1);
+END
+
+-- Puma RS-X
+IF @PumaRSXId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@PumaRSXId, @MauDen, @Size40, N'PUMA-RSX-BLK-40', N'8007000001', 2500000, 2800000, 40, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@PumaRSXId, @MauDen, @Size41, N'PUMA-RSX-BLK-41', N'8007000002', 2500000, 2800000, 35, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@PumaRSXId, @MauDo, @Size40, N'PUMA-RSX-RED-40', N'8007000003', 2500000, 2800000, 30, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1);
+END
+
+-- Vans Old Skool
+IF @VansOSId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@VansOSId, @MauDen, @Size40, N'VANS-OS-BLK-40', N'8009000001', 1500000, 1800000, 50, N'https://images.unsplash.com/photo-1588099768523-f4e6a5679d88?w=600', 1),
+    (@VansOSId, @MauDen, @Size41, N'VANS-OS-BLK-41', N'8009000002', 1500000, 1800000, 45, N'https://images.unsplash.com/photo-1588099768523-f4e6a5679d88?w=600', 1),
+    (@VansOSId, @MauDen, @Size42, N'VANS-OS-BLK-42', N'8009000003', 1500000, 1800000, 40, N'https://images.unsplash.com/photo-1588099768523-f4e6a5679d88?w=600', 1),
+    (@VansOSId, @MauDo, @Size40, N'VANS-OS-RED-40', N'8009000004', 1500000, 1800000, 35, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1);
+END
+
+-- Converse Chuck Taylor
+IF @ConverseCTId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@ConverseCTId, @MauDen, @Size40, N'CONV-CT-BLK-40', N'8011000001', 1200000, 1400000, 80, N'https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=600', 1),
+    (@ConverseCTId, @MauDen, @Size41, N'CONV-CT-BLK-41', N'8011000002', 1200000, 1400000, 75, N'https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=600', 1),
+    (@ConverseCTId, @MauTrang, @Size40, N'CONV-CT-WHT-40', N'8011000003', 1200000, 1400000, 70, N'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=600', 1),
+    (@ConverseCTId, @MauTrang, @Size41, N'CONV-CT-WHT-41', N'8011000004', 1200000, 1400000, 65, N'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=600', 1),
+    (@ConverseCTId, @MauDo, @Size40, N'CONV-CT-RED-40', N'8011000005', 1200000, 1400000, 60, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1);
+END
+
+-- New Balance 990v6
+IF @NewBalance990Id IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@NewBalance990Id, @MauXam, @Size40, N'NB-990V6-GRY-40', N'8013000001', 5500000, 6000000, 30, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@NewBalance990Id, @MauXam, @Size41, N'NB-990V6-GRY-41', N'8013000002', 5500000, 6000000, 25, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@NewBalance990Id, @MauDen, @Size40, N'NB-990V6-BLK-40', N'8013000003', 5500000, 6000000, 20, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1);
+END
+
+-- Biti's Hunter Street
+IF @BitisStreetId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    (@BitisStreetId, @MauDen, @Size40, N'BITIS-ST-BLK-40', N'8015000001', 850000, 1000000, 100, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@BitisStreetId, @MauDen, @Size41, N'BITIS-ST-BLK-41', N'8015000002', 850000, 1000000, 95, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@BitisStreetId, @MauTrang, @Size40, N'BITIS-ST-WHT-40', N'8015000003', 850000, 1000000, 90, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@BitisStreetId, @MauDo, @Size40, N'BITIS-ST-RED-40', N'8015000004', 850000, 1000000, 85, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1);
 END
 GO
 
--- Tạo lại UNIQUE INDEX cho phép NULL
-CREATE UNIQUE NONCLUSTERED INDEX UQ_SanPhamChiTiet_Barcode
-ON dbo.SanPhamChiTiet(Barcode)
-WHERE Barcode IS NOT NULL;
 GO
 
-PRINT 'Đã tạo lại UNIQUE INDEX cho Barcode (cho phép NULL)';
-GO
+-- ==================== KHÁCH HÀNG ====================
+PRINT N'Đang thêm Khách Hàng...';
 
-/* ==================== SEED DATA ==================== */
-
--- VaiTro
-INSERT INTO dbo.VaiTro (VaiTroId, TenVaiTro, MoTa) VALUES 
-(1, N'ADMIN', N'Quản trị viên - Toàn quyền hệ thống'),
-(2, N'STAFF', N'Nhân viên - Quản lý đơn hàng và sản phẩm'),
-(3, N'MANAGER', N'Quản lý - Quản lý nhân viên và báo cáo');
-
--- DanhMuc
-INSERT INTO dbo.DanhMuc (Ten, MoTa) VALUES
-(N'Giày chạy bộ', N'Running shoes cho tập luyện'),
-(N'Giày casual', N'Giày dạo phố hằng ngày'),
-(N'Giày công sở', N'Giày trang trọng cho văn phòng'),
-(N'Boots', N'Giày cao cổ, trekking'),
-(N'Sneakers', N'Giày thể thao phổ thông'),
-(N'Sandals', N'Dép quai hậu thoáng mát');
-
--- ThuongHieu
-INSERT INTO dbo.ThuongHieu (Ten, MoTa) VALUES
-(N'Nike', N'Thương hiệu thể thao hàng đầu thế giới'),
-(N'Adidas', N'Thương hiệu Đức nổi tiếng với công nghệ Boost'),
-(N'Puma', N'Thương hiệu thể thao năng động'),
-(N'Converse', N'Giày casual cổ điển'),
-(N'Timberland', N'Thương hiệu nổi tiếng với boots'),
-(N'Vans', N'Thương hiệu skateboard nổi tiếng'),
-(N'New Balance', N'Chuyên về giày chạy bộ'),
-(N'Reebok', N'Thương hiệu thể thao đa dạng');
-
--- MauSac
-INSERT INTO dbo.MauSac (Ten, MaHex) VALUES
-(N'Đen', N'#000000'),
-(N'Trắng', N'#FFFFFF'),
-(N'Xám', N'#808080'),
-(N'Xanh navy', N'#000080'),
-(N'Nâu', N'#8B4513'),
-(N'Đỏ', N'#FF0000'),
-(N'Xanh dương', N'#0000FF'),
-(N'Xanh lá', N'#008000'),
-(N'Hồng', N'#FFC0CB'),
-(N'Cam', N'#FFA500'),
-(N'Vàng', N'#FFFF00'),
-(N'Tím', N'#800080'),
-(N'Be', N'#F5F5DC'),
-(N'Xám đậm', N'#696969'),
-(N'Xanh ngọc', N'#40E0D0');
-
--- KichThuoc
-INSERT INTO dbo.KichThuoc (Ten) VALUES
-(N'35'), (N'36'), (N'37'), (N'38'), (N'39'), 
-(N'40'), (N'41'), (N'42'), (N'43'), (N'44'), (N'45');
-
--- ChatLieu
-INSERT INTO dbo.ChatLieu (Ten) VALUES
-(N'Da bò'), (N'Vải lưới'), (N'Da lộn'), (N'Canvas'), (N'PU'),
-(N'Da tổng hợp'), (N'Vải cotton'), (N'Cao su'), (N'EVA'), (N'Synthetic');
-
--- NhanVien (Admin mặc định)
-INSERT INTO dbo.NhanVien (VaiTroId, HoTen, Email, MatKhauHash, Sdt, TrangThai)
-VALUES 
-(1, N'Admin System', N'admin@shopgiaydep.com', N'$2a$10$dummyHashForAdmin123', N'0901234567', 1),
-(2, N'Nguyễn Văn Staff', N'staff@shopgiaydep.com', N'$2a$10$dummyHashForStaff123', N'0901234568', 1);
-
--- KhachHang (Sample)
+-- Password mẫu: 123456 (đã hash với BCrypt)
 INSERT INTO dbo.KhachHang (HoTen, Email, Sdt, MatKhauHash, NgaySinh, GioiTinh, TrangThai) VALUES
-(N'Nguyễn Văn An', N'nguyenvanan@mail.vn', N'0912345001', N'$2a$10$dummyHash1', '1995-03-15', N'M', 1),
-(N'Trần Thị Bích', N'tranthibich@mail.vn', N'0912345002', N'$2a$10$dummyHash2', '1998-07-22', N'F', 1),
-(N'Lê Minh Hoàng', N'leminhhoang@mail.vn', N'0912345003', N'$2a$10$dummyHash3', '1992-11-10', N'M', 1),
-(N'Phạm Ngọc Anh', N'phamngocanh@mail.vn', N'0912345004', N'$2a$10$dummyHash4', '2000-05-08', N'F', 1),
-(N'Hoàng Gia Bảo', N'hoanggiabao@mail.vn', N'0912345005', N'$2a$10$dummyHash5', '1996-09-25', N'M', 1);
+(N'Nguyễn Văn An', N'nguyenvanan@gmail.com', N'0901234567', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1990-01-15', N'Nam', 1),
+(N'Trần Thị Bình', N'tranthibinh@gmail.com', N'0902345678', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1992-05-20', N'Nữ', 1),
+(N'Lê Văn Cường', N'levancuong@gmail.com', N'0903456789', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1988-08-10', N'Nam', 1),
+(N'Phạm Thị Dung', N'phamthidung@gmail.com', N'0904567890', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1995-12-25', N'Nữ', 1),
+(N'Hoàng Văn Em', N'hoangvanem@gmail.com', N'0905678901', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1998-07-08', N'Nam', 1);
+GO
 
--- DiaChi (Sample)
-INSERT INTO dbo.DiaChi (KhachHangId, HoTenNhan, SdtNhan, DiaChi, PhuongXa, QuanHuyen, TinhTP, MacDinh) VALUES
-(1, N'Nguyễn Văn An', N'0912345001', N'123 Nguyễn Văn Linh', N'Phường Thạc Gián', N'Quận Thanh Khê', N'Đà Nẵng', 1),
-(1, N'Nguyễn Văn An', N'0912345001', N'456 Lê Duẩn', N'Phường Hải Châu 1', N'Quận Hải Châu', N'Đà Nẵng', 0),
-(2, N'Trần Thị Bích', N'0912345002', N'789 Trần Phú', N'Phường Phước Ninh', N'Quận Hải Châu', N'Đà Nẵng', 1);
+GO
 
--- KhuyenMai (Sample)
+-- ==================== NHÂN VIÊN ====================
+PRINT N'Đang thêm Nhân Viên...';
+
+-- Password mẫu: admin123 (đã hash)
+INSERT INTO dbo.NhanVien (VaiTroId, HoTen, Email, MatKhauHash, Sdt, ChucVu, TrangThai) VALUES
+(1, N'Admin System', N'admin@shoponline.vn', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', N'0909999999', N'Quản trị viên', 1),
+(2, N'Hoàng Văn Hùng', N'hunghoang@shoponline.vn', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', N'0905555555', N'Nhân viên bán hàng', 1),
+(3, N'Võ Thị Lan', N'lanvo@shoponline.vn', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', N'0906666666', N'Quản lý kho', 1);
+GO
+
+GO
+
+-- ==================== ĐỊA CHỈ ====================
+PRINT N'Đang thêm Địa Chỉ...';
+
+-- Lấy ID khách hàng
+DECLARE @KH1 INT = (SELECT KhachHangId FROM dbo.KhachHang WHERE Email = N'nguyenvanan@gmail.com');
+DECLARE @KH2 INT = (SELECT KhachHangId FROM dbo.KhachHang WHERE Email = N'tranthibinh@gmail.com');
+DECLARE @KH3 INT = (SELECT KhachHangId FROM dbo.KhachHang WHERE Email = N'levancuong@gmail.com');
+DECLARE @KH4 INT = (SELECT KhachHangId FROM dbo.KhachHang WHERE Email = N'phamthidung@gmail.com');
+
+IF @KH1 IS NOT NULL
+BEGIN
+    INSERT INTO dbo.DiaChi (KhachHangId, HoTenNhan, SdtNhan, DiaChi, PhuongXa, QuanHuyen, TinhTP, MacDinh) VALUES
+    (@KH1, N'Nguyễn Văn An', N'0901234567', N'123 Nguyễn Huệ', N'Phường Bến Nghé', N'Quận 1', N'TP. Hồ Chí Minh', 1),
+    (@KH1, N'Nguyễn Văn An', N'0901234567', N'456 Võ Văn Ngân', N'Phường Linh Chiểu', N'Thủ Đức', N'TP. Hồ Chí Minh', 0);
+END
+
+IF @KH2 IS NOT NULL
+BEGIN
+    INSERT INTO dbo.DiaChi (KhachHangId, HoTenNhan, SdtNhan, DiaChi, PhuongXa, QuanHuyen, TinhTP, MacDinh) VALUES
+    (@KH2, N'Trần Thị Bình', N'0902345678', N'789 Lê Lợi', N'Phường Bến Thành', N'Quận 1', N'TP. Hồ Chí Minh', 1);
+END
+
+IF @KH3 IS NOT NULL
+BEGIN
+    INSERT INTO dbo.DiaChi (KhachHangId, HoTenNhan, SdtNhan, DiaChi, PhuongXa, QuanHuyen, TinhTP, MacDinh) VALUES
+    (@KH3, N'Lê Văn Cường', N'0903456789', N'321 Hai Bà Trưng', N'Phường Đakao', N'Quận 1', N'TP. Hồ Chí Minh', 1);
+END
+
+IF @KH4 IS NOT NULL
+BEGIN
+    INSERT INTO dbo.DiaChi (KhachHangId, HoTenNhan, SdtNhan, DiaChi, PhuongXa, QuanHuyen, TinhTP, MacDinh) VALUES
+    (@KH4, N'Phạm Thị Dung', N'0904567890', N'654 Pasteur', N'Phường 6', N'Quận 3', N'TP. Hồ Chí Minh', 1);
+END
+GO
+
+GO
+
+-- ==================== KHUYẾN MÃI ====================
+PRINT N'Đang thêm Khuyến Mãi...';
+
 INSERT INTO dbo.KhuyenMai (Ma, Ten, MoTa, Loai, GiaTri, GiamToiDa, DieuKienApDung, SoLuong, NgayBatDau, NgayKetThuc, TrangThai) VALUES
-(N'WELCOME10', N'Giảm 10% cho khách hàng mới', N'Áp dụng cho đơn hàng đầu tiên', N'percent', 10, 100000, 0, 100, '2024-01-01', '2024-12-31', 1),
-(N'SALE50K', N'Giảm 50.000đ', N'Giảm 50k cho đơn từ 500k', N'fixed', 50000, NULL, 500000, 50, '2024-01-01', '2024-12-31', 1),
-(N'FREESHIP', N'Miễn phí vận chuyển', N'Miễn phí ship cho đơn từ 300k', N'fixed', 30000, NULL, 300000, 200, '2024-01-01', '2024-12-31', 1),
-(N'SUMMER2024', N'Sale mùa hè 2024', N'Giảm 20% tất cả sản phẩm', N'percent', 20, 200000, 300000, 500, '2024-06-01', '2024-08-31', 1);
+(N'WELCOME10', N'Giảm 10% cho khách hàng mới', N'Áp dụng cho đơn hàng đầu tiên từ 500k', N'percent', 10, 100000, 500000, 100, '2024-01-01', '2025-12-31', 1),
+(N'FREESHIP', N'Miễn phí vận chuyển', N'Áp dụng cho đơn từ 1 triệu', N'fixed', 30000, NULL, 1000000, 500, '2024-01-01', '2025-12-31', 1),
+(N'SUMMER2024', N'Giảm 15% mùa hè', N'Áp dụng cho tất cả sản phẩm', N'percent', 15, 200000, 300000, 200, '2024-06-01', '2024-08-31', 1),
+(N'BLACKFRIDAY', N'Giảm 500k Black Friday', N'Giảm cố định 500k cho đơn từ 3 triệu', N'fixed', 500000, NULL, 3000000, 50, '2024-11-24', '2024-11-30', 1);
+GO
 
--- Newsletter (Sample)
+GO
+
+-- ==================== NEWSLETTER ====================
+PRINT N'Đang thêm Newsletter...';
+
 INSERT INTO dbo.Newsletter (Email, IsActive) VALUES
-(N'test1@example.com', 1),
-(N'test2@example.com', 1),
-(N'test3@example.com', 0),
-(N'newsletter@example.com', 1);
-
--- SanPham (Sample - 10 sản phẩm)
-INSERT INTO dbo.SanPham (DanhMucId, ThuongHieuId, ChatLieuId, Ten, MoTa, TrangThai) VALUES
-(1, 1, 2, N'Nike Air Zoom Pegasus 40', N'Giày chạy bộ cao cấp với công nghệ Air Zoom', 1),
-(5, 2, 2, N'Adidas Ultraboost 23', N'Giày thể thao với đế Boost êm ái', 1),
-(2, 4, 4, N'Converse Chuck Taylor All Star', N'Giày casual cổ điển, phong cách đường phố', 1),
-(4, 5, 1, N'Timberland 6-Inch Premium Boot', N'Boots da bò cao cấp, chống nước', 1),
-(5, 3, 2, N'Puma RS-X', N'Giày sneaker phong cách retro', 1),
-(2, 6, 4, N'Vans Old Skool', N'Giày skateboard cổ điển với sọc đặc trưng', 1),
-(1, 7, 2, N'New Balance 990v6', N'Giày chạy bộ cao cấp Made in USA', 1),
-(5, 8, 6, N'Reebok Club C 85', N'Giày tennis cổ điển, phong cách tối giản', 1),
-(3, 1, 1, N'Nike Air Force 1', N'Giày thể thao kinh điển, phù hợp mọi phong cách', 1),
-(5, 2, 2, N'Adidas Stan Smith', N'Giày tennis huyền thoại, thiết kế tối giản', 1);
-
--- SanPhamChiTiet (Sample - Variants cho 3 sản phẩm đầu)
--- Nike Air Zoom Pegasus 40
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(1, 1, 6, N'NIKE-PEG40-BLK-40', 3200000, 3500000, 50, N'/images/nike-pegasus-black.jpg', 1),
-(1, 1, 7, N'NIKE-PEG40-BLK-41', 3200000, 3500000, 45, N'/images/nike-pegasus-black.jpg', 1),
-(1, 2, 6, N'NIKE-PEG40-WHT-40', 3200000, 3500000, 40, N'/images/nike-pegasus-white.jpg', 1),
-(1, 2, 7, N'NIKE-PEG40-WHT-41', 3200000, 3500000, 35, N'/images/nike-pegasus-white.jpg', 1),
-(1, 3, 6, N'NIKE-PEG40-GRY-40', 3200000, 3500000, 30, N'/images/nike-pegasus-grey.jpg', 1);
-
--- Adidas Ultraboost 23
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(2, 1, 6, N'ADIDAS-UB23-BLK-40', 4500000, 5000000, 60, N'/images/adidas-ultraboost-black.jpg', 1),
-(2, 1, 7, N'ADIDAS-UB23-BLK-41', 4500000, 5000000, 55, N'/images/adidas-ultraboost-black.jpg', 1),
-(2, 2, 6, N'ADIDAS-UB23-WHT-40', 4500000, 5000000, 50, N'/images/adidas-ultraboost-white.jpg', 1),
-(2, 2, 7, N'ADIDAS-UB23-WHT-41', 4500000, 5000000, 45, N'/images/adidas-ultraboost-white.jpg', 1),
-(2, 4, 6, N'ADIDAS-UB23-NVY-40', 4500000, 5000000, 40, N'/images/adidas-ultraboost-navy.jpg', 1);
-
--- Converse Chuck Taylor
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(3, 1, 5, N'CONV-CT-BLK-39', 1200000, 1500000, 100, N'/images/converse-chuck-black.jpg', 1),
-(3, 1, 6, N'CONV-CT-BLK-40', 1200000, 1500000, 95, N'/images/converse-chuck-black.jpg', 1),
-(3, 2, 5, N'CONV-CT-WHT-39', 1200000, 1500000, 90, N'/images/converse-chuck-white.jpg', 1),
-(3, 2, 6, N'CONV-CT-WHT-40', 1200000, 1500000, 85, N'/images/converse-chuck-white.jpg', 1),
-(3, 6, 5, N'CONV-CT-RED-39', 1200000, 1500000, 80, N'/images/converse-chuck-red.jpg', 1);
-
--- Timberland Boot
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(4, 5, 7, N'TIMB-BOOT-BRN-41', 5500000, 6000000, 30, N'/images/timberland-boot-brown.jpg', 1),
-(4, 5, 8, N'TIMB-BOOT-BRN-42', 5500000, 6000000, 28, N'/images/timberland-boot-brown.jpg', 1),
-(4, 1, 7, N'TIMB-BOOT-BLK-41', 5500000, 6000000, 25, N'/images/timberland-boot-black.jpg', 1),
-(4, 1, 8, N'TIMB-BOOT-BLK-42', 5500000, 6000000, 22, N'/images/timberland-boot-black.jpg', 1);
-
--- Puma RS-X
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(5, 2, 6, N'PUMA-RSX-WHT-40', 2800000, 3200000, 70, N'/images/puma-rsx-white.jpg', 1),
-(5, 2, 7, N'PUMA-RSX-WHT-41', 2800000, 3200000, 65, N'/images/puma-rsx-white.jpg', 1),
-(5, 1, 6, N'PUMA-RSX-BLK-40', 2800000, 3200000, 60, N'/images/puma-rsx-black.jpg', 1),
-(5, 10, 6, N'PUMA-RSX-ORG-40', 2800000, 3200000, 55, N'/images/puma-rsx-orange.jpg', 1);
-
--- Vans Old Skool
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(6, 1, 6, N'VANS-OS-BLK-40', 1800000, 2000000, 80, N'/images/vans-oldskool-black.jpg', 1),
-(6, 1, 7, N'VANS-OS-BLK-41', 1800000, 2000000, 75, N'/images/vans-oldskool-black.jpg', 1),
-(6, 2, 6, N'VANS-OS-WHT-40', 1800000, 2000000, 70, N'/images/vans-oldskool-white.jpg', 1),
-(6, 4, 6, N'VANS-OS-NVY-40', 1800000, 2000000, 65, N'/images/vans-oldskool-navy.jpg', 1);
-
--- New Balance 990v6
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(7, 3, 7, N'NB-990V6-GRY-41', 6500000, 7000000, 20, N'/images/nb-990-grey.jpg', 1),
-(7, 3, 8, N'NB-990V6-GRY-42', 6500000, 7000000, 18, N'/images/nb-990-grey.jpg', 1),
-(7, 1, 7, N'NB-990V6-BLK-41', 6500000, 7000000, 15, N'/images/nb-990-black.jpg', 1);
-
--- Reebok Club C 85
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(8, 2, 6, N'REEBOK-CC85-WHT-40', 2200000, 2500000, 90, N'/images/reebok-clubc-white.jpg', 1),
-(8, 2, 7, N'REEBOK-CC85-WHT-41', 2200000, 2500000, 85, N'/images/reebok-clubc-white.jpg', 1),
-(8, 1, 6, N'REEBOK-CC85-BLK-40', 2200000, 2500000, 80, N'/images/reebok-clubc-black.jpg', 1);
-
--- Nike Air Force 1
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(9, 2, 6, N'NIKE-AF1-WHT-40', 2800000, 3000000, 100, N'/images/nike-af1-white.jpg', 1),
-(9, 2, 7, N'NIKE-AF1-WHT-41', 2800000, 3000000, 95, N'/images/nike-af1-white.jpg', 1),
-(9, 1, 6, N'NIKE-AF1-BLK-40', 2800000, 3000000, 90, N'/images/nike-af1-black.jpg', 1),
-(9, 1, 7, N'NIKE-AF1-BLK-41', 2800000, 3000000, 85, N'/images/nike-af1-black.jpg', 1);
-
--- Adidas Stan Smith
-INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
-(10, 2, 6, N'ADIDAS-SS-WHT-40', 2500000, 2800000, 110, N'/images/adidas-stansmith-white.jpg', 1),
-(10, 2, 7, N'ADIDAS-SS-WHT-41', 2500000, 2800000, 105, N'/images/adidas-stansmith-white.jpg', 1),
-(10, 8, 6, N'ADIDAS-SS-GRN-40', 2500000, 2800000, 100, N'/images/adidas-stansmith-green.jpg', 1);
+(N'subscriber1@gmail.com', 1),
+(N'subscriber2@gmail.com', 1),
+(N'subscriber3@gmail.com', 1);
+GO
 
 GO
 
-/* ==================== STORED PROCEDURES ==================== */
-
--- Procedure: Lấy sản phẩm bán chạy
-CREATE OR ALTER PROCEDURE sp_GetBestSellingProducts
-    @Top INT = 10
-AS
-BEGIN
-    SELECT TOP (@Top)
-        sp.SanPhamId,
-        sp.Ten,
-        sp.TrangThai,
-        th.Ten AS ThuongHieu,
-        dm.Ten AS DanhMuc,
-        SUM(hdct.SoLuong) AS TongSoLuongBan,
-        SUM(hdct.ThanhTien) AS TongDoanhThu,
-        AVG(CAST(dg.DiemSao AS FLOAT)) AS DiemTrungBinh,
-        COUNT(DISTINCT dg.DanhGiaId) AS SoLuotDanhGia
-    FROM dbo.SanPham sp
-    INNER JOIN dbo.HoaDonChiTiet hdct ON sp.SanPhamId = hdct.VariantId
-    INNER JOIN dbo.HoaDon hd ON hdct.HoaDonId = hd.HoaDonId
-    LEFT JOIN dbo.ThuongHieu th ON sp.ThuongHieuId = th.ThuongHieuId
-    LEFT JOIN dbo.DanhMuc dm ON sp.DanhMucId = dm.DanhMucId
-    LEFT JOIN dbo.DanhGia dg ON sp.SanPhamId = dg.SanPhamId AND dg.TrangThai = 1
-    WHERE hd.TrangThai = N'HoanThanh'
-    GROUP BY sp.SanPhamId, sp.Ten, sp.TrangThai, th.Ten, dm.Ten
-    ORDER BY TongSoLuongBan DESC;
-END;
+-- ==================== THỐNG KÊ ====================
+SELECT 'VaiTro' AS [Bảng], COUNT(*) AS [Số Lượng] FROM dbo.VaiTro
+UNION ALL
+SELECT 'DanhMuc', COUNT(*) FROM dbo.DanhMuc
+UNION ALL
+SELECT 'ThuongHieu', COUNT(*) FROM dbo.ThuongHieu
+UNION ALL
+SELECT 'MauSac', COUNT(*) FROM dbo.MauSac
+UNION ALL
+SELECT 'KichThuoc', COUNT(*) FROM dbo.KichThuoc
+UNION ALL
+SELECT 'ChatLieu', COUNT(*) FROM dbo.ChatLieu
+UNION ALL
+SELECT 'SanPham', COUNT(*) FROM dbo.SanPham
+UNION ALL
+SELECT 'SanPhamChiTiet', COUNT(*) FROM dbo.SanPhamChiTiet
+UNION ALL
+SELECT 'KhachHang', COUNT(*) FROM dbo.KhachHang
+UNION ALL
+SELECT 'NhanVien', COUNT(*) FROM dbo.NhanVien
+UNION ALL
+SELECT 'DiaChi', COUNT(*) FROM dbo.DiaChi
+UNION ALL
+SELECT 'KhuyenMai', COUNT(*) FROM dbo.KhuyenMai
+UNION ALL
+SELECT 'Newsletter', COUNT(*) FROM dbo.Newsletter;
 GO
 
--- Procedure: Thống kê doanh thu theo thời gian
-CREATE OR ALTER PROCEDURE sp_GetRevenueByDateRange
-    @StartDate DATE,
-    @EndDate DATE
-AS
-BEGIN
-    SELECT 
-        CAST(hd.CreatedAt AS DATE) AS Ngay,
-        COUNT(DISTINCT hd.HoaDonId) AS SoDonHang,
-        SUM(hd.TongTien) AS TongTien,
-        SUM(hd.GiamGia) AS TongGiamGia,
-        SUM(hd.PhiVanChuyen) AS TongPhiShip,
-        SUM(hd.TongThanhToan) AS DoanhThu
-    FROM dbo.HoaDon hd
-    WHERE hd.TrangThai = N'HoanThanh'
-        AND CAST(hd.CreatedAt AS DATE) BETWEEN @StartDate AND @EndDate
-    GROUP BY CAST(hd.CreatedAt AS DATE)
-    ORDER BY Ngay;
-END;
-GO
-
--- Procedure: Thống kê tồn kho
-CREATE OR ALTER PROCEDURE sp_GetInventoryReport
-AS
-BEGIN
-    SELECT 
-        sp.SanPhamId,
-        sp.Ten AS TenSanPham,
-        th.Ten AS ThuongHieu,
-        dm.Ten AS DanhMuc,
-        COUNT(spct.VariantId) AS SoBienThe,
-        SUM(spct.SoLuongTon) AS TongTonKho,
-        MIN(spct.SoLuongTon) AS TonKhoThapNhat,
-                MAX(spct.SoLuongTon) AS TonKhoCaoNhat,
-        AVG(spct.GiaBan) AS GiaTrungBinh,
-        SUM(spct.SoLuongTon * spct.GiaBan) AS GiaTriTonKho
-    FROM dbo.SanPham sp
-    INNER JOIN dbo.SanPhamChiTiet spct ON sp.SanPhamId = spct.SanPhamId
-    LEFT JOIN dbo.ThuongHieu th ON sp.ThuongHieuId = th.ThuongHieuId
-    LEFT JOIN dbo.DanhMuc dm ON sp.DanhMucId = dm.DanhMucId
-    WHERE sp.TrangThai = 1 AND spct.TrangThai = 1
-    GROUP BY sp.SanPhamId, sp.Ten, th.Ten, dm.Ten
-    ORDER BY TongTonKho ASC;
-END;
-GO
-
--- Procedure: Lấy top khách hàng VIP
-CREATE OR ALTER PROCEDURE sp_GetTopCustomers
-    @Top INT = 10
-AS
-BEGIN
-    SELECT TOP (@Top)
-        kh.KhachHangId,
-        kh.HoTen,
-        kh.Email,
-        kh.Sdt,
-        COUNT(DISTINCT hd.HoaDonId) AS SoDonHang,
-        SUM(hd.TongThanhToan) AS TongChiTieu,
-        AVG(hd.TongThanhToan) AS GiaTriTrungBinh,
-        MAX(hd.CreatedAt) AS LanMuaCuoi
-    FROM dbo.KhachHang kh
-    INNER JOIN dbo.HoaDon hd ON kh.KhachHangId = hd.KhachHangId
-    WHERE hd.TrangThai = N'HoanThanh'
-    GROUP BY kh.KhachHangId, kh.HoTen, kh.Email, kh.Sdt
-    ORDER BY TongChiTieu DESC;
-END;
-GO
-
--- Procedure: Cập nhật trạng thái đơn hàng
-CREATE OR ALTER PROCEDURE sp_UpdateOrderStatus
-    @HoaDonId INT,
-    @TrangThaiMoi NVARCHAR(50),
-    @NhanVienId INT = NULL,
-    @GhiChu NVARCHAR(MAX) = NULL
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    DECLARE @TrangThaiCu NVARCHAR(50);
-    
-    -- Lấy trạng thái cũ
-    SELECT @TrangThaiCu = TrangThai 
-    FROM dbo.HoaDon 
-    WHERE HoaDonId = @HoaDonId;
-    
-    IF @TrangThaiCu IS NULL
-    BEGIN
-        RAISERROR(N'Không tìm thấy đơn hàng', 16, 1);
-        RETURN;
-    END
-    
-    -- Cập nhật trạng thái
-    UPDATE dbo.HoaDon
-    SET TrangThai = @TrangThaiMoi,
-        UpdatedAt = SYSUTCDATETIME()
-    WHERE HoaDonId = @HoaDonId;
-    
-    -- Lưu lịch sử
-    INSERT INTO dbo.LichSuTrangThai (HoaDonId, TrangThaiCu, TrangThaiMoi, NhanVienId, GhiChu)
-    VALUES (@HoaDonId, @TrangThaiCu, @TrangThaiMoi, @NhanVienId, @GhiChu);
-    
-    -- Nếu hủy đơn, hoàn lại tồn kho
-    IF @TrangThaiMoi = N'Huy'
-    BEGIN
-        UPDATE spct
-        SET spct.SoLuongTon = spct.SoLuongTon + hdct.SoLuong
-        FROM dbo.SanPhamChiTiet spct
-        INNER JOIN dbo.HoaDonChiTiet hdct ON spct.VariantId = hdct.VariantId
-        WHERE hdct.HoaDonId = @HoaDonId;
-    END
-END;
-GO
-
--- Procedure: Tìm kiếm sản phẩm
-CREATE OR ALTER PROCEDURE sp_SearchProducts
-    @Keyword NVARCHAR(200) = NULL,
-    @DanhMucId INT = NULL,
-    @ThuongHieuId INT = NULL,
-    @MinPrice DECIMAL(18,2) = NULL,
-    @MaxPrice DECIMAL(18,2) = NULL,
-    @PageNumber INT = 1,
-    @PageSize INT = 20
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
-    
-    WITH ProductCTE AS
-    (
-        SELECT DISTINCT
-            sp.SanPhamId,
-            sp.Ten,
-            sp.MoTa,
-            sp.TrangThai,
-            th.Ten AS ThuongHieu,
-            dm.Ten AS DanhMuc,
-            MIN(spct.GiaBan) AS GiaThapNhat,
-            MAX(spct.GiaBan) AS GiaCaoNhat,
-            SUM(spct.SoLuongTon) AS TongTonKho,
-            AVG(CAST(dg.DiemSao AS FLOAT)) AS DiemTrungBinh,
-            COUNT(DISTINCT dg.DanhGiaId) AS SoLuotDanhGia,
-            sp.CreatedAt
-        FROM dbo.SanPham sp
-        INNER JOIN dbo.SanPhamChiTiet spct ON sp.SanPhamId = spct.SanPhamId
-        LEFT JOIN dbo.ThuongHieu th ON sp.ThuongHieuId = th.ThuongHieuId
-        LEFT JOIN dbo.DanhMuc dm ON sp.DanhMucId = dm.DanhMucId
-        LEFT JOIN dbo.DanhGia dg ON sp.SanPhamId = dg.SanPhamId AND dg.TrangThai = 1
-        WHERE sp.TrangThai = 1 
-            AND spct.TrangThai = 1
-            AND (@Keyword IS NULL OR sp.Ten LIKE N'%' + @Keyword + N'%')
-            AND (@DanhMucId IS NULL OR sp.DanhMucId = @DanhMucId)
-            AND (@ThuongHieuId IS NULL OR sp.ThuongHieuId = @ThuongHieuId)
-        GROUP BY sp.SanPhamId, sp.Ten, sp.MoTa, sp.TrangThai, th.Ten, dm.Ten, sp.CreatedAt
-        HAVING (@MinPrice IS NULL OR MIN(spct.GiaBan) >= @MinPrice)
-            AND (@MaxPrice IS NULL OR MAX(spct.GiaBan) <= @MaxPrice)
-    )
-    SELECT *,
-        (SELECT COUNT(*) FROM ProductCTE) AS TotalRecords
-    FROM ProductCTE
-    ORDER BY CreatedAt DESC
-    OFFSET @Offset ROWS
-    FETCH NEXT @PageSize ROWS ONLY;
-END;
-GO
-
-/* ==================== VIEWS ==================== */
-
--- View: Thống kê tổng quan
-CREATE OR ALTER VIEW vw_DashboardStats
-AS
-SELECT
-    (SELECT COUNT(*) FROM dbo.SanPham WHERE TrangThai = 1) AS TongSanPham,
-    (SELECT COUNT(*) FROM dbo.SanPhamChiTiet WHERE TrangThai = 1) AS TongBienThe,
-    (SELECT SUM(SoLuongTon) FROM dbo.SanPhamChiTiet WHERE TrangThai = 1) AS TongTonKho,
-    (SELECT COUNT(*) FROM dbo.KhachHang WHERE TrangThai = 1) AS TongKhachHang,
-    (SELECT COUNT(*) FROM dbo.HoaDon WHERE TrangThai = N'ChoXuLy') AS DonHangChoXuLy,
-    (SELECT COUNT(*) FROM dbo.HoaDon WHERE TrangThai = N'GiaoHang') AS DonHangDangGiao,
-    (SELECT COUNT(*) FROM dbo.HoaDon WHERE TrangThai = N'HoanThanh' 
-        AND CAST(CreatedAt AS DATE) = CAST(GETDATE() AS DATE)) AS DonHangHomNay,
-    (SELECT ISNULL(SUM(TongThanhToan), 0) FROM dbo.HoaDon 
-        WHERE TrangThai = N'HoanThanh' 
-        AND CAST(CreatedAt AS DATE) = CAST(GETDATE() AS DATE)) AS DoanhThuHomNay,
-    (SELECT ISNULL(SUM(TongThanhToan), 0) FROM dbo.HoaDon 
-        WHERE TrangThai = N'HoanThanh' 
-        AND MONTH(CreatedAt) = MONTH(GETDATE()) 
-        AND YEAR(CreatedAt) = YEAR(GETDATE())) AS DoanhThuThangNay;
-GO
-
--- View: Chi tiết sản phẩm với thông tin đầy đủ
-CREATE OR ALTER VIEW vw_ProductDetails
-AS
-SELECT 
-    sp.SanPhamId,
-    sp.Ten AS TenSanPham,
-    sp.MoTa,
-    sp.TrangThai AS TrangThaiSanPham,
-    dm.Ten AS DanhMuc,
-    th.Ten AS ThuongHieu,
-    cl.Ten AS ChatLieu,
-    spct.VariantId,
-    spct.SKU,
-    spct.Barcode,
-    ms.Ten AS MauSac,
-    ms.MaHex,
-    kt.Ten AS KichThuoc,
-    spct.GiaBan,
-    spct.GiaGoc,
-    spct.SoLuongTon,
-    spct.HinhAnh,
-    spct.TrangThai AS TrangThaiVariant,
-    sp.CreatedAt,
-    sp.UpdatedAt
-FROM dbo.SanPham sp
-INNER JOIN dbo.SanPhamChiTiet spct ON sp.SanPhamId = spct.SanPhamId
-LEFT JOIN dbo.DanhMuc dm ON sp.DanhMucId = dm.DanhMucId
-LEFT JOIN dbo.ThuongHieu th ON sp.ThuongHieuId = th.ThuongHieuId
-LEFT JOIN dbo.ChatLieu cl ON sp.ChatLieuId = cl.ChatLieuId
-LEFT JOIN dbo.MauSac ms ON spct.MauSacId = ms.MauSacId
-LEFT JOIN dbo.KichThuoc kt ON spct.KichThuocId = kt.KichThuocId;
-GO
-
--- View: Chi tiết đơn hàng
-CREATE OR ALTER VIEW vw_OrderDetails
-AS
-SELECT 
-    hd.HoaDonId,
-    hd.MaHoaDon,
-    hd.CreatedAt AS NgayDat,
-    hd.TrangThai,
-    kh.KhachHangId,
-    kh.HoTen AS TenKhachHang,
-    kh.Email AS EmailKhachHang,
-    kh.Sdt AS SdtKhachHang,
-    hd.HoTenNhan,
-    hd.SdtNhan,
-    hd.DiaChiNhan,
-    hd.PhuongXa,
-    hd.QuanHuyen,
-    hd.TinhTP,
-    hd.PhuongThucThanhToan,
-    hd.TongTien,
-    hd.GiamGia,
-    hd.PhiVanChuyen,
-    hd.TongThanhToan,
-    km.Ma AS MaKhuyenMai,
-    km.Ten AS TenKhuyenMai,
-    nv.HoTen AS NhanVienXuLy,
-    hd.GhiChu
-FROM dbo.HoaDon hd
-INNER JOIN dbo.KhachHang kh ON hd.KhachHangId = kh.KhachHangId
-LEFT JOIN dbo.KhuyenMai km ON hd.KhuyenMaiId = km.KhuyenMaiId
-LEFT JOIN dbo.NhanVien nv ON hd.NhanVienId = nv.NhanVienId;
-GO
-
-/* ==================== TRIGGERS ==================== */
-
--- Trigger: Tự động cập nhật UpdatedAt
-CREATE OR ALTER TRIGGER trg_UpdateTimestamp_SanPham
-ON dbo.SanPham
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    UPDATE dbo.SanPham
-    SET UpdatedAt = SYSUTCDATETIME()
-    FROM dbo.SanPham sp
-    INNER JOIN inserted i ON sp.SanPhamId = i.SanPhamId;
-END;
-GO
-
-CREATE OR ALTER TRIGGER trg_UpdateTimestamp_SanPhamChiTiet
-ON dbo.SanPhamChiTiet
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    UPDATE dbo.SanPhamChiTiet
-    SET UpdatedAt = SYSUTCDATETIME()
-    FROM dbo.SanPhamChiTiet spct
-    INNER JOIN inserted i ON spct.VariantId = i.VariantId;
-END;
-GO
-
-CREATE OR ALTER TRIGGER trg_UpdateTimestamp_KhachHang
-ON dbo.KhachHang
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    UPDATE dbo.KhachHang
-    SET UpdatedAt = SYSUTCDATETIME()
-    FROM dbo.KhachHang kh
-    INNER JOIN inserted i ON kh.KhachHangId = i.KhachHangId;
-END;
-GO
-
-CREATE OR ALTER TRIGGER trg_UpdateTimestamp_HoaDon
-ON dbo.HoaDon
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    UPDATE dbo.HoaDon
-    SET UpdatedAt = SYSUTCDATETIME()
-    FROM dbo.HoaDon hd
-    INNER JOIN inserted i ON hd.HoaDonId = i.HoaDonId;
-END;
-GO
-
--- Trigger: Kiểm tra tồn kho khi thêm vào giỏ hàng
-CREATE OR ALTER TRIGGER trg_CheckStock_GioHang
-ON dbo.GioHang
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    IF EXISTS (
-        SELECT 1
-        FROM inserted i
-        INNER JOIN dbo.SanPhamChiTiet spct ON i.VariantId = spct.VariantId
-        WHERE i.SoLuong > spct.SoLuongTon
-    )
-    BEGIN
-        RAISERROR(N'Số lượng vượt quá tồn kho', 16, 1);
-        ROLLBACK TRANSACTION;
-        RETURN;
-    END
-END;
-GO
-
--- Trigger: Kiểm tra tồn kho khi tạo đơn hàng
-CREATE OR ALTER TRIGGER trg_CheckStock_HoaDonChiTiet
-ON dbo.HoaDonChiTiet
-AFTER INSERT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    IF EXISTS (
-        SELECT 1
-        FROM inserted i
-        INNER JOIN dbo.SanPhamChiTiet spct ON i.VariantId = spct.VariantId
-                WHERE i.SoLuong > spct.SoLuongTon
-    )
-    BEGIN
-        RAISERROR(N'Số lượng vượt quá tồn kho', 16, 1);
-        ROLLBACK TRANSACTION;
-        RETURN;
-    END
-    
-    -- Trừ tồn kho
-    UPDATE spct
-    SET spct.SoLuongTon = spct.SoLuongTon - i.SoLuong
-    FROM dbo.SanPhamChiTiet spct
-    INNER JOIN inserted i ON spct.VariantId = i.VariantId;
-END;
-GO
-
--- Trigger: Tự động tính ThanhTien cho HoaDonChiTiet
-CREATE OR ALTER TRIGGER trg_CalculateThanhTien_HoaDonChiTiet
-ON dbo.HoaDonChiTiet
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    UPDATE hdct
-    SET hdct.ThanhTien = hdct.SoLuong * hdct.DonGia
-    FROM dbo.HoaDonChiTiet hdct
-    INNER JOIN inserted i ON hdct.HoaDonChiTietId = i.HoaDonChiTietId;
-END;
-GO
-
-/* ==================== FUNCTIONS ==================== */
-
--- Function: Tính tổng giá trị đơn hàng
-CREATE OR ALTER FUNCTION fn_CalculateOrderTotal
-(
-    @HoaDonId INT
-)
-RETURNS DECIMAL(18,2)
-AS
-BEGIN
-    DECLARE @Total DECIMAL(18,2);
-    
-    SELECT @Total = SUM(ThanhTien)
-    FROM dbo.HoaDonChiTiet
-    WHERE HoaDonId = @HoaDonId;
-    
-    RETURN ISNULL(@Total, 0);
-END;
-GO
-
--- Function: Kiểm tra voucher có hợp lệ không
-CREATE OR ALTER FUNCTION fn_IsVoucherValid
-(
-    @MaKhuyenMai NVARCHAR(50),
-    @NgayKiemTra DATE
-)
-RETURNS BIT
-AS
-BEGIN
-    DECLARE @IsValid BIT = 0;
-    
-    IF EXISTS (
-        SELECT 1
-        FROM dbo.KhuyenMai
-        WHERE Ma = @MaKhuyenMai
-            AND TrangThai = 1
-            AND SoLuong > 0
-            AND NgayBatDau <= @NgayKiemTra
-            AND NgayKetThuc >= @NgayKiemTra
-    )
-    BEGIN
-        SET @IsValid = 1;
-    END
-    
-    RETURN @IsValid;
-END;
-GO
-
--- Function: Tính điểm trung bình sản phẩm
-CREATE OR ALTER FUNCTION fn_GetProductRating
-(
-    @SanPhamId INT
-)
-RETURNS DECIMAL(3,2)
-AS
-BEGIN
-    DECLARE @Rating DECIMAL(3,2);
-    
-    SELECT @Rating = AVG(CAST(DiemSao AS DECIMAL(3,2)))
-    FROM dbo.DanhGia
-    WHERE SanPhamId = @SanPhamId
-        AND TrangThai = 1;
-    
-    RETURN ISNULL(@Rating, 0);
-END;
-GO
-
--- Function: Đếm số lượng đã bán của sản phẩm
-CREATE OR ALTER FUNCTION fn_GetProductSoldCount
-(
-    @SanPhamId INT
-)
-RETURNS INT
-AS
-BEGIN
-    DECLARE @SoldCount INT;
-    
-    SELECT @SoldCount = SUM(hdct.SoLuong)
-    FROM dbo.HoaDonChiTiet hdct
-    INNER JOIN dbo.SanPhamChiTiet spct ON hdct.VariantId = spct.VariantId
-    INNER JOIN dbo.HoaDon hd ON hdct.HoaDonId = hd.HoaDonId
-    WHERE spct.SanPhamId = @SanPhamId
-        AND hd.TrangThai = N'HoanThanh';
-    
-    RETURN ISNULL(@SoldCount, 0);
-END;
-GO
-
-/* ==================== INDEXES FOR PERFORMANCE ==================== */
-
--- Additional indexes for better performance
-CREATE NONCLUSTERED INDEX IX_HoaDon_KhachHang_TrangThai 
-ON dbo.HoaDon(KhachHangId, TrangThai) 
-INCLUDE (MaHoaDon, TongThanhToan, CreatedAt);
-
-CREATE NONCLUSTERED INDEX IX_HoaDonChiTiet_HoaDon_Variant 
-ON dbo.HoaDonChiTiet(HoaDonId, VariantId) 
-INCLUDE (SoLuong, DonGia, ThanhTien);
-
-CREATE NONCLUSTERED INDEX IX_SanPhamChiTiet_SanPham_TrangThai 
-ON dbo.SanPhamChiTiet(SanPhamId, TrangThai) 
-INCLUDE (GiaBan, SoLuongTon);
-
-CREATE NONCLUSTERED INDEX IX_DanhGia_SanPham_TrangThai 
-ON dbo.DanhGia(SanPhamId, TrangThai) 
-INCLUDE (DiemSao);
-
-CREATE NONCLUSTERED INDEX IX_GioHang_KhachHang_Variant 
-ON dbo.GioHang(KhachHangId, VariantId) 
-INCLUDE (SoLuong);
-
+PRINT N'- Tài khoản khách hàng: nguyenvanan@gmail.com / 123456';
+PRINT N'- Tài khoản admin: admin@shoponline.vn / admin123';
+PRINT N'- Mã khuyến mãi: WELCOME10, FREESHIP, SUMMER2024, BLACKFRIDAY';
 GO
