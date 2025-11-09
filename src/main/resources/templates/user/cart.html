@@ -36,100 +36,34 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/static">Trang chủ</a>
+                    <a class="nav-link" th:href="@{/Index}">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#products">Sản phẩm</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#categories">Danh mục</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#features">Dịch vụ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contact">Liên hệ</a>
+                    <a class="nav-link" href="#">Sản phẩm</a>
                 </li>
             </ul>
 
             <div class="d-flex align-items-center gap-3">
-                <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#searchModal">
-                    <i class="fas fa-search"></i>
-                </button>
-                <a href="#" class="btn-icon position-relative">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge-dot"></span>
-                </a>
                 <a th:href="@{/cart}" class="btn-icon position-relative">
                     <i class="fas fa-shopping-bag"></i>
-                    <span class="cart-badge">0</span>
-                </a>
-
-                <!-- USER DROPDOWN -->
-                <div th:if="${session.khachHang != null}" class="dropdown">
-                    <button class="btn-user-dropdown" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="user-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <span class="user-name d-none d-lg-inline" th:text="${session.khachHangTen}">User Name</span>
-                        <i class="fas fa-chevron-down ms-2 d-none d-lg-inline"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userDropdown">
-                        <li class="dropdown-header">
-                            <div class="user-info">
-                                <div class="user-avatar-large">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="user-details">
-                                    <div class="user-name-large" th:text="${session.khachHangTen}">Nguyễn Văn A</div>
-                                    <div class="user-email" th:text="${session.khachHang.email}">user@example.com</div>
-                                </div>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="/profile">
-                                <i class="fas fa-user me-2"></i>
-                                Tài khoản của tôi
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/orders">
-                                <i class="fas fa-box me-2"></i>
-                                Đơn hàng
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/wishlist">
-                                <i class="fas fa-heart me-2"></i>
-                                Yêu thích
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/admin">
-                                <i class="fas fa-address-card me-2"></i>
-                                Quản trị viên
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" th:href="@{/logout}">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                Đăng xuất
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- NÚT ĐĂNG NHẬP -->
-                <a th:if="${session.khachHang == null}" th:href="@{/login}" class="btn btn-primary btn-sm px-4">
-                    Đăng nhập
+                    <span class="cart-badge" id="cartBadge">3</span>
                 </a>
             </div>
         </div>
     </div>
 </nav>
 
+<!-- Breadcrumb -->
+<section class="breadcrumb-section py-3 bg-light">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a th:href="@{/Index}">Trang chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+            </ol>
+        </nav>
+    </div>
+</section>
 
 <!-- Cart Section -->
 <section class="cart-section py-5">
@@ -140,37 +74,33 @@
         <div class="row">
             <!-- Cart Items -->
             <div class="col-lg-8 mb-4">
-                <div class="cart-items" th:if="${cart.items.size() > 0}">
-                    <div class="cart-item mb-3" th:each="item, iterStat : ${cart.items}">
+                <div class="cart-items">
+
+                    <!-- Cart Item 1 -->
+                    <div class="cart-item">
                         <div class="row align-items-center">
                             <!-- Product Image -->
                             <div class="col-md-2 col-3">
-                                <img th:src="${item.imageUrl}" alt="Product" class="img-fluid rounded">
+                                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200"
+                                     alt="Product"
+                                     class="img-fluid rounded">
                             </div>
 
                             <!-- Product Info -->
                             <div class="col-md-4 col-9">
-                                <h6 class="mb-1" th:text="${item.name}"></h6>
-                                <p class="text-muted small mb-1">
-                                    <span th:text="'Màu: ' + ${item.color}"></span> |
-                                    <span th:text="'Size: ' + ${item.size}"></span>
-                                </p>
-                                <p class="text-primary fw-bold mb-0" th:text="${#numbers.formatDecimal(item.price,0,'','.')} + '₫'"></p>
+                                <h6 class="mb-1">Nike Air Zoom Pegasus 40</h6>
+                                <p class="text-muted small mb-1">Màu: Đen | Size: 42</p>
+                                <p class="text-primary fw-bold mb-0">3.200.000₫</p>
                             </div>
 
                             <!-- Quantity -->
                             <div class="col-md-3 col-6 mt-3 mt-md-0">
-                                <div class="quantity-selector d-flex align-items-center">
-                                    <button class="btn-quantity btn btn-outline-secondary" th:onclick="'decreaseQuantity(' + ${iterStat.index} + ')'">
+                                <div class="quantity-selector">
+                                    <button class="btn-quantity" onclick="decreaseQuantity('item1')">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    <input type="number"
-                                           th:id="'item' + ${iterStat.index}"
-                                           th:value="${item.quantity}"
-                                           min="1" max="10"
-                                           class="quantity-input form-control mx-1 text-center"
-                                           th:onchange="'updateItemTotal(' + ${iterStat.index} + ',' + ${item.price} + ')'">
-                                    <button class="btn-quantity btn btn-outline-secondary" th:onclick="'increaseQuantity(' + ${iterStat.index} + ')'">
+                                    <input type="number" id="item1" value="1" min="1" max="10" class="quantity-input" onchange="updateItemTotal('item1', 3200000)">
+                                    <button class="btn-quantity" onclick="increaseQuantity('item1')">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -178,28 +108,91 @@
 
                             <!-- Total & Remove -->
                             <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
-                                <p class="fw-bold mb-2" th:id="'total-item' + ${iterStat.index}"
-                                   th:text="${#numbers.formatDecimal(item.total,0,'','.')} + '₫'"></p>
-                                <button class="btn btn-sm btn-outline-danger" th:onclick="'removeItem(' + ${iterStat.index} + ')'">
+                                <p class="fw-bold mb-2" id="total-item1">3.200.000₫</p>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item1')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tổng tiền -->
-                    <div class="cart-total mt-4 text-end">
-                        <h5>Tổng tiền: <span th:text="${#numbers.formatDecimal(cart.totalPrice,0,'','.')} + '₫'"></span></h5>
-                    </div>
-                </div>
+                    <!-- Cart Item 2 -->
+                    <div class="cart-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 col-3">
+                                <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200"
+                                     alt="Product"
+                                     class="img-fluid rounded">
+                            </div>
 
-                <div th:if="${cart.items.size() == 0}">
-                    <p class="text-center text-muted">Giỏ hàng của bạn đang trống.</p>
+                            <div class="col-md-4 col-9">
+                                <h6 class="mb-1">Adidas Ultraboost 23</h6>
+                                <p class="text-muted small mb-1">Màu: Trắng | Size: 41</p>
+                                <p class="text-primary fw-bold mb-0">4.500.000₫</p>
+                            </div>
+
+                            <div class="col-md-3 col-6 mt-3 mt-md-0">
+                                <div class="quantity-selector">
+                                    <button class="btn-quantity" onclick="decreaseQuantity('item2')">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" id="item2" value="2" min="1" max="10" class="quantity-input" onchange="updateItemTotal('item2', 4500000)">
+                                    <button class="btn-quantity" onclick="increaseQuantity('item2')">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
+                                <p class="fw-bold mb-2" id="total-item2">9.000.000₫</p>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item2')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Item 3 -->
+                    <div class="cart-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 col-3">
+                                <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200"
+                                     alt="Product"
+                                     class="img-fluid rounded">
+                            </div>
+
+                            <div class="col-md-4 col-9">
+                                <h6 class="mb-1">Nike Air Force 1</h6>
+                                <p class="text-muted small mb-1">Màu: Trắng | Size: 40</p>
+                                <p class="text-primary fw-bold mb-0">2.800.000₫</p>
+                            </div>
+
+                            <div class="col-md-3 col-6 mt-3 mt-md-0">
+                                <div class="quantity-selector">
+                                    <button class="btn-quantity" onclick="decreaseQuantity('item3')">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" id="item3" value="1" min="1" max="10" class="quantity-input" onchange="updateItemTotal('item3', 2800000)">
+                                    <button class="btn-quantity" onclick="increaseQuantity('item3')">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
+                                <p class="fw-bold mb-2" id="total-item3">2.800.000₫</p>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item3')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="d-flex justify-content-between mt-4">
-                    <a th:href="@{/Index}" class="btn btn-outline-secondary">
+                    <a th:href="@{/}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>
                         Tiếp tục mua hàng
                     </a>
@@ -278,28 +271,6 @@
         </div>
     </div>
 </section>
-<!-- Search Modal -->
-<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body p-4">
-                <form action="/static" method="get">
-                    <div class="search-modal-header mb-4">
-                        <h5 class="mb-2" id="searchModalLabel">Tìm kiếm sản phẩm</h5>
-                        <p class="text-muted small mb-0">Nhập tên sản phẩm, thương hiệu hoặc mã sản phẩm</p>
-                    </div>
-                    <div class="input-group input-group-lg">
-                        <input type="text" class="form-control" name="search"
-                               placeholder="Tìm kiếm..." autofocus>
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Empty Cart Message (Hidden by default) -->
 <section class="empty-cart-section py-5 d-none" id="emptyCart">
@@ -307,7 +278,7 @@
         <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
         <h3 class="mb-3">Giỏ hàng trống</h3>
         <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
-        <a th:href="@{/Index}" class="btn btn-primary btn-lg">
+        <a th:href="@{/}" class="btn btn-primary btn-lg">
             <i class="fas fa-shopping-bag me-2"></i>
             Mua sắm ngay
         </a>
