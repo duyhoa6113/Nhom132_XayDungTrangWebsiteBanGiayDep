@@ -19,6 +19,30 @@ import java.util.Optional;
 @Repository
 public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
 
+    Page<SanPham> findByTrangThai(Integer trangThai, Pageable pageable);
+    Page<SanPham> findByDanhMuc_DanhMucIdAndTrangThai(Integer danhMucId, Integer trangThai, Pageable pageable);
+
+    /**
+     * Lấy sản phẩm cùng danh mục, loại trừ sản phẩm hiện tại
+     * Dùng cho: Sản phẩm liên quan
+     */
+    Page<SanPham> findByDanhMuc_DanhMucIdAndSanPhamIdNotAndTrangThai(
+            Integer danhMucId,
+            Integer excludeId,
+            Integer trangThai,
+            Pageable pageable
+    );
+
+    /**
+     * Lấy sản phẩm khác, loại trừ sản phẩm hiện tại
+     * Dùng khi không đủ sản phẩm cùng danh mục
+     */
+    Page<SanPham> findBySanPhamIdNotAndTrangThai(
+            Integer excludeId,
+            Integer trangThai,
+            Pageable pageable
+    );
+
     /**
      * Lấy sản phẩm nổi bật - mới nhất, đang active
      * @param pageable - phân trang
@@ -88,4 +112,10 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
      * @return Optional sản phẩm
      */
     Optional<SanPham> findBySanPhamIdAndTrangThai(Integer sanPhamId, int trangThai);
+
+
+    // Lấy sản phẩm bán chạy (giả lập - lấy random)
+    @Query(value = "SELECT TOP(?1) * FROM SanPham WHERE TrangThai = 1 ORDER BY NEWID()",
+            nativeQuery = true)
+    List<SanPham> findRandomProducts(int limit);
 }

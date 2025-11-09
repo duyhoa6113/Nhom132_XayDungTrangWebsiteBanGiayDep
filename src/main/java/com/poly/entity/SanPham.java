@@ -23,10 +23,6 @@ public class SanPham {
     @Column(name = "SanPhamId")
     private Integer sanPhamId;
 
-    // ============================================
-    // RELATIONSHIPS
-    // ============================================
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DanhMucId", nullable = false)
     private DanhMuc danhMuc;
@@ -41,10 +37,6 @@ public class SanPham {
 
     @OneToMany(mappedBy = "sanPham", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SanPhamChiTiet> variants;
-
-    // ============================================
-    // BASIC FIELDS
-    // ============================================
 
     @Column(name = "Ten", nullable = false, length = 200)
     private String ten;
@@ -61,9 +53,6 @@ public class SanPham {
     @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
 
-    // ============================================
-    // LIFECYCLE CALLBACKS
-    // ============================================
 
     @PrePersist
     protected void onCreate() {
@@ -74,10 +63,6 @@ public class SanPham {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-    // ============================================
-    // TRANSIENT METHODS - ✅ ĐÃ SỬA LỖI BigDecimal
-    // ============================================
 
     /**
      * Lấy hình ảnh chính của sản phẩm (từ variant đầu tiên)
@@ -188,10 +173,6 @@ public class SanPham {
         return chatLieu != null ? chatLieu.getTen() : "";
     }
 
-    // ============================================
-    // GETTERS AND SETTERS
-    // ============================================
-
     public Integer getSanPhamId() {
         return sanPhamId;
     }
@@ -272,10 +253,6 @@ public class SanPham {
         this.updatedAt = updatedAt;
     }
 
-    // ============================================
-    // EQUALS AND HASHCODE
-    // ============================================
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -289,10 +266,6 @@ public class SanPham {
         return getClass().hashCode();
     }
 
-    // ============================================
-    // TO STRING
-    // ============================================
-
     @Override
     public String toString() {
         return "SanPham{" +
@@ -301,4 +274,5 @@ public class SanPham {
                 ", trangThai=" + trangThai +
                 '}';
     }
+
 }

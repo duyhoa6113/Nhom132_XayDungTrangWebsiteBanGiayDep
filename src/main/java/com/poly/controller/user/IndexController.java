@@ -38,7 +38,7 @@ public class IndexController {
     @Autowired
     private SanPhamService sanPhamService;
 
-    @GetMapping({ "/Index"})
+    @GetMapping({ "/home","/Index"})
     public String index(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size,
