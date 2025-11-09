@@ -176,7 +176,7 @@ CREATE INDEX IX_NhanVien_TrangThai ON dbo.NhanVien(TrangThai);
 
 /* =============== CART =============== */
 
--- GioHang (ĐÃ SỬA - Đơn giản hóa)
+-- GioHang 
 CREATE TABLE dbo.GioHang
 (
     GioHangId    INT IDENTITY(1,1) PRIMARY KEY,
@@ -513,7 +513,9 @@ DECLARE @NikeReactId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%
 DECLARE @NikeAF1Id INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Air Force 1%');
 DECLARE @AdidasUBId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Ultraboost%');
 DECLARE @AdidasStanId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Stan Smith%');
+DECLARE @AdidasSolarboostId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Adidas Solarboost%');
 DECLARE @PumaRSXId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%RS-X%');
+DECLARE @PumaVelocityId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Puma Velocity Nitro%');
 DECLARE @VansOSId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Old Skool%');
 DECLARE @ConverseCTId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Chuck Taylor All Star%');
 DECLARE @NewBalance990Id INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%990v6%');
@@ -526,11 +528,14 @@ DECLARE @MauXam INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xám');
 DECLARE @MauXanhDuong INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xanh Dương');
 DECLARE @MauDo INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Đỏ');
 DECLARE @MauXanhLa INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xanh Lá');
+DECLARE @MauCam INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Cam');
 
 -- Lấy ID kích thước
 DECLARE @Size40 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'40');
 DECLARE @Size41 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'41');
 DECLARE @Size42 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'42');
+DECLARE @Size43 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'43');
+DECLARE @Size44 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'44');
 
 -- Nike Air Zoom Pegasus 40
 IF @NikePegasusId IS NOT NULL
@@ -587,6 +592,19 @@ BEGIN
     (@AdidasStanId, @MauXanhLa, @Size40, N'ADIDAS-STAN-GRN-40', N'8005000004', 2200000, 2500000, 30, N'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600', 1);
 END
 
+-- ADIDAS SOLARBOOST
+IF @AdidasSolarboostId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    -- Màu Đen
+    (@AdidasSolarboostId, @MauDen, @Size40, N'ADIDAS-SOLAR-BLK-40', N'8006000001', 3500000, 4000000, 55, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@AdidasSolarboostId, @MauDen, @Size41, N'ADIDAS-SOLAR-BLK-41', N'8006000002', 3500000, 4000000, 50, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@AdidasSolarboostId, @MauTrang, @Size41, N'ADIDAS-SOLAR-WHT-41', N'8006000006', 3500000, 4000000, 45, N'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=600', 1),
+    (@AdidasSolarboostId, @MauTrang, @Size42, N'ADIDAS-SOLAR-WHT-42', N'8006000007', 3500000, 4000000, 40, N'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=600', 1),
+	(@AdidasSolarboostId, @MauCam, @Size40, N'ADIDAS-SOLAR-ORG-40', N'8006000013', 3800000, 4000000, 20, N'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600', 1),
+    (@AdidasSolarboostId, @MauCam, @Size41, N'ADIDAS-SOLAR-ORG-41', N'8006000014', 3800000, 4000000, 15, N'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600', 1);
+ END   
+
 -- Puma RS-X
 IF @PumaRSXId IS NOT NULL
 BEGIN
@@ -595,6 +613,20 @@ BEGIN
     (@PumaRSXId, @MauDen, @Size41, N'PUMA-RSX-BLK-41', N'8007000002', 2500000, 2800000, 35, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
     (@PumaRSXId, @MauDo, @Size40, N'PUMA-RSX-RED-40', N'8007000003', 2500000, 2800000, 30, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1);
 END
+
+-- PUMA VELOCITY NITRO
+IF @PumaVelocityId IS NOT NULL
+BEGIN
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    -- Màu Đen
+    (@PumaVelocityId, @MauDen, @Size40, N'PUMA-VELO-BLK-40', N'8008000002', 2800000, 3200000, 50, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@PumaVelocityId, @MauDen, @Size41, N'PUMA-VELO-BLK-41', N'8008000003', 2800000, 3200000, 45, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@PumaVelocityId, @MauDen, @Size42, N'PUMA-VELO-BLK-42', N'8008000004', 2800000, 3200000, 40, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+	(@PumaVelocityId, @MauTrang, @Size40, N'PUMA-VELO-WHT-40', N'8008000007', 2800000, 3200000, 45, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@PumaVelocityId, @MauTrang, @Size41, N'PUMA-VELO-WHT-41', N'8008000008', 2800000, 3200000, 40, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+	(@PumaVelocityId, @MauDo, @Size41, N'PUMA-VELO-RED-41', N'8008000014', 2800000, 3200000, 20, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1),
+    (@PumaVelocityId, @MauDo, @Size42, N'PUMA-VELO-RED-42', N'8008000015', 2800000, 3200000, 15, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1);
+END    
 
 -- Vans Old Skool
 IF @VansOSId IS NOT NULL
