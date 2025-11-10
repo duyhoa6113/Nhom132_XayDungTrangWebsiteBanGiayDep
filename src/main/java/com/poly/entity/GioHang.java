@@ -51,7 +51,7 @@ public class GioHang {
         updatedAt = LocalDateTime.now();
     }
 
-    /**
+    /*#
      * Tính thành tiền
      */
     @Transient
