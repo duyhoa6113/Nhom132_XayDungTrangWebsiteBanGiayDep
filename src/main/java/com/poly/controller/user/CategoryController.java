@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -24,9 +26,6 @@ public class CategoryController {
     @Autowired
     private ProductService productService;
 
-    /**
-     *
-     */
     @GetMapping("/{categoryId}")
     public String showCategory(
             @PathVariable("categoryId") Integer categoryId,
@@ -43,9 +42,7 @@ public class CategoryController {
         try {
             // 1. Lấy thông tin danh mục
             var category = categoryService.getCategoryById(categoryId);
-            if (category == null) {
-                return "redirect:/";
-            }
+            if (category == null) return "redirect:/";
             model.addAttribute("category", category);
 
             // 2. Lấy tất cả danh mục cho sidebar
@@ -68,31 +65,32 @@ public class CategoryController {
             var materials = categoryService.getMaterialsByCategory(categoryId);
             model.addAttribute("materials", materials);
 
-            // 7. ✅ XỬ LÝ SORT - SIMPLE
-            Sort sorting;
+            // 7. Xử lý sort
+            Sort dbSort = Sort.by(Sort.Direction.DESC, "createdAt"); // mặc định
+            boolean sortByPrice = false;
+            boolean priceAsc = true;
+
             switch (sort) {
                 case "newest":
-                    sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                    dbSort = Sort.by(Sort.Direction.DESC, "createdAt");
                     break;
                 case "bestseller":
-                    sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                    dbSort = Sort.by(Sort.Direction.DESC, "soLuongDaBan");
                     break;
                 case "price-asc":
-                case "price-desc":
-                    // Tạm thời không sort theo giá
-                    sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                    sortByPrice = true;
+                    priceAsc = true;
                     break;
-                default:
-                    sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                case "price-desc":
+                    sortByPrice = true;
+                    priceAsc = false;
                     break;
             }
 
-            Pageable pageable = PageRequest.of(page, size, sorting);
+            Pageable pageable = PageRequest.of(page, size, dbSort);
 
-            // 8. ✅ LẤY SẢN PHẨM - SIMPLE
+            // 8. Lấy sản phẩm
             Page<SanPham> productsPage;
-
-            // Check có filter không
             boolean hasFilters = (brand != null && !brand.isEmpty()) ||
                     (priceRange != null && !priceRange.isEmpty()) ||
                     (size_filter != null && !size_filter.isEmpty()) ||
@@ -100,27 +98,36 @@ public class CategoryController {
                     (material != null && !material.isEmpty());
 
             if (hasFilters) {
-                // Có filter → Dùng filterProducts
                 productsPage = productService.filterProducts(
                         categoryId, brand, priceRange, size_filter,
                         color, material, null, pageable
                 );
             } else {
-                // Không có filter → Lấy tất cả sản phẩm trong category
                 productsPage = productService.getProductsByCategory(categoryId, pageable);
             }
 
-            // 9. Đếm tổng số sản phẩm
-            long totalProducts = productService.countProductsByCategory(categoryId);
+            // Tạo list mutable để sort
+            List<SanPham> products = new ArrayList<>(productsPage.getContent());
+
+             // 9. Sort theo giá nếu cần
+            if (sortByPrice) {
+                if (priceAsc) {
+                    products.sort(Comparator.comparing(SanPham::getGiaMin));
+                } else {
+                    products.sort(Comparator.comparing(SanPham::getGiaMin).reversed());
+                }
+            }
+
 
             // 10. Add vào model
-            model.addAttribute("products", productsPage.getContent());
+            long totalProducts = productService.countProductsByCategory(categoryId);
+            model.addAttribute("products", products);
             model.addAttribute("totalProducts", totalProducts);
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", productsPage.getTotalPages());
             model.addAttribute("totalElements", productsPage.getTotalElements());
 
-            // 11. Giữ lại filter đã chọn
+            // 11. Giữ lại filter và sort đã chọn
             model.addAttribute("selectedBrands", brand);
             model.addAttribute("selectedPriceRange", priceRange);
             model.addAttribute("selectedSizes", size_filter);
@@ -131,12 +138,10 @@ public class CategoryController {
             return "user/category";
 
         } catch (Exception e) {
-            // Log error
-            System.err.println("ERROR in CategoryController: " + e.getMessage());
+            System.err.println("❌ ERROR in CategoryController: " + e.getClass().getName());
             e.printStackTrace();
-
-            // Redirect về trang chủ nếu có lỗi
-            return "redirect:/";
+            model.addAttribute("errorMessage", "Đã xảy ra lỗi khi tải danh mục: " + e.getMessage());
+            return "error-page";
         }
     }
 }

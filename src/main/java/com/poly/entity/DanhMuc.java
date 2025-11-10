@@ -20,7 +20,7 @@ public class DanhMuc {
     private String moTa;
 
     @Column(name = "TrangThai", nullable = false)
-    private int trangThai = 1;  // ✅ QUAN TRỌNG: Phải là int hoặc Integer
+    private int trangThai = 1;
 
     @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
@@ -36,15 +36,14 @@ public class DanhMuc {
     @Transient
     private Long productCount;
 
-    public Long getProductCount() {
-        return productCount;
+    // ✅ Thêm getter này để Thymeleaf có thể dùng category.id
+    public Integer getId() {
+        return this.danhMucId;
     }
 
-    public void setProductCount(Long productCount) {
-        this.productCount = productCount;
-    }
+    public Long getProductCount() { return productCount; }
+    public void setProductCount(Long productCount) { this.productCount = productCount; }
 
-    // Getters and Setters
     public Integer getDanhMucId() { return danhMucId; }
     public void setDanhMucId(Integer danhMucId) { this.danhMucId = danhMucId; }
 
