@@ -64,6 +64,10 @@ public class SanPham {
         updatedAt = LocalDateTime.now();
     }
 
+    @Transient
+    private Integer soLuongDaBan;
+
+
     /**
      * Lấy hình ảnh chính của sản phẩm (từ variant đầu tiên)
      */
@@ -252,6 +256,15 @@ public class SanPham {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public Integer getSoLuongDaBan() {
+        return soLuongDaBan;
+    }
+
+    public void setSoLuongDaBan(Integer soLuongDaBan) {
+        this.soLuongDaBan = soLuongDaBan;
+    }
+
 
     @Override
     public boolean equals(Object o) {

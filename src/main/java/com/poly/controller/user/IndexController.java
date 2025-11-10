@@ -38,10 +38,10 @@ public class IndexController {
     @Autowired
     private SanPhamService sanPhamService;
 
-    @GetMapping({ "/home","/Index"})
+    @GetMapping({"/Index"})
     public String index(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) Integer category,
             @RequestParam(required = false) String search,
             Model model) {
@@ -70,7 +70,7 @@ public class IndexController {
         }
 
         // ===== THÊM PHẦN NÀY - Lấy sản phẩm nổi bật =====
-        List<SanPham> featuredProducts = sanPhamService.getFeaturedProducts(4);
+        List<SanPham> featuredProducts = sanPhamService.getFeaturedProducts(6);
         model.addAttribute("featuredProducts", featuredProducts);
         // ================================================
 
