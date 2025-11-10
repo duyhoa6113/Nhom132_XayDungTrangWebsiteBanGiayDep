@@ -6,6 +6,7 @@ import com.poly.repository.SanPhamRepository;
 import jakarta.persistence.criteria.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,7 @@ public class ProductService {
     private SanPhamRepository sanPhamRepository;
 
     /**
-     * Lọc sản phẩm với nhiều tiêu chí
-     * FIXED: Sử dụng Specification đúng cách
+     * ✅ FIXED: Lọc sản phẩm - trả về Page<SanPham>
      */
     public Page<SanPham> filterProducts(
             Integer categoryId,
@@ -31,19 +31,19 @@ public class ProductService {
             List<Integer> sizeIds,
             List<Integer> colorIds,
             List<Integer> materialIds,
-            Integer rating,
+            Integer rating,  // Tham số này sẽ bị bỏ qua
             Pageable pageable
     ) {
         Specification<SanPham> spec = createSpecification(
                 categoryId, brandIds, priceRange, sizeIds,
-                colorIds, materialIds, rating
+                colorIds, materialIds
         );
 
         return sanPhamRepository.findAll(spec, pageable);
     }
 
     /**
-     * Tạo Specification cho filter
+     * Tạo Specification cho filter (KHÔNG CÓ RATING)
      */
     private Specification<SanPham> createSpecification(
             Integer categoryId,
@@ -51,8 +51,7 @@ public class ProductService {
             String priceRange,
             List<Integer> sizeIds,
             List<Integer> colorIds,
-            List<Integer> materialIds,
-            Integer rating
+            List<Integer> materialIds
     ) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -189,25 +188,67 @@ public class ProductService {
     }
 
     /**
-     * Lấy sản phẩm theo danh mục (không filter)
+     * ✅ FIXED: Lấy sản phẩm theo danh mục - TRẢ VỀ Page
      */
     public Page<SanPham> getProductsByCategory(Integer categoryId, Pageable pageable) {
         return sanPhamRepository.findProductsByCategoryWithPage(categoryId, pageable);
     }
 
     /**
-     * Search sản phẩm theo tên
+     * ✅ Search sản phẩm theo tên - TRẢ VỀ Page
      */
     public Page<SanPham> searchProducts(String keyword, Pageable pageable) {
         return sanPhamRepository.searchProducts(keyword, pageable);
     }
 
     /**
-     * Lấy sản phẩm nổi bật
+     * ✅ FIXED: Lấy sản phẩm mới nhất - TRẢ VỀ Page
+     */
+    public Page<SanPham> getNewestProducts(Pageable pageable) {
+        return sanPhamRepository.findNewestProducts(pageable);
+    }
+
+    /**
+     * ✅ FIXED: Lấy sản phẩm nổi bật - TRẢ VỀ List
+     * Dùng cho homepage carousel/slider với số lượng cố định
      */
     public List<SanPham> getFeaturedProducts(int limit) {
         return sanPhamRepository.findFeaturedProducts(
-                org.springframework.data.domain.PageRequest.of(0, limit)
+                PageRequest.of(0, limit)
+        );
+    }
+
+    /**
+     * ✅ Lấy sản phẩm có discount cao - TRẢ VỀ List
+     */
+    public List<SanPham> getTopDiscountedProducts(int limit) {
+        return sanPhamRepository.findTopDiscountedProducts(
+                PageRequest.of(0, limit)
+        );
+    }
+
+    /**
+     * ✅ Lấy sản phẩm random (bán chạy giả lập) - TRẢ VỀ List
+     */
+    public List<SanPham> getRandomProducts(int limit) {
+        return sanPhamRepository.findRandomProducts(limit);
+    }
+
+    /**
+     * ✅ Lấy sản phẩm liên quan - TRẢ VỀ Page
+     */
+    public Page<SanPham> getRelatedProducts(Integer categoryId, Integer excludeId, Pageable pageable) {
+        return sanPhamRepository.findByDanhMuc_DanhMucIdAndSanPhamIdNotAndTrangThai(
+                categoryId, excludeId, 1, pageable
+        );
+    }
+
+    /**
+     * ✅ Lấy sản phẩm khác (fallback khi không đủ sản phẩm liên quan) - TRẢ VỀ Page
+     */
+    public Page<SanPham> getOtherProducts(Integer excludeId, Pageable pageable) {
+        return sanPhamRepository.findBySanPhamIdNotAndTrangThai(
+                excludeId, 1, pageable
         );
     }
 }
