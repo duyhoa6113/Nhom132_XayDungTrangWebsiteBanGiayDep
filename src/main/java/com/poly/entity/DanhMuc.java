@@ -2,6 +2,7 @@ package com.poly.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "DanhMuc")
@@ -27,6 +28,20 @@ public class DanhMuc {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    @OneToMany(mappedBy = "danhMuc")
+    private List<SanPham> sanPhams;
+
+    @Transient
+    private Long productCount;
+
+    public Long getProductCount() {
+        return productCount;
+    }
+
+    public void setProductCount(Long productCount) {
+        this.productCount = productCount;
     }
 
     // Getters and Setters

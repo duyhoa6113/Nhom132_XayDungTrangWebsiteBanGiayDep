@@ -53,6 +53,8 @@ public class SanPham {
     @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
 
+    @Column(name = "SoLuongDaBan")
+    private Integer soLuongDaBan;
 
     @PrePersist
     protected void onCreate() {
@@ -252,6 +254,15 @@ public class SanPham {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public Integer getSoLuongDaBan() {
+        return soLuongDaBan;
+    }
+
+    public void setSoLuongDaBan(Integer soLuongDaBan) {
+        this.soLuongDaBan = soLuongDaBan;
+    }
+
 
     @Override
     public boolean equals(Object o) {

@@ -789,3 +789,6 @@ PRINT N'- Tài khoản khách hàng: nguyenvanan@gmail.com / 123456';
 PRINT N'- Tài khoản admin: admin@shoponline.vn / admin123';
 PRINT N'- Mã khuyến mãi: WELCOME10, FREESHIP, SUMMER2024, BLACKFRIDAY';
 GO
+
+ALTER TABLE SanPham
+ADD soLuongDaBan INT DEFAULT 0;
