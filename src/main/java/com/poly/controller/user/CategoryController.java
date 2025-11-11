@@ -30,7 +30,7 @@ public class CategoryController {
     public String showCategory(
             @PathVariable("categoryId") Integer categoryId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "24") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "popular") String sort,
             @RequestParam(required = false) List<Integer> brand,
             @RequestParam(required = false) String priceRange,

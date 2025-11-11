@@ -14,16 +14,17 @@ import java.util.Optional;
 
 /**
  * Repository để truy vấn dữ liệu sản phẩm
- * ✅ FIXED: Thêm methods sort theo giá
+ *
  */
 @Repository
 public interface SanPhamRepository extends JpaRepository<SanPham, Integer>,
         JpaSpecificationExecutor<SanPham> {
 
-    // ========== EXISTING METHODS ==========
+    // ========== BASIC FIND METHODS ==========
 
-    Page<SanPham> findByTrangThai(Integer trangThai, Pageable pageable);
-    Page<SanPham> findByDanhMuc_DanhMucIdAndTrangThai(Integer danhMucId, Integer trangThai, Pageable pageable);
+    Page<SanPham> findByTrangThai(int trangThai, Pageable pageable);
+
+    Page<SanPham> findByDanhMuc_DanhMucIdAndTrangThai(Integer danhMucId, int trangThai, Pageable pageable);
 
     Page<SanPham> findByDanhMuc_DanhMucIdAndSanPhamIdNotAndTrangThai(
             Integer danhMucId,
@@ -38,9 +39,13 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer>,
             Pageable pageable
     );
 
-    Page<SanPham> findByTrangThai(int trangThai, Pageable pageable);
-    Page<SanPham> findByDanhMuc_DanhMucIdAndTrangThai(Integer danhMucId, int trangThai, Pageable pageable);
+    Optional<SanPham> findBySanPhamIdAndTrangThai(Integer sanPhamId, int trangThai);
 
+    // ========== QUERY METHODS - PAGE ==========
+
+    /**
+     * ✅ Tìm kiếm sản phẩm theo keyword (ONLY ONE - removed duplicate)
+     */
     @Query("SELECT sp FROM SanPham sp " +
             "LEFT JOIN sp.thuongHieu th " +
             "WHERE sp.trangThai = 1 " +
@@ -57,7 +62,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer>,
     @Query("SELECT sp FROM SanPham sp WHERE sp.thuongHieu.thuongHieuId = :brandId AND sp.trangThai = 1")
     Page<SanPham> findProductsByBrand(@Param("brandId") Integer brandId, Pageable pageable);
 
-    // ========== LIST METHODS ==========
+    // ========== QUERY METHODS - LIST ==========
 
     @Query("SELECT sp FROM SanPham sp WHERE sp.trangThai = 1 ORDER BY sp.createdAt DESC")
     List<SanPham> findFeaturedProducts(Pageable pageable);
@@ -76,11 +81,12 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer>,
     @Query("SELECT sp FROM SanPham sp WHERE sp.danhMuc.danhMucId = :categoryId AND sp.trangThai = 1")
     List<SanPham> findProductsByCategory(@Param("categoryId") Integer categoryId);
 
-    // ========== SINGLE OBJECT ==========
+    /**
+     * ✅ Autocomplete search - Top 10 results
+     */
+    List<SanPham> findTop10ByTenContainingIgnoreCaseAndTrangThai(String keyword, int trangThai);
 
-    Optional<SanPham> findBySanPhamIdAndTrangThai(Integer sanPhamId, int trangThai);
-
-    // ========== COUNT ==========
+    // ========== COUNT METHODS ==========
 
     @Query("SELECT COUNT(sp) FROM SanPham sp WHERE sp.danhMuc.danhMucId = :danhMucId AND sp.trangThai = :trangThai")
     long countByDanhMucIdAndTrangThai(@Param("danhMucId") Integer danhMucId,
@@ -96,11 +102,20 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer>,
             "AND sp.trangThai = 1")
     long countByMaterialId(@Param("materialId") Integer materialId);
 
-    // ========== ✅ NEW: SORT BY PRICE METHODS ==========
+    /**
+     * ✅ Đếm số kết quả tìm kiếm
+     */
+    @Query("SELECT COUNT(sp) FROM SanPham sp " +
+            "LEFT JOIN sp.thuongHieu th " +
+            "WHERE sp.trangThai = 1 " +
+            "AND (LOWER(sp.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(th.ten) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    long countSearchResults(@Param("keyword") String keyword);
+
+    // ========== PRICE SORT METHODS (Native Query) ==========
 
     /**
      * Lấy sản phẩm theo danh mục, sắp xếp theo giá tăng dần
-     * Native query để sort theo MIN(GiaBan) từ variants
      */
     @Query(value = """
         SELECT sp.* FROM SanPham sp

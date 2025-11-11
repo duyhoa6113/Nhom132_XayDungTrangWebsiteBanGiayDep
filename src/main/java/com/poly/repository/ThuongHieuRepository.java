@@ -12,43 +12,39 @@ import java.util.Optional;
 
 /**
  * Repository để truy vấn dữ liệu thương hiệu
+ * ✅ FIXED: Removed duplicates & fixed query without relationship
  *
  * @author Nhóm 132
  */
 @Repository
 public interface ThuongHieuRepository extends JpaRepository<ThuongHieu, Integer> {
 
+    // ========== BASIC CRUD METHODS ==========
+
     /**
      * Tìm thương hiệu theo trạng thái
-     * @param trangThai - 1: active, 0: inactive
-     * @return List thương hiệu
      */
     List<ThuongHieu> findByTrangThai(int trangThai);
 
     /**
      * Tìm thương hiệu theo trạng thái và sắp xếp theo tên
-     * @param trangThai - 1: active, 0: inactive
-     * @return List thương hiệu đã sắp xếp
      */
     List<ThuongHieu> findByTrangThaiOrderByTenAsc(int trangThai);
 
     /**
      * Tìm thương hiệu theo ID và trạng thái
-     * @param thuongHieuId - ID thương hiệu
-     * @param trangThai - 1: active, 0: inactive
-     * @return Optional thương hiệu
      */
     Optional<ThuongHieu> findByThuongHieuIdAndTrangThai(Integer thuongHieuId, int trangThai);
 
     /**
      * Tìm thương hiệu theo tên
-     * @param ten - Tên thương hiệu
-     * @return Optional thương hiệu
      */
     Optional<ThuongHieu> findByTen(String ten);
 
+    // ========== CATEGORY PAGE METHODS ==========
+
     /**
-     * ✅ THÊM MỚI: Lấy thương hiệu có trong danh mục kèm số lượng sản phẩm
+     * Lấy thương hiệu có trong danh mục kèm số lượng sản phẩm
      * Dùng cho filter sidebar trong category page
      */
     @Query("""
@@ -67,8 +63,7 @@ public interface ThuongHieuRepository extends JpaRepository<ThuongHieu, Integer>
     List<BrandWithCount> findBrandsByCategoryWithCount(@Param("categoryId") Integer categoryId);
 
     /**
-     * ✅ THÊM MỚI: Lấy tất cả thương hiệu kèm số lượng sản phẩm
-     * Dùng cho trang chủ hoặc admin
+     * Lấy tất cả thương hiệu kèm số lượng sản phẩm
      */
     @Query("""
         SELECT th.thuongHieuId as thuongHieuId,
@@ -83,7 +78,7 @@ public interface ThuongHieuRepository extends JpaRepository<ThuongHieu, Integer>
     List<BrandWithCount> findAllBrandsWithCount();
 
     /**
-     * ✅ THÊM MỚI: Lấy thương hiệu có sản phẩm (không lấy thương hiệu rỗng)
+     * Lấy thương hiệu có sản phẩm (không lấy thương hiệu rỗng)
      */
     @Query("SELECT DISTINCT th FROM ThuongHieu th " +
             "INNER JOIN SanPham sp ON th.thuongHieuId = sp.thuongHieu.thuongHieuId " +
@@ -92,24 +87,45 @@ public interface ThuongHieuRepository extends JpaRepository<ThuongHieu, Integer>
             "ORDER BY th.ten ASC")
     List<ThuongHieu> findBrandsWithProducts();
 
+    // ========== SEARCH PAGE METHODS ==========
+
     /**
-     * ✅ THÊM MỚI: Đếm số sản phẩm theo thương hiệu
+     * ✅ FIXED: Tìm thương hiệu theo keyword (cho search page)
+     * Không dùng th.sanPhams vì không có relationship mapping
+     */
+    @Query("SELECT DISTINCT th FROM ThuongHieu th " +
+            "INNER JOIN SanPham sp ON th.thuongHieuId = sp.thuongHieu.thuongHieuId " +
+            "WHERE sp.trangThai = 1 " +
+            "AND (LOWER(sp.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(th.ten) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND th.trangThai = 1 " +
+            "ORDER BY th.ten")
+    List<ThuongHieu> findBrandsByKeyword(@Param("keyword") String keyword);
+
+    /**
+     * Tìm thương hiệu theo tên (search trong admin)
+     * Chỉ search theo tên thương hiệu
+     */
+    @Query("SELECT th FROM ThuongHieu th " +
+            "WHERE LOWER(th.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "AND th.trangThai = 1 " +
+            "ORDER BY th.ten ASC")
+    List<ThuongHieu> searchBrandsByName(@Param("keyword") String keyword);
+
+    // ========== COUNT METHODS ==========
+
+    /**
+     * Đếm số sản phẩm theo thương hiệu
      */
     @Query("SELECT COUNT(sp) FROM SanPham sp " +
             "WHERE sp.thuongHieu.thuongHieuId = :brandId " +
             "AND sp.trangThai = 1")
     long countProductsByBrand(@Param("brandId") Integer brandId);
 
-    /**
-     * ✅ THÊM MỚI: Tìm thương hiệu theo tên (search, case-insensitive)
-     */
-    @Query("SELECT th FROM ThuongHieu th " +
-            "WHERE LOWER(th.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "AND th.trangThai = 1")
-    List<ThuongHieu> searchBrands(@Param("keyword") String keyword);
+    // ========== TOP BRANDS ==========
 
     /**
-     * ✅ THÊM MỚI: Lấy top thương hiệu có nhiều sản phẩm nhất
+     * Lấy top thương hiệu có nhiều sản phẩm nhất
      */
     @Query(value = """
         SELECT TOP(:limit) th.* 

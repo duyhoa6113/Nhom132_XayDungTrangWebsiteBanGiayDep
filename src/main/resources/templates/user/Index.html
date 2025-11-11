@@ -124,11 +124,15 @@
 
                 <!-- Search Box -->
                 <div class="col">
-                    <form action="/" method="get" class="search-form">
+                    <form action="/search" method="get" class="search-form">
                         <div class="search-box-main">
-                            <input type="text" name="search" class="search-input-main"
+                            <input type="text"
+                                   name="q"
+                                   class="search-input-main"
                                    placeholder="Tìm giày thể thao, sneaker, sandals..."
-                                   th:value="${search}">
+                                   th:value="${keyword}"
+                                   autocomplete="off"
+                                   required>
                             <button type="submit" class="btn-search-main">
                                 <i class="fas fa-search"></i>
                             </button>
@@ -542,6 +546,92 @@
         }
 
         lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('.search-input-main');
+
+        if (searchInput) {
+            let searchTimeout = null;
+
+            // Create suggestions dropdown
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'search-suggestions-home';
+            suggestionsDiv.id = 'searchSuggestionsHome';
+            searchInput.parentElement.appendChild(suggestionsDiv);
+
+            // Input event
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+
+                const keyword = this.value.trim();
+
+                if (keyword.length < 2) {
+                    suggestionsDiv.classList.remove('show');
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    fetchSuggestions(keyword);
+                }, 300);
+            });
+
+            // Focus event
+            searchInput.addEventListener('focus', function() {
+                const keyword = this.value.trim();
+                if (keyword.length >= 2) {
+                    suggestionsDiv.classList.add('show');
+                }
+            });
+
+            // Click outside to close
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                    suggestionsDiv.classList.remove('show');
+                }
+            });
+
+            // Fetch suggestions from API
+            function fetchSuggestions(keyword) {
+                fetch(`/search/suggestions?q=${encodeURIComponent(keyword)}`)
+                    .then(response => response.json())
+                    .then(suggestions => {
+                        if (suggestions && suggestions.length > 0) {
+                            showSuggestions(suggestions, keyword);
+                        } else {
+                            suggestionsDiv.classList.remove('show');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching suggestions:', error);
+                        suggestionsDiv.classList.remove('show');
+                    });
+            }
+
+            // Show suggestions
+            function showSuggestions(suggestions, keyword) {
+                suggestionsDiv.innerHTML = '';
+
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('a');
+                    item.href = `/search?q=${encodeURIComponent(suggestion)}`;
+                    item.className = 'suggestion-item-home';
+
+                    // Highlight matching text
+                    const regex = new RegExp(`(${keyword})`, 'gi');
+                    const highlightedText = suggestion.replace(regex, '<span class="suggestion-highlight">$1</span>');
+
+                    item.innerHTML = `
+                    <i class="fas fa-search"></i>
+                    <span>${highlightedText}</span>
+                `;
+
+                    suggestionsDiv.appendChild(item);
+                });
+
+                suggestionsDiv.classList.add('show');
+            }
+        }
     });
 </script>
 </body>
