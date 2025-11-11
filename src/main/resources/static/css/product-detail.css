@@ -947,3 +947,27 @@ a {
 .bg-light {
     background-color: #f5f5f5 !important;
 }
+
+
+#mainImage {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.thumbnail-img:hover {
+    border-color: #ee4d2d !important;
+    transform: scale(1.05);
+}
+
+.color-option.active {
+    border: 2px solid #ee4d2d;
+    background-color: #fff5f5;
+}
+
+.color-option {
+    transition: all 0.3s ease;
+}
+
+.color-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
