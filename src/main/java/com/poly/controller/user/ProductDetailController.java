@@ -3,6 +3,7 @@ package com.poly.controller.user;
 import com.poly.entity.KichThuoc;
 import com.poly.entity.MauSac;
 import com.poly.entity.SanPham;
+import com.poly.entity.SanPhamChiTiet;
 import com.poly.repository.SanPhamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -11,9 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,65 +32,70 @@ public class ProductDetailController {
      */
     @GetMapping("/product/{id}")
     public String productDetail(@PathVariable("id") Integer id, Model model) {
-
-        // Lấy thông tin sản phẩm theo ID
         SanPham sanPham = sanPhamRepository.findById(id).orElse(null);
-
-        // Nếu không tìm thấy sản phẩm, redirect về trang chủ
         if (sanPham == null) {
             return "redirect:/";
         }
 
-        // ============================================
-        // LỌC MÀU SẮC VÀ KÍCH THƯỚC DUY NHẤT
-        // ============================================
+        // Lọc variant còn hàng và active
+        List<SanPhamChiTiet> activeVariants = sanPham.getVariants().stream()
+                .filter(v -> v.isActive() && v.isInStock())
+                .collect(Collectors.toList());
 
-        // Lấy danh sách màu sắc unique (không trùng lặp)
-        Set<MauSac> uniqueColors = sanPham.getVariants().stream()
-                .filter(v -> v.getTrangThai() == 1)  // Chỉ lấy variant active
-                .map(v -> v.getMauSac())              // Lấy màu sắc
-                .collect(Collectors.toCollection(LinkedHashSet::new));  // Loại bỏ trùng lặp, giữ thứ tự
+        // Lấy màu sắc và kích thước unique
+        Set<MauSac> uniqueColors = activeVariants.stream()
+                .map(SanPhamChiTiet::getMauSac)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        // Lấy danh sách kích thước unique (không trùng lặp)
-        Set<KichThuoc> uniqueSizes = sanPham.getVariants().stream()
-                .filter(v -> v.getTrangThai() == 1)   // Chỉ lấy variant active
-                .filter(v -> v.getSoLuongTon() > 0)   // Chỉ lấy còn hàng
-                .map(v -> v.getKichThuoc())            // Lấy kích thước
-                .collect(Collectors.toCollection(LinkedHashSet::new));  // Loại bỏ trùng lặp, giữ thứ tự
+        Set<KichThuoc> uniqueSizes = activeVariants.stream()
+                .map(SanPhamChiTiet::getKichThuoc)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        // ============================================
-        // LẤY SẢN PHẨM LIÊN QUAN (CÙNG DANH MỤC)
-        // ============================================
+        // Map hình ảnh theo màu
+        Map<Integer, List<String>> imagesByColor = new HashMap<>();
+        for (SanPhamChiTiet v : activeVariants) {
+            if (v.getMauSac() != null && v.getHinhAnh() != null && !v.getHinhAnh().isEmpty()) {
+                imagesByColor.computeIfAbsent(v.getMauSac().getMauSacId(), k -> new ArrayList<>())
+                        .add(v.getHinhAnh());
+            }
+        }
+        // Nếu không có ảnh nào, dùng ảnh chính
+        if (imagesByColor.isEmpty() && sanPham.getHinhAnhChinh() != null) {
+            for (MauSac color : uniqueColors) {
+                imagesByColor.put(color.getMauSacId(),
+                        Collections.singletonList(sanPham.getHinhAnhChinh()));
+            }
+        }
 
-        List<SanPham> relatedProducts = List.of(); // Khởi tạo list rỗng
+        // Chuẩn bị dữ liệu cho JS
+        List<Map<String, ? extends Number>> variantsDataForJs = activeVariants.stream().map(v -> Map.of(
+                "variantId", v.getVariantId(),
+                "colorId", v.getMauSac().getMauSacId(),
+                "sizeId", v.getKichThuoc().getKichThuocId(),
+                "stock", v.getSoLuongTon(),
+                "price", v.getGiaBan()
+        )).collect(Collectors.toList());
 
+        // Sản phẩm liên quan
+        List<SanPham> relatedProducts = new ArrayList<>();
         if (sanPham.getDanhMuc() != null) {
-            // Lấy 4 sản phẩm cùng danh mục, loại trừ sản phẩm hiện tại
             relatedProducts = sanPhamRepository
                     .findByDanhMuc_DanhMucIdAndSanPhamIdNotAndTrangThai(
                             sanPham.getDanhMuc().getDanhMucId(),
                             id,
                             1,
-                            PageRequest.of(0, 4)
+                            PageRequest.of(0, 6)
                     ).getContent();
-
-            // Nếu không đủ 4 sản phẩm cùng danh mục, lấy thêm sản phẩm khác
-            if (relatedProducts.size() < 4) {
-                int remaining = 4 - relatedProducts.size();
-                List<SanPham> additionalProducts = sanPhamRepository
-                        .findBySanPhamIdNotAndTrangThai(id, 1, PageRequest.of(0, remaining))
-                        .getContent();
-
-                // Merge 2 lists
-                relatedProducts = new java.util.ArrayList<>(relatedProducts);
-                relatedProducts.addAll(additionalProducts);
-            }
         }
 
-        // Đưa dữ liệu vào model
         model.addAttribute("product", sanPham);
         model.addAttribute("uniqueColors", uniqueColors);
         model.addAttribute("uniqueSizes", uniqueSizes);
+        model.addAttribute("activeVariants", activeVariants);
+        model.addAttribute("imagesByColor", imagesByColor);
+        model.addAttribute("variantsData", variantsDataForJs);
         model.addAttribute("relatedProducts", relatedProducts);
         model.addAttribute("pageTitle", sanPham.getTen());
 
