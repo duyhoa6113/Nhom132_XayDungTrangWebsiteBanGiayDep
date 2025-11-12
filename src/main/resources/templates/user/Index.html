@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,622 +18,468 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/index.css}">
 </head>
+
 <body>
 
-<!-- ========== NAVBAR (Shopee Style) ========== -->
-<nav class="navbar navbar-light bg-white shadow-sm sticky-top">
-    <!-- Top Bar -->
-    <div class="navbar-top">
-        <div class="section-wrapper">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="top-links">
-                    <a href="/seller" class="top-link">Trang chủ</a>
-                    <span class="divider">|</span>
-                    <a href="/download" class="top-link">Tải ứng dụng</a>
-                    <span class="divider">|</span>
-                    <span class="top-link">Kết nối</span>
-                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                </div>
-                <div class="top-links">
-                    <a href="#" class="top-link">
-                        <i class="far fa-bell me-1"></i>Thông Báo
-                    </a>
-                    <a href="#" class="top-link">
-                        <i class="far fa-question-circle me-1"></i>Hỗ Trợ
-                    </a>
-                    <a href="#" class="top-link">
-                        <i class="fas fa-globe me-1"></i>Tiếng Việt
-                        <i class="fas fa-chevron-down ms-1 small"></i>
-                    </a>
+    <!-- ========== NAVBAR (Shopee Style) ========== -->
+    <nav class="navbar navbar-light bg-white shadow-sm sticky-top">
+        <!-- Top Bar -->
+        <div th:replace="~{/components/header.html}"></div>
 
-                    <!-- USER DROPDOWN -->
-                    <div th:if="${session.khachHang != null}" class="dropdown d-inline">
-                        <a href="#" class="top-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="far fa-user-circle me-1"></i>
-                            <span th:text="${session.khachHangTen}">User</span>
+        <!-- Main Navbar -->
+        <div class="navbar-main">
+            <div class="section-wrapper">
+                <div class="row align-items-center w-100 g-3">
+                    <!-- Logo -->
+                    <div class="col-auto">
+                        <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
+                            <div class="logo-icon">
+                                <i class="fas fa-running"></i>
+                            </div>
+                            <span class="logo-text ms-2">NiceSport</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu shadow-lg" aria-labelledby="userDropdown">
-                            <li class="dropdown-header">
-                                <div class="user-info">
-                                    <div class="user-avatar-large">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="user-details">
-                                        <div class="user-name-large" th:text="${session.khachHangTen}">User Name</div>
-                                        <div class="user-email" th:text="${session.khachHang.email}">user@example.com</div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider m-0"></li>
-                            <li>
-                                <a class="dropdown-item" href="/profile">
-                                    <i class="fas fa-user-circle"></i>
-                                    <span>Tài khoản của tôi</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/orders">
-                                    <i class="fas fa-box"></i>
-                                    <span>Đơn hàng</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/wishlist">
-                                    <i class="fas fa-heart"></i>
-                                    <span>Yêu thích</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/admin">
-                                    <i class="fas fa-cog"></i>
-                                    <span>Quản trị viên</span>
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider m-0"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" th:href="@{/logout}">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <span>Đăng xuất</span>
+                    </div>
+
+                    <!-- Search Box -->
+                    <div class="col">
+                        <form action="/search" method="get" class="search-form">
+                            <div class="search-box-main">
+                                <input type="text" name="q" class="search-input-main"
+                                    placeholder="Tìm giày thể thao, sneaker, sandals..." th:value="${keyword}"
+                                    autocomplete="off" required>
+                                <button type="submit" class="btn-search-main">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Cart -->
+                    <div class="col-auto">
+                        <a th:href="@{/cart}" class="cart-icon-main position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge-main" th:if="${cartCount != null && cartCount > 0}"
+                                th:text="${cartCount}">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== HERO BANNER ========== -->
+    <section class="hero-banner" id="home">
+        <div class="section-wrapper">
+            <div class="row g-3">
+                <!-- Sidebar Categories -->
+                <div class="col-lg-2 d-none d-lg-block">
+                    <div class="category-sidebar">
+                        <h6 class="sidebar-title">
+                            <i class="fas fa-th-large me-2"></i>Danh Mục
+                        </h6>
+                        <ul class="category-list">
+                            <li th:each="cat : ${categories}">
+                                <!-- ĐÃ SỬA -->
+                                <a th:href="@{/category/{id}(id=${cat.danhMucId})}" class="category-item">
+                                    <span th:text="${cat.ten}">Danh mục</span>
+                                    <i class="fas fa-chevron-right ms-auto"></i>
                                 </a>
                             </li>
                         </ul>
                     </div>
+                </div>
 
-                    <!-- NÚT ĐĂNG NHẬP -->
-                    <a th:if="${session.khachHang == null}" th:href="@{/login}" class="top-link">
-                        <i class="far fa-user-circle me-1"></i>Đăng nhập
-                    </a>
+                <!-- Main Banner Slider -->
+                <div class="col-lg-10">
+                    <div id="mainBannerCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="0"
+                                class="active"></button>
+                            <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="1"></button>
+                            <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="2"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="banner-slide banner-1">
+                                    <div class="banner-content">
+                                        <h2 class="banner-title">Giày Thể Thao Mới Nhất 2025</h2>
+                                        <p class="banner-subtitle">Giảm giá lên đến 50%</p>
+                                        <a href="#featured" class="btn btn-banner">Mua Ngay</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="banner-slide banner-2">
+                                    <div class="banner-content">
+                                        <h2 class="banner-title">Sneakers Hot Trend</h2>
+                                        <p class="banner-subtitle">Bộ sưu tập độc quyền</p>
+                                        <a href="#products" class="btn btn-banner">Khám Phá</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="banner-slide banner-3">
+                                    <div class="banner-content">
+                                        <h2 class="banner-title">Miễn Phí Vận Chuyển</h2>
+                                        <p class="banner-subtitle">Cho đơn hàng từ 500K</p>
+                                        <a href="#products" class="btn btn-banner">Mua Sắm</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#mainBannerCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#mainBannerCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Main Navbar -->
-    <div class="navbar-main">
+    <!-- ========== FEATURES ========== -->
+    <section class="features-shopee py-4">
         <div class="section-wrapper">
-            <div class="row align-items-center w-100 g-3">
-                <!-- Logo -->
-                <div class="col-auto">
-                    <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
-                        <div class="logo-icon">
-                            <i class="fas fa-running"></i>
-                        </div>
-                        <span class="logo-text ms-2">NiceSport</span>
-                    </a>
-                </div>
-
-                <!-- Search Box -->
-                <div class="col">
-                    <form action="/search" method="get" class="search-form">
-                        <div class="search-box-main">
-                            <input type="text"
-                                   name="q"
-                                   class="search-input-main"
-                                   placeholder="Tìm giày thể thao, sneaker, sandals..."
-                                   th:value="${keyword}"
-                                   autocomplete="off"
-                                   required>
-                            <button type="submit" class="btn-search-main">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Cart -->
-                <div class="col-auto">
-                    <a th:href="@{/cart}" class="cart-icon-main position-relative">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-badge-main" th:if="${cartCount != null && cartCount > 0}"
-                              th:text="${cartCount}">0</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<!-- ========== HERO BANNER ========== -->
-<section class="hero-banner" id="home">
-    <div class="section-wrapper">
-        <div class="row g-3">
-            <!-- Sidebar Categories -->
-            <div class="col-lg-2 d-none d-lg-block">
-                <div class="category-sidebar">
-                    <h6 class="sidebar-title">
-                        <i class="fas fa-th-large me-2"></i>Danh Mục
-                    </h6>
-                    <ul class="category-list">
-                        <li th:each="cat : ${categories}">
-                            <!-- ĐÃ SỬA -->
-                            <a th:href="@{/category/{id}(id=${cat.danhMucId})}" class="category-item">
-                                <span th:text="${cat.ten}">Danh mục</span>
-                                <i class="fas fa-chevron-right ms-auto"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Main Banner Slider -->
-            <div class="col-lg-10">
-                <div id="mainBannerCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="0" class="active"></button>
-                        <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="1"></button>
-                        <button type="button" data-bs-target="#mainBannerCarousel" data-bs-slide-to="2"></button>
-                    </div>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <div class="banner-slide banner-1">
-                                <div class="banner-content">
-                                    <h2 class="banner-title">Giày Thể Thao Mới Nhất 2025</h2>
-                                    <p class="banner-subtitle">Giảm giá lên đến 50%</p>
-                                    <a href="#featured" class="btn btn-banner">Mua Ngay</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="banner-slide banner-2">
-                                <div class="banner-content">
-                                    <h2 class="banner-title">Sneakers Hot Trend</h2>
-                                    <p class="banner-subtitle">Bộ sưu tập độc quyền</p>
-                                    <a href="#products" class="btn btn-banner">Khám Phá</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="banner-slide banner-3">
-                                <div class="banner-content">
-                                    <h2 class="banner-title">Miễn Phí Vận Chuyển</h2>
-                                    <p class="banner-subtitle">Cho đơn hàng từ 500K</p>
-                                    <a href="#products" class="btn btn-banner">Mua Sắm</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#mainBannerCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#mainBannerCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ========== FEATURES ========== -->
-<section class="features-shopee py-4">
-    <div class="section-wrapper">
-        <div class="row g-3">
-            <div class="col-md-3 col-sm-6">
-                <div class="feature-item-shopee">
-                    <i class="fas fa-shipping-fast feature-icon-shopee"></i>
-                    <div class="feature-text">
-                        <h6>Miễn Phí Vận Chuyển</h6>
-                        <p>Đơn hàng từ 500K</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="feature-item-shopee">
-                    <i class="fas fa-shield-alt feature-icon-shopee"></i>
-                    <div class="feature-text">
-                        <h6>Hàng Chính Hãng 100%</h6>
-                        <p>Cam kết bảo hành</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="feature-item-shopee">
-                    <i class="fas fa-undo-alt feature-icon-shopee"></i>
-                    <div class="feature-text">
-                        <h6>Đổi Trả Dễ Dàng</h6>
-                        <p>Trong vòng 7 ngày</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="feature-item-shopee">
-                    <i class="fas fa-headset feature-icon-shopee"></i>
-                    <div class="feature-text">
-                        <h6>Hỗ Trợ 24/7</h6>
-                        <p>Hotline: 1900-xxxx</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ========== FLASH SALE ========== -->
-<section class="flash-sale-section py-4" id="featured" th:if="${featuredProducts != null && !featuredProducts.empty}">
-    <div class="section-wrapper">
-        <div class="flash-sale-header">
-            <div class="d-flex align-items-center gap-3">
-                <h3 class="flash-sale-title">
-                    <i class="fas fa-bolt me-2"></i>FLASH SALE
-                </h3>
-                <div class="flash-sale-timer">
-                    <span>Kết thúc trong</span>
-                    <div class="timer">
-                        <span class="time-box">23</span>
-                        <span class="colon">:</span>
-                        <span class="time-box">59</span>
-                        <span class="colon">:</span>
-                        <span class="time-box">45</span>
-                    </div>
-                </div>
-            </div>
-            <a href="#products" class="flash-sale-link">
-                Xem tất cả <i class="fas fa-chevron-right ms-1"></i>
-            </a>
-        </div>
-
-        <div class="flash-sale-products">
             <div class="row g-3">
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6" th:each="product : ${featuredProducts}">
-                    <a th:href="@{/product/{id}(id=${product.sanPhamId})}" class="product-card-shopee">
-                        <div class="product-image-shopee">
-                            <img th:if="${product.hinhAnhChinh != null}"
-                                 th:src="${product.hinhAnhChinh}"
-                                 th:alt="${product.ten}"
-                                 class="img-fluid">
-                            <img th:if="${product.hinhAnhChinh == null}"
-                                 src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"
-                                 th:alt="${product.ten}"
-                                 class="img-fluid">
-                            <div class="product-badges-shopee">
-                                <span class="badge-discount" th:if="${product.tyLeGiamGia > 0}">
-                                    <span th:text="${product.tyLeGiamGia}">15</span>% GIẢM
-                                </span>
-                            </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-item-shopee">
+                        <i class="fas fa-shipping-fast feature-icon-shopee"></i>
+                        <div class="feature-text">
+                            <h6>Miễn Phí Vận Chuyển</h6>
+                            <p>Đơn hàng từ 500K</p>
                         </div>
-                        <div class="product-info-shopee">
-                            <h6 class="product-name-shopee" th:text="${product.ten}">Nike Air Max</h6>
-                            <div class="product-price-shopee">
-                                <span class="price-current" th:text="${product.giaMinFormatted} + '₫'">1.500.000₫</span>
-                            </div>
-                            <div class="product-stats-shopee">
-                                <span class="product-sold">Đã bán <span th:text="${product.soLuongDaBan != null ? product.soLuongDaBan : '999+'}">999+</span></span>
-                            </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-item-shopee">
+                        <i class="fas fa-shield-alt feature-icon-shopee"></i>
+                        <div class="feature-text">
+                            <h6>Hàng Chính Hãng 100%</h6>
+                            <p>Cam kết bảo hành</p>
                         </div>
-                    </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-item-shopee">
+                        <i class="fas fa-undo-alt feature-icon-shopee"></i>
+                        <div class="feature-text">
+                            <h6>Đổi Trả Dễ Dàng</h6>
+                            <p>Trong vòng 7 ngày</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-item-shopee">
+                        <i class="fas fa-headset feature-icon-shopee"></i>
+                        <div class="feature-text">
+                            <h6>Hỗ Trợ 24/7</h6>
+                            <p>Hotline: 1900-xxxx</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- ========== GỢI Ý HÔM NAY ========== -->
-<section class="products-section-shopee py-4" id="products">
-    <div class="section-wrapper">
-        <div class="section-header-shopee">
-            <h3 class="section-title-shopee">GỢI Ý HÔM NAY</h3>
-        </div>
-
-        <div class="products-grid-shopee">
-            <div class="row g-3">
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6"
-                     th:each="product : ${productsPage.content}">
-                    <a th:href="@{/product/{id}(id=${product.sanPhamId})}" class="product-card-shopee">
-                        <div class="product-image-shopee">
-                            <img th:if="${product.hinhAnhChinh != null}"
-                                 th:src="${product.hinhAnhChinh}"
-                                 th:alt="${product.ten}"
-                                 class="img-fluid">
-                            <img th:if="${product.hinhAnhChinh == null}"
-                                 src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"
-                                 th:alt="${product.ten}"
-                                 class="img-fluid">
-                            <div class="product-badges-shopee">
-                                <span class="badge-discount" th:if="${product.tyLeGiamGia > 0}">
-                                    <span th:text="${product.tyLeGiamGia}">15</span>% GIẢM
-                                </span>
-                                <span class="badge-brand" th:if="${product.thuongHieuTen != null}"
-                                      th:text="${product.thuongHieuTen}">Nike</span>
-                            </div>
+    <!-- ========== FLASH SALE ========== -->
+    <section class="flash-sale-section py-4" id="featured"
+        th:if="${featuredProducts != null && !featuredProducts.empty}">
+        <div class="section-wrapper">
+            <div class="flash-sale-header">
+                <div class="d-flex align-items-center gap-3">
+                    <h3 class="flash-sale-title">
+                        <i class="fas fa-bolt me-2"></i>FLASH SALE
+                    </h3>
+                    <div class="flash-sale-timer">
+                        <span>Kết thúc trong</span>
+                        <div class="timer">
+                            <span class="time-box">23</span>
+                            <span class="colon">:</span>
+                            <span class="time-box">59</span>
+                            <span class="colon">:</span>
+                            <span class="time-box">45</span>
                         </div>
-                        <div class="product-info-shopee">
-                            <h6 class="product-name-shopee" th:text="${product.ten}">Tên sản phẩm</h6>
-                            <div class="product-price-shopee">
-                                <span class="price-current" th:text="${product.giaMinFormatted} + '₫'">1.500.000₫</span>
-                                <span class="price-old" th:if="${product.giaGocMin != null}"
-                                      th:text="${product.giaGocMinFormatted} + '₫'">2.000.000₫</span>
-                            </div>
-                            <div class="product-stats-shopee">
-                                <div class="product-rating">
-                                    <i class="fas fa-star"></i>
-                                    <span>4.8</span>
+                    </div>
+                </div>
+                <a href="#products" class="flash-sale-link">
+                    Xem tất cả <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="flash-sale-products">
+                <div class="row g-3">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6" th:each="product : ${featuredProducts}">
+                        <a th:href="@{/product/{id}(id=${product.sanPhamId})}" class="product-card-shopee">
+                            <div class="product-image-shopee">
+                                <img th:if="${product.hinhAnhChinh != null}" th:src="${product.hinhAnhChinh}"
+                                    th:alt="${product.ten}" class="img-fluid">
+                                <img th:if="${product.hinhAnhChinh == null}"
+                                    src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"
+                                    th:alt="${product.ten}" class="img-fluid">
+                                <div class="product-badges-shopee">
+                                    <span class="badge-discount" th:if="${product.tyLeGiamGia > 0}">
+                                        <span th:text="${product.tyLeGiamGia}">15</span>% GIẢM
+                                    </span>
                                 </div>
-                                <span class="product-sold">Đã bán 2.5k</span>
                             </div>
-                        </div>
-                        <div class="product-location-shopee">
-                            <i class="fas fa-map-marker-alt me-1"></i>TP. Hồ Chí Minh
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <nav th:if="${productsPage.totalPages > 1}" class="mt-4">
-            <ul class="pagination-shopee">
-                <li class="page-item-shopee" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                    <a class="page-link-shopee"
-                       th:href="@{/(page=${currentPage - 1}, size=24, category=${category}, search=${search})}">
-                        <i class="fas fa-chevron-left"></i>
-                    </a>
-                </li>
-
-                <li class="page-item-shopee"
-                    th:each="i : ${#numbers.sequence(0, productsPage.totalPages - 1)}"
-                    th:classappend="${i == currentPage ? 'active' : ''}">
-                    <a class="page-link-shopee"
-                       th:href="@{/(page=${i}, size=24, category=${category}, search=${search})}"
-                       th:text="${i + 1}">1</a>
-                </li>
-
-                <li class="page-item-shopee"
-                    th:classappend="${currentPage == productsPage.totalPages - 1 ? 'disabled' : ''}">
-                    <a class="page-link-shopee"
-                       th:href="@{/(page=${currentPage + 1}, size=24, category=${category}, search=${search})}">
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</section>
-
-<!-- ========== FOOTER ========== -->
-<footer class="footer-shopee">
-    <div class="footer-top">
-        <div class="section-wrapper">
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">CHĂM SÓC KHÁCH HÀNG</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Trung Tâm Trợ Giúp</a></li>
-                        <li><a href="#">Hướng Dẫn Mua Hàng</a></li>
-                        <li><a href="#">Chính Sách Đổi Trả</a></li>
-                        <li><a href="#">Chính Sách Bảo Hành</a></li>
-                        <li><a href="#">Liên Hệ</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">VỀ NICESPORT</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Giới Thiệu</a></li>
-                        <li><a href="#">Tuyển Dụng</a></li>
-                        <li><a href="#">Điều Khoản</a></li>
-                        <li><a href="#">Chính Sách Bảo Mật</a></li>
-                        <li><a href="#">Flash Sale</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">THANH TOÁN</h6>
-                    <div class="payment-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/d4bbea4570b93bfd5fc652ca82a262a8" alt="COD">
-                        <img src="https://down-vn.img.susercontent.com/file/a0a9062ebe19b45c1ae0506f16af5c16" alt="Card">
-                        <img src="https://down-vn.img.susercontent.com/file/38fd98e55806c3b2e4535c4e4a6c4c08" alt="ATM">
-                        <img src="https://down-vn.img.susercontent.com/file/9263fa8c83628f5deff55e2a90758b06" alt="Momo">
-                    </div>
-                    <h6 class="footer-heading mt-3">VẬN CHUYỂN</h6>
-                    <div class="shipping-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/5e3f0bee86058637ff23cfdf2e14ca09" alt="GHN">
-                        <img src="https://down-vn.img.susercontent.com/file/d10b0ec09f0322f9201a4f3daf378ed2" alt="Giao Hàng Nhanh">
-                        <img src="https://down-vn.img.susercontent.com/file/59270fb2f3fbb7cbc92fca3877edde3f" alt="Grab">
+                            <div class="product-info-shopee">
+                                <h6 class="product-name-shopee" th:text="${product.ten}">Nike Air Max</h6>
+                                <div class="product-price-shopee">
+                                    <span class="price-current"
+                                        th:text="${product.giaMinFormatted} + '₫'">1.500.000₫</span>
+                                </div>
+                                <div class="product-stats-shopee">
+                                    <span class="product-sold">Đã bán <span
+                                            th:text="${product.soLuongDaBan != null ? product.soLuongDaBan : '999+'}">999+</span></span>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">THEO DÕI CHÚNG TÔI</h6>
-                    <ul class="footer-links">
-                        <li><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
-                        <li><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
-                        <li><a href="#"><i class="fab fa-tiktok me-2"></i>TikTok</a></li>
-                        <li><a href="#"><i class="fab fa-youtube me-2"></i>YouTube</a></li>
-                    </ul>
-                </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="footer-bottom">
+    <!-- ========== GỢI Ý HÔM NAY ========== -->
+    <section class="products-section-shopee py-4" id="products">
         <div class="section-wrapper">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="mb-2">© 2025 NiceSport. Tất cả các quyền được bảo lưu.</p>
-                    <p class="footer-address">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        Địa chỉ: 123 Đường ABC, Quận 1, TP. Hồ Chí Minh |
-                        <i class="fas fa-phone ms-3 me-2"></i>
-                        Hotline: 1900-xxxx
-                    </p>
+            <div class="section-header-shopee">
+                <h3 class="section-title-shopee">GỢI Ý HÔM NAY</h3>
+            </div>
+
+            <div class="products-grid-shopee">
+                <div class="row g-3">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6" th:each="product : ${productsPage.content}">
+                        <a th:href="@{/product/{id}(id=${product.sanPhamId})}" class="product-card-shopee">
+                            <div class="product-image-shopee">
+                                <img th:if="${product.hinhAnhChinh != null}" th:src="${product.hinhAnhChinh}"
+                                    th:alt="${product.ten}" class="img-fluid">
+                                <img th:if="${product.hinhAnhChinh == null}"
+                                    src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"
+                                    th:alt="${product.ten}" class="img-fluid">
+                                <div class="product-badges-shopee">
+                                    <span class="badge-discount" th:if="${product.tyLeGiamGia > 0}">
+                                        <span th:text="${product.tyLeGiamGia}">15</span>% GIẢM
+                                    </span>
+                                    <span class="badge-brand" th:if="${product.thuongHieuTen != null}"
+                                        th:text="${product.thuongHieuTen}">Nike</span>
+                                </div>
+                            </div>
+                            <div class="product-info-shopee">
+                                <h6 class="product-name-shopee" th:text="${product.ten}">Tên sản phẩm</h6>
+                                <div class="product-price-shopee">
+                                    <span class="price-current"
+                                        th:text="${product.giaMinFormatted} + '₫'">1.500.000₫</span>
+                                    <span class="price-old" th:if="${product.giaGocMin != null}"
+                                        th:text="${product.giaGocMinFormatted} + '₫'">2.000.000₫</span>
+                                </div>
+                                <div class="product-stats-shopee">
+                                    <div class="product-rating">
+                                        <i class="fas fa-star"></i>
+                                        <span>4.8</span>
+                                    </div>
+                                    <span class="product-sold">Đã bán 2.5k</span>
+                                </div>
+                            </div>
+                            <div class="product-location-shopee">
+                                <i class="fas fa-map-marker-alt me-1"></i>TP. Hồ Chí Minh
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
+
+            <!-- Pagination -->
+            <nav th:if="${productsPage.totalPages > 1}" class="mt-4">
+                <ul class="pagination-shopee">
+                    <li class="page-item-shopee" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                        <a class="page-link-shopee"
+                            th:href="@{/(page=${currentPage - 1}, size=24, category=${category}, search=${search})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item-shopee" th:each="i : ${#numbers.sequence(0, productsPage.totalPages - 1)}"
+                        th:classappend="${i == currentPage ? 'active' : ''}">
+                        <a class="page-link-shopee"
+                            th:href="@{/(page=${i}, size=24, category=${category}, search=${search})}"
+                            th:text="${i + 1}">1</a>
+                    </li>
+
+                    <li class="page-item-shopee"
+                        th:classappend="${currentPage == productsPage.totalPages - 1 ? 'disabled' : ''}">
+                        <a class="page-link-shopee"
+                            th:href="@{/(page=${currentPage + 1}, size=24, category=${category}, search=${search})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-    </div>
-</footer>
+    </section>
 
-<!-- Scroll to Top Button -->
-<button class="scroll-to-top" id="scrollToTop">
-    <i class="fas fa-chevron-up"></i>
-</button>
+    <!-- ========== FOOTER ========== -->
+    <div th:replace="~{/components/footer.html}"></div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
-<!-- Custom JS -->
-<script>
-    // Scroll to top button
-    const scrollBtn = document.getElementById('scrollToTop');
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            scrollBtn.classList.add('show');
-        } else {
-            scrollBtn.classList.remove('show');
-        }
-    });
-    scrollBtn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    // Flash Sale Timer (demo)
-    function updateTimer() {
-        const timeBoxes = document.querySelectorAll('.time-box');
-        if (timeBoxes.length > 0) {
-            let hours = parseInt(timeBoxes[0].textContent);
-            let minutes = parseInt(timeBoxes[1].textContent);
-            let seconds = parseInt(timeBoxes[2].textContent);
-
-            if (seconds > 0) {
-                seconds--;
+    <!-- Custom JS -->
+    <script>
+        // Scroll to top button
+        const scrollBtn = document.getElementById('scrollToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('show');
             } else {
-                seconds = 59;
-                if (minutes > 0) {
-                    minutes--;
+                scrollBtn.classList.remove('show');
+            }
+        });
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Flash Sale Timer (demo)
+        function updateTimer() {
+            const timeBoxes = document.querySelectorAll('.time-box');
+            if (timeBoxes.length > 0) {
+                let hours = parseInt(timeBoxes[0].textContent);
+                let minutes = parseInt(timeBoxes[1].textContent);
+                let seconds = parseInt(timeBoxes[2].textContent);
+
+                if (seconds > 0) {
+                    seconds--;
                 } else {
-                    minutes = 59;
-                    if (hours > 0) {
-                        hours--;
+                    seconds = 59;
+                    if (minutes > 0) {
+                        minutes--;
+                    } else {
+                        minutes = 59;
+                        if (hours > 0) {
+                            hours--;
+                        }
                     }
                 }
+
+                timeBoxes[0].textContent = hours.toString().padStart(2, '0');
+                timeBoxes[1].textContent = minutes.toString().padStart(2, '0');
+                timeBoxes[2].textContent = seconds.toString().padStart(2, '0');
+            }
+        }
+        setInterval(updateTimer, 1000);
+
+        let lastScrollTop = 0;
+        const navbar = document.querySelector('.navbar');
+
+        window.addEventListener('scroll', function () {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop > lastScrollTop && scrollTop > 80) {
+                // Cuộn xuống -> ẩn navbar
+                navbar.classList.add('hide');
+            } else if (scrollTop < lastScrollTop - 5) {
+                // Cuộn lên -> hiện lại navbar
+                navbar.classList.remove('hide');
             }
 
-            timeBoxes[0].textContent = hours.toString().padStart(2, '0');
-            timeBoxes[1].textContent = minutes.toString().padStart(2, '0');
-            timeBoxes[2].textContent = seconds.toString().padStart(2, '0');
-        }
-    }
-    setInterval(updateTimer, 1000);
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
 
-    let lastScrollTop = 0;
-    const navbar = document.querySelector('.navbar');
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.querySelector('.search-input-main');
 
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (searchInput) {
+                let searchTimeout = null;
 
-        if (scrollTop > lastScrollTop && scrollTop > 80) {
-            // Cuộn xuống -> ẩn navbar
-            navbar.classList.add('hide');
-        } else if (scrollTop < lastScrollTop - 5) {
-            // Cuộn lên -> hiện lại navbar
-            navbar.classList.remove('hide');
-        }
+                // Create suggestions dropdown
+                const suggestionsDiv = document.createElement('div');
+                suggestionsDiv.className = 'search-suggestions-home';
+                suggestionsDiv.id = 'searchSuggestionsHome';
+                searchInput.parentElement.appendChild(suggestionsDiv);
 
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-    });
+                // Input event
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.querySelector('.search-input-main');
+                    const keyword = this.value.trim();
 
-        if (searchInput) {
-            let searchTimeout = null;
-
-            // Create suggestions dropdown
-            const suggestionsDiv = document.createElement('div');
-            suggestionsDiv.className = 'search-suggestions-home';
-            suggestionsDiv.id = 'searchSuggestionsHome';
-            searchInput.parentElement.appendChild(suggestionsDiv);
-
-            // Input event
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-
-                const keyword = this.value.trim();
-
-                if (keyword.length < 2) {
-                    suggestionsDiv.classList.remove('show');
-                    return;
-                }
-
-                searchTimeout = setTimeout(() => {
-                    fetchSuggestions(keyword);
-                }, 300);
-            });
-
-            // Focus event
-            searchInput.addEventListener('focus', function() {
-                const keyword = this.value.trim();
-                if (keyword.length >= 2) {
-                    suggestionsDiv.classList.add('show');
-                }
-            });
-
-            // Click outside to close
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-                    suggestionsDiv.classList.remove('show');
-                }
-            });
-
-            // Fetch suggestions from API
-            function fetchSuggestions(keyword) {
-                fetch(`/search/suggestions?q=${encodeURIComponent(keyword)}`)
-                    .then(response => response.json())
-                    .then(suggestions => {
-                        if (suggestions && suggestions.length > 0) {
-                            showSuggestions(suggestions, keyword);
-                        } else {
-                            suggestionsDiv.classList.remove('show');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching suggestions:', error);
+                    if (keyword.length < 2) {
                         suggestionsDiv.classList.remove('show');
-                    });
-            }
+                        return;
+                    }
 
-            // Show suggestions
-            function showSuggestions(suggestions, keyword) {
-                suggestionsDiv.innerHTML = '';
+                    searchTimeout = setTimeout(() => {
+                        fetchSuggestions(keyword);
+                    }, 300);
+                });
 
-                suggestions.forEach(suggestion => {
-                    const item = document.createElement('a');
-                    item.href = `/search?q=${encodeURIComponent(suggestion)}`;
-                    item.className = 'suggestion-item-home';
+                // Focus event
+                searchInput.addEventListener('focus', function () {
+                    const keyword = this.value.trim();
+                    if (keyword.length >= 2) {
+                        suggestionsDiv.classList.add('show');
+                    }
+                });
 
-                    // Highlight matching text
-                    const regex = new RegExp(`(${keyword})`, 'gi');
-                    const highlightedText = suggestion.replace(regex, '<span class="suggestion-highlight">$1</span>');
+                // Click outside to close
+                document.addEventListener('click', function (e) {
+                    if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                        suggestionsDiv.classList.remove('show');
+                    }
+                });
 
-                    item.innerHTML = `
+                // Fetch suggestions from API
+                function fetchSuggestions(keyword) {
+                    fetch(`/search/suggestions?q=${encodeURIComponent(keyword)}`)
+                        .then(response => response.json())
+                        .then(suggestions => {
+                            if (suggestions && suggestions.length > 0) {
+                                showSuggestions(suggestions, keyword);
+                            } else {
+                                suggestionsDiv.classList.remove('show');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching suggestions:', error);
+                            suggestionsDiv.classList.remove('show');
+                        });
+                }
+
+                // Show suggestions
+                function showSuggestions(suggestions, keyword) {
+                    suggestionsDiv.innerHTML = '';
+
+                    suggestions.forEach(suggestion => {
+                        const item = document.createElement('a');
+                        item.href = `/search?q=${encodeURIComponent(suggestion)}`;
+                        item.className = 'suggestion-item-home';
+
+                        // Highlight matching text
+                        const regex = new RegExp(`(${keyword})`, 'gi');
+                        const highlightedText = suggestion.replace(regex, '<span class="suggestion-highlight">$1</span>');
+
+                        item.innerHTML = `
                     <i class="fas fa-search"></i>
                     <span>${highlightedText}</span>
                 `;
 
-                    suggestionsDiv.appendChild(item);
-                });
+                        suggestionsDiv.appendChild(item);
+                    });
 
-                suggestionsDiv.classList.add('show');
+                    suggestionsDiv.classList.add('show');
+                }
             }
-        }
-    });
-</script>
+        });
+    </script>
 </body>
+
 </html>

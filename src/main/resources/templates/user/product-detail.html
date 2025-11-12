@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,642 +18,475 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/product-detail.css}">
 </head>
+
 <body>
 
-<!-- ========== NAVBAR (Shopee Style) ========== -->
-<nav class="navbar navbar-light bg-white shadow-sm sticky-top">
-    <!-- Top Bar -->
-    <div class="navbar-top">
-        <div class="section-wrapper">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="top-links">
-                    <a href="/seller" class="top-link">Trang chủ</a>
-                    <span class="divider">|</span>
-                    <a href="/download" class="top-link">Tải ứng dụng</a>
-                    <span class="divider">|</span>
-                    <span class="top-link">Kết nối</span>
-                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                </div>
-                <div class="top-links">
-                    <a href="#" class="top-link">
-                        <i class="far fa-bell me-1"></i>Thông Báo
-                    </a>
-                    <a href="#" class="top-link">
-                        <i class="far fa-question-circle me-1"></i>Hỗ Trợ
-                    </a>
-                    <a href="#" class="top-link">
-                        <i class="fas fa-globe me-1"></i>Tiếng Việt
-                        <i class="fas fa-chevron-down ms-1 small"></i>
-                    </a>
+    <!-- ========== NAVBAR (Shopee Style) ========== -->
+    <nav class="navbar navbar-light bg-white shadow-sm sticky-top">
+        <!-- Top Bar -->
+        <div th:replace="~{/components/footer.html}"></div>
 
-                    <!-- USER DROPDOWN -->
-                    <div th:if="${session.khachHang != null}" class="dropdown d-inline">
-                        <a href="#" class="top-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="far fa-user-circle me-1"></i>
-                            <span th:text="${session.khachHangTen}">User</span>
+        <!-- Main Navbar -->
+        <div class="navbar-main">
+            <div class="section-wrapper">
+                <div class="row align-items-center w-100 g-3">
+                    <!-- Logo -->
+                    <div class="col-auto">
+                        <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
+                            <div class="logo-icon">
+                                <i class="fas fa-running"></i>
+                            </div>
+                            <span class="logo-text ms-2">NiceSport</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu shadow-lg" aria-labelledby="userDropdown">
-                            <li class="dropdown-header">
-                                <div class="user-info">
-                                    <div class="user-avatar-large">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="user-details">
-                                        <div class="user-name-large" th:text="${session.khachHangTen}">User Name</div>
-                                        <div class="user-email" th:text="${session.khachHang.email}">user@example.com</div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider m-0"></li>
-                            <li>
-                                <a class="dropdown-item" href="/profile">
-                                    <i class="fas fa-user-circle"></i>
-                                    <span>Tài khoản của tôi</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/orders">
-                                    <i class="fas fa-box"></i>
-                                    <span>Đơn hàng</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/wishlist">
-                                    <i class="fas fa-heart"></i>
-                                    <span>Yêu thích</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/admin">
-                                    <i class="fas fa-cog"></i>
-                                    <span>Quản trị viên</span>
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider m-0"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" th:href="@{/logout}">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <span>Đăng xuất</span>
-                                </a>
-                            </li>
-                        </ul>
                     </div>
 
-                    <!-- NÚT ĐĂNG NHẬP -->
-                    <a th:if="${session.khachHang == null}" th:href="@{/login}" class="top-link">
-                        <i class="far fa-user-circle me-1"></i>Đăng nhập
-                    </a>
+                    <!-- Search Box -->
+                    <div class="col">
+                        <form action="/search" method="get" class="search-form">
+                            <div class="search-box-main">
+                                <input type="text" name="q" class="search-input-main"
+                                    placeholder="Tìm giày thể thao, sneaker, sandals..." th:value="${keyword}">
+                                <button type="submit" class="btn-search-main">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Cart -->
+                    <div class="col-auto">
+                        <a th:href="@{/cart}" class="cart-icon-main position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge-main" th:if="${cartCount != null && cartCount > 0}"
+                                th:text="${cartCount}">0</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <!-- Main Navbar -->
-    <div class="navbar-main">
-        <div class="section-wrapper">
-            <div class="row align-items-center w-100 g-3">
-                <!-- Logo -->
-                <div class="col-auto">
-                    <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
-                        <div class="logo-icon">
-                            <i class="fas fa-running"></i>
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-section py-3 bg-light">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a th:href="@{/Index}">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="#">Sản phẩm</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${product.ten}">Tên sản phẩm</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail-section py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Product Images -->
+                <div class="col-lg-6 mb-4">
+                    <div class="product-images">
+                        <!-- Main Image -->
+                        <div class="main-image mb-3">
+                            <img th:if="${product.hinhAnhChinh != null}" th:src="${product.hinhAnhChinh}"
+                                th:alt="${product.ten}" class="img-fluid rounded" id="">
+                            <img th:if="${product.hinhAnhChinh == null}"
+                                src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
+                                th:alt="${product.ten}" class="img-fluid rounded" id="">
+
+                            <!-- Sale Badge -->
+                            <div th:if="${product.tyLeGiamGia > 0}" class="sale-badge">
+                                -<span th:text="${product.tyLeGiamGia}">15</span>%
+                            </div>
                         </div>
-                        <span class="logo-text ms-2">NiceSport</span>
-                    </a>
+
+                        <!-- Thumbnail Images -->
+                        <div class="thumbnail-images">
+                            <div class="row g-2">
+                                <div class="col-3" th:each="variant, iterStat : ${product.variants}"
+                                    th:if="${iterStat.index < 4}">
+                                    <img th:if="${product.hinhAnhChinh != null}" th:src="${product.hinhAnhChinh}"
+                                        th:alt="${product.ten}" class="img-fluid rounded" id="mainImage">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Search Box -->
-                <div class="col">
-                    <form action="/search" method="get" class="search-form">
-                        <div class="search-box-main">
-                            <input type="text"
-                                   name="q"
-                                   class="search-input-main"
-                                   placeholder="Tìm giày thể thao, sneaker, sandals..."
-                                   th:value="${keyword}">
-                            <button type="submit" class="btn-search-main">
+                <!-- Product Info -->
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <!-- Brand -->
+                        <div class="product-brand mb-2" th:text="${product.thuongHieuTen}">Nike</div>
+
+                        <!-- Product Name -->
+                        <h1 class="product-name mb-3" th:text="${product.ten}">Nike Air Zoom Pegasus 40</h1>
+
+                        <!-- Rating -->
+                        <div class="product-rating mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                            <span class="text-muted ms-2">(4.5 / 5.0)</span>
+                            <span class="text-muted ms-2">•</span>
+                            <span class="text-muted ms-2">128 đánh giá</span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="product-price-section mb-4">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <span class="price-current" th:text="${product.giaMinFormatted} + '₫'">3.200.000₫</span>
+                                <span th:if="${product.giaGocMin != null}" class="price-old"
+                                    th:text="${product.giaGocMinFormatted} + '₫'">3.500.000₫</span>
+                                <span th:if="${product.tyLeGiamGia > 0}" class="badge bg-danger">
+                                    Giảm <span th:text="${product.tyLeGiamGia}">9</span>%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Product Description -->
+                        <div class="product-description mb-4">
+                            <h5 class="mb-3">Mô tả sản phẩm</h5>
+                            <p th:text="${product.moTa}" class="text-muted">
+                                Giày chạy bộ cao cấp với công nghệ Air Zoom giúp tăng độ êm ái và phản hồi tốt...
+                            </p>
+                        </div>
+
+                        <!-- Color Selection -->
+                        <div class="product-options mb-4">
+                            <h5 class="mb-3">Chọn màu sắc</h5>
+                            <div class="color-options">
+                                <!-- Dùng Set để lọc màu unique -->
+                                <th:block th:with="uniqueColors=${#sets.toSet(product.variants.![mauSac])}">
+                                    <button th:each="color : ${uniqueColors}" th:if="${color != null}"
+                                        class="color-option" th:data-color="${color.ten}" th:title="${color.ten}"
+                                        th:onclick="'selectColor(this)'">
+                                        <span class="color-circle"
+                                            th:style="'background-color: ' + ${color.maHex}"></span>
+                                        <span class="color-name" th:text="${color.ten}">Đen</span>
+                                    </button>
+                                </th:block>
+                            </div>
+                        </div>
+
+                        <!-- Size Selection -->
+                        <div class="product-options mb-4">
+                            <h5 class="mb-3">Chọn kích thước</h5>
+                            <div class="size-options">
+                                <!-- Dùng Set để lọc size unique -->
+                                <th:block th:with="uniqueSizes=${#sets.toSet(product.variants.![kichThuoc])}">
+                                    <button th:each="size : ${uniqueSizes}" th:if="${size != null}" class="size-option"
+                                        th:data-size="${size.ten}"
+                                        th:data-variant-id="${product.variants[__${sizeStat.index}__]?.variantId}"
+                                        th:onclick="'selectSize(this)'">
+                                        <span th:text="${size.ten}">40</span>
+                                    </button>
+                                </th:block>
+                            </div>
+                            <div class="text-muted small mt-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Hướng dẫn chọn size
+                            </div>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="product-quantity mb-4">
+                            <h5 class="mb-3">Số lượng</h5>
+                            <div class="quantity-selector">
+                                <button class="btn-quantity" onclick="decreaseQuantity()">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" id="quantity" value="1" min="1" max="10" class="quantity-input">
+                                <button class="btn-quantity" onclick="increaseQuantity()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="product-actions mb-4">
+                            <button class="btn btn-primary btn-lg w-100 mb-3" onclick="addToCart()">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Thêm vào giỏ hàng
+                            </button>
+                            <button class="btn btn-outline-danger btn-lg w-100 mb-3">
+                                <i class="far fa-heart me-2"></i>
+                                Yêu thích
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Details Tabs -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
+                                data-bs-target="#description" type="button">
+                                Mô tả sản phẩm
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="specifications-tab" data-bs-toggle="tab"
+                                data-bs-target="#specifications" type="button">
+                                Chi tiết sản phẩm
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
+                                type="button">
+                                Đánh giá (128)
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content border border-top-0 p-4" id="productTabsContent">
+                        <div class="tab-pane fade show active" id="description" role="tabpanel">
+                            <p th:text="${product.moTa}">
+                                Giày chạy bộ cao cấp với công nghệ Air Zoom giúp tăng độ êm ái và phản hồi tốt.
+                                Thiết kế lưới thoáng khí, đế ngoài bền bỉ.
+                            </p>
+                            <ul>
+                                <li>Công nghệ đệm êm ái</li>
+                                <li>Thiết kế thoáng khí</li>
+                                <li>Đế ngoài chống trượt</li>
+                                <li>Phù hợp chạy đường dài</li>
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade" id="specifications" role="tabpanel">
+                            <table class="table">
+                                <tr>
+                                    <th width="200">Thương hiệu:</th>
+                                    <td th:text="${product.thuongHieuTen}">Nike</td>
+                                </tr>
+                                <tr>
+                                    <th>Chất liệu:</th>
+                                    <td th:text="${product.chatLieuTen}">Da tổng hợp</td>
+                                </tr>
+                                <tr>
+                                    <th>Danh mục:</th>
+                                    <td th:text="${product.danhMucTen}">Giày thể thao</td>
+                                </tr>
+                                <tr>
+                                    <th>Xuất xứ:</th>
+                                    <td>Việt Nam</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="reviews" role="tabpanel">
+                            <!-- Review Item -->
+                            <div class="review-item mb-4">
+                                <div class="d-flex gap-3">
+                                    <div class="review-avatar">
+                                        <i class="fas fa-user-circle fa-3x text-secondary"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <div>
+                                                <strong>Nguyễn Văn A</strong>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                </div>
+                                            </div>
+                                            <span class="text-muted small">2 ngày trước</span>
+                                        </div>
+                                        <p class="mb-0">
+                                            Sản phẩm chất lượng tốt, đúng như mô tả. Giao hàng nhanh.
+                                            Tôi rất hài lòng với đôi giày này!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- More reviews... -->
+                            <div class="text-center">
+                                <button class="btn btn-outline-primary">Xem thêm đánh giá</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Products -->
+    <section class="related-products py-5 bg-light">
+        <div class="container">
+            <h3 class="text-center mb-4">Sản phẩm liên quan</h3>
+
+            <!-- Kiểm tra có sản phẩm liên quan không -->
+            <div th:if="${relatedProducts != null && !relatedProducts.isEmpty()}" class="row g-4">
+                <!-- Lặp qua danh sách sản phẩm liên quan -->
+                <div class="col-lg-3 col-md-6" th:each="relatedProduct : ${relatedProducts}">
+                    <a th:href="@{/product/{id}(id=${relatedProduct.sanPhamId})}" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm product-card-hover">
+                            <!-- Hình ảnh sản phẩm -->
+                            <div class="position-relative">
+                                <img th:src="${relatedProduct.hinhAnhChinh != null ? relatedProduct.hinhAnhChinh : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'}"
+                                    class="card-img-top" th:alt="${relatedProduct.ten}"
+                                    style="height: 250px; object-fit: cover;">
+
+                                <!-- Sale badge nếu có giảm giá -->
+                                <span th:if="${relatedProduct.tyLeGiamGia > 0}"
+                                    class="badge bg-danger position-absolute top-0 end-0 m-2">
+                                    -<span th:text="${relatedProduct.tyLeGiamGia}">15</span>%
+                                </span>
+                            </div>
+
+                            <!-- Thông tin sản phẩm -->
+                            <div class="card-body">
+                                <!-- Thương hiệu -->
+                                <p class="text-muted small mb-1" th:text="${relatedProduct.thuongHieuTen}">Nike</p>
+
+                                <!-- Tên sản phẩm -->
+                                <h6 class="card-title mb-2" th:text="${relatedProduct.ten}"
+                                    style="height: 40px; overflow: hidden; text-overflow: ellipsis;">
+                                    Nike Air Zoom Pegasus 40
+                                </h6>
+
+                                <!-- Giá -->
+                                <div class="d-flex align-items-center gap-2">
+                                    <p class="text-danger fw-bold mb-0"
+                                        th:text="${relatedProduct.giaMinFormatted} + '₫'">
+                                        2.500.000₫
+                                    </p>
+
+                                    <!-- Giá gốc nếu có giảm giá -->
+                                    <p th:if="${relatedProduct.giaGocMin != null && relatedProduct.giaGocMin > relatedProduct.giaMin}"
+                                        class="text-muted text-decoration-line-through small mb-0"
+                                        th:text="${relatedProduct.giaGocMinFormatted} + '₫'">
+                                        3.000.000₫
+                                    </p>
+                                </div>
+
+                                <!-- Rating -->
+                                <div class="mt-2">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                    <span class="text-muted small ms-1">(4.5)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Thông báo nếu không có sản phẩm liên quan -->
+            <div th:if="${relatedProducts == null || relatedProducts.isEmpty()}" class="text-center py-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Không có sản phẩm liên quan</p>
+            </div>
+        </div>
+    </section>
+    <!-- Search Modal -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body p-4">
+                    <form action="/static" method="get">
+                        <div class="search-modal-header mb-4">
+                            <h5 class="mb-2" id="searchModalLabel">Tìm kiếm sản phẩm</h5>
+                            <p class="text-muted small mb-0">Nhập tên sản phẩm, thương hiệu hoặc mã sản phẩm</p>
+                        </div>
+                        <div class="input-group input-group-lg">
+                            <input type="text" class="form-control" name="search" placeholder="Tìm kiếm..." autofocus>
+                            <button class="btn btn-primary" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </form>
                 </div>
-
-                <!-- Cart -->
-                <div class="col-auto">
-                    <a th:href="@{/cart}" class="cart-icon-main position-relative">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-badge-main" th:if="${cartCount != null && cartCount > 0}"
-                              th:text="${cartCount}">0</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<!-- Breadcrumb -->
-<section class="breadcrumb-section py-3 bg-light">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a th:href="@{/Index}">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="#">Sản phẩm</a></li>
-                <li class="breadcrumb-item active" aria-current="page" th:text="${product.ten}">Tên sản phẩm</li>
-            </ol>
-        </nav>
-    </div>
-</section>
-
-<!-- Product Detail Section -->
-<section class="product-detail-section py-5">
-    <div class="container">
-        <div class="row">
-            <!-- Product Images -->
-            <div class="col-lg-6 mb-4">
-                <div class="product-images">
-                    <!-- Main Image -->
-                    <div class="main-image mb-3">
-                        <img th:if="${product.hinhAnhChinh != null}"
-                             th:src="${product.hinhAnhChinh}"
-                             th:alt="${product.ten}"
-                             class="img-fluid rounded"
-                             id="">
-                        <img th:if="${product.hinhAnhChinh == null}"
-                             src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
-                             th:alt="${product.ten}"
-                             class="img-fluid rounded"
-                             id="">
-
-                        <!-- Sale Badge -->
-                        <div th:if="${product.tyLeGiamGia > 0}" class="sale-badge">
-                            -<span th:text="${product.tyLeGiamGia}">15</span>%
-                        </div>
-                    </div>
-
-                    <!-- Thumbnail Images -->
-                    <div class="thumbnail-images">
-                        <div class="row g-2">
-                            <div class="col-3" th:each="variant, iterStat : ${product.variants}" th:if="${iterStat.index < 4}">
-                                <img th:if="${product.hinhAnhChinh != null}"
-                                     th:src="${product.hinhAnhChinh}"
-                                     th:alt="${product.ten}"
-                                     class="img-fluid rounded"
-                                     id="mainImage">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product Info -->
-            <div class="col-lg-6">
-                <div class="product-info">
-                    <!-- Brand -->
-                    <div class="product-brand mb-2" th:text="${product.thuongHieuTen}">Nike</div>
-
-                    <!-- Product Name -->
-                    <h1 class="product-name mb-3" th:text="${product.ten}">Nike Air Zoom Pegasus 40</h1>
-
-                    <!-- Rating -->
-                    <div class="product-rating mb-3">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                        <span class="text-muted ms-2">(4.5 / 5.0)</span>
-                        <span class="text-muted ms-2">•</span>
-                        <span class="text-muted ms-2">128 đánh giá</span>
-                    </div>
-
-                    <!-- Price -->
-                    <div class="product-price-section mb-4">
-                        <div class="d-flex align-items-center gap-3 mb-2">
-                            <span class="price-current" th:text="${product.giaMinFormatted} + '₫'">3.200.000₫</span>
-                            <span th:if="${product.giaGocMin != null}"
-                                  class="price-old"
-                                  th:text="${product.giaGocMinFormatted} + '₫'">3.500.000₫</span>
-                            <span th:if="${product.tyLeGiamGia > 0}" class="badge bg-danger">
-                                Giảm <span th:text="${product.tyLeGiamGia}">9</span>%
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Product Description -->
-                    <div class="product-description mb-4">
-                        <h5 class="mb-3">Mô tả sản phẩm</h5>
-                        <p th:text="${product.moTa}" class="text-muted">
-                            Giày chạy bộ cao cấp với công nghệ Air Zoom giúp tăng độ êm ái và phản hồi tốt...
-                        </p>
-                    </div>
-
-                    <!-- Color Selection -->
-                    <div class="product-options mb-4">
-                        <h5 class="mb-3">Chọn màu sắc</h5>
-                        <div class="color-options">
-                            <!-- Dùng Set để lọc màu unique -->
-                            <th:block th:with="uniqueColors=${#sets.toSet(product.variants.![mauSac])}">
-                                <button th:each="color : ${uniqueColors}"
-                                        th:if="${color != null}"
-                                        class="color-option"
-                                        th:data-color="${color.ten}"
-                                        th:title="${color.ten}"
-                                        th:onclick="'selectColor(this)'">
-                <span class="color-circle"
-                      th:style="'background-color: ' + ${color.maHex}"></span>
-                                    <span class="color-name" th:text="${color.ten}">Đen</span>
-                                </button>
-                            </th:block>
-                        </div>
-                    </div>
-
-                    <!-- Size Selection -->
-                    <div class="product-options mb-4">
-                        <h5 class="mb-3">Chọn kích thước</h5>
-                        <div class="size-options">
-                            <!-- Dùng Set để lọc size unique -->
-                            <th:block th:with="uniqueSizes=${#sets.toSet(product.variants.![kichThuoc])}">
-                                <button th:each="size : ${uniqueSizes}"
-                                        th:if="${size != null}"
-                                        class="size-option"
-                                        th:data-size="${size.ten}"
-                                        th:data-variant-id="${product.variants[__${sizeStat.index}__]?.variantId}"
-                                        th:onclick="'selectSize(this)'">
-                                    <span th:text="${size.ten}">40</span>
-                                </button>
-                            </th:block>
-                        </div>
-                        <div class="text-muted small mt-2">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Hướng dẫn chọn size
-                        </div>
-                    </div>
-
-                    <!-- Quantity -->
-                    <div class="product-quantity mb-4">
-                        <h5 class="mb-3">Số lượng</h5>
-                        <div class="quantity-selector">
-                            <button class="btn-quantity" onclick="decreaseQuantity()">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input type="number" id="quantity" value="1" min="1" max="10" class="quantity-input">
-                            <button class="btn-quantity" onclick="increaseQuantity()">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="product-actions mb-4">
-                        <button class="btn btn-primary btn-lg w-100 mb-3" onclick="addToCart()">
-                            <i class="fas fa-shopping-cart me-2"></i>
-                            Thêm vào giỏ hàng
-                        </button>
-                        <button class="btn btn-outline-danger btn-lg w-100 mb-3">
-                            <i class="far fa-heart me-2"></i>
-                            Yêu thích
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Product Details Tabs -->
-        <div class="row mt-5">
-            <div class="col-12">
-                <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button">
-                            Mô tả sản phẩm
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button">
-                            Chi tiết sản phẩm
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button">
-                            Đánh giá (128)
-                        </button>
-                    </li>
-                </ul>
-                <div class="tab-content border border-top-0 p-4" id="productTabsContent">
-                    <div class="tab-pane fade show active" id="description" role="tabpanel">
-                        <p th:text="${product.moTa}">
-                            Giày chạy bộ cao cấp với công nghệ Air Zoom giúp tăng độ êm ái và phản hồi tốt.
-                            Thiết kế lưới thoáng khí, đế ngoài bền bỉ.
-                        </p>
-                        <ul>
-                            <li>Công nghệ đệm êm ái</li>
-                            <li>Thiết kế thoáng khí</li>
-                            <li>Đế ngoài chống trượt</li>
-                            <li>Phù hợp chạy đường dài</li>
-                        </ul>
-                    </div>
-                    <div class="tab-pane fade" id="specifications" role="tabpanel">
-                        <table class="table">
-                            <tr>
-                                <th width="200">Thương hiệu:</th>
-                                <td th:text="${product.thuongHieuTen}">Nike</td>
-                            </tr>
-                            <tr>
-                                <th>Chất liệu:</th>
-                                <td th:text="${product.chatLieuTen}">Da tổng hợp</td>
-                            </tr>
-                            <tr>
-                                <th>Danh mục:</th>
-                                <td th:text="${product.danhMucTen}">Giày thể thao</td>
-                            </tr>
-                            <tr>
-                                <th>Xuất xứ:</th>
-                                <td>Việt Nam</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="tab-pane fade" id="reviews" role="tabpanel">
-                        <!-- Review Item -->
-                        <div class="review-item mb-4">
-                            <div class="d-flex gap-3">
-                                <div class="review-avatar">
-                                    <i class="fas fa-user-circle fa-3x text-secondary"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <div>
-                                            <strong>Nguyễn Văn A</strong>
-                                            <div class="text-warning">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <span class="text-muted small">2 ngày trước</span>
-                                    </div>
-                                    <p class="mb-0">
-                                        Sản phẩm chất lượng tốt, đúng như mô tả. Giao hàng nhanh.
-                                        Tôi rất hài lòng với đôi giày này!
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- More reviews... -->
-                        <div class="text-center">
-                            <button class="btn btn-outline-primary">Xem thêm đánh giá</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Related Products -->
-<section class="related-products py-5 bg-light">
-    <div class="container">
-        <h3 class="text-center mb-4">Sản phẩm liên quan</h3>
-
-        <!-- Kiểm tra có sản phẩm liên quan không -->
-        <div th:if="${relatedProducts != null && !relatedProducts.isEmpty()}" class="row g-4">
-            <!-- Lặp qua danh sách sản phẩm liên quan -->
-            <div class="col-lg-3 col-md-6" th:each="relatedProduct : ${relatedProducts}">
-                <a th:href="@{/product/{id}(id=${relatedProduct.sanPhamId})}"
-                   class="text-decoration-none">
-                    <div class="card h-100 border-0 shadow-sm product-card-hover">
-                        <!-- Hình ảnh sản phẩm -->
-                        <div class="position-relative">
-                            <img th:src="${relatedProduct.hinhAnhChinh != null ? relatedProduct.hinhAnhChinh : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'}"
-                                 class="card-img-top"
-                                 th:alt="${relatedProduct.ten}"
-                                 style="height: 250px; object-fit: cover;">
-
-                            <!-- Sale badge nếu có giảm giá -->
-                            <span th:if="${relatedProduct.tyLeGiamGia > 0}"
-                                  class="badge bg-danger position-absolute top-0 end-0 m-2">
-                                -<span th:text="${relatedProduct.tyLeGiamGia}">15</span>%
-                            </span>
-                        </div>
-
-                        <!-- Thông tin sản phẩm -->
-                        <div class="card-body">
-                            <!-- Thương hiệu -->
-                            <p class="text-muted small mb-1" th:text="${relatedProduct.thuongHieuTen}">Nike</p>
-
-                            <!-- Tên sản phẩm -->
-                            <h6 class="card-title mb-2"
-                                th:text="${relatedProduct.ten}"
-                                style="height: 40px; overflow: hidden; text-overflow: ellipsis;">
-                                Nike Air Zoom Pegasus 40
-                            </h6>
-
-                            <!-- Giá -->
-                            <div class="d-flex align-items-center gap-2">
-                                <p class="text-danger fw-bold mb-0"
-                                   th:text="${relatedProduct.giaMinFormatted} + '₫'">
-                                    2.500.000₫
-                                </p>
-
-                                <!-- Giá gốc nếu có giảm giá -->
-                                <p th:if="${relatedProduct.giaGocMin != null && relatedProduct.giaGocMin > relatedProduct.giaMin}"
-                                   class="text-muted text-decoration-line-through small mb-0"
-                                   th:text="${relatedProduct.giaGocMinFormatted} + '₫'">
-                                    3.000.000₫
-                                </p>
-                            </div>
-
-                            <!-- Rating -->
-                            <div class="mt-2">
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star-half-alt text-warning"></i>
-                                <span class="text-muted small ms-1">(4.5)</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- Thông báo nếu không có sản phẩm liên quan -->
-        <div th:if="${relatedProducts == null || relatedProducts.isEmpty()}"
-             class="text-center py-5">
-            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-            <p class="text-muted">Không có sản phẩm liên quan</p>
-        </div>
-    </div>
-</section>
-<!-- Search Modal -->
-<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body p-4">
-                <form action="/static" method="get">
-                    <div class="search-modal-header mb-4">
-                        <h5 class="mb-2" id="searchModalLabel">Tìm kiếm sản phẩm</h5>
-                        <p class="text-muted small mb-0">Nhập tên sản phẩm, thương hiệu hoặc mã sản phẩm</p>
-                    </div>
-                    <div class="input-group input-group-lg">
-                        <input type="text" class="form-control" name="search"
-                               placeholder="Tìm kiếm..." autofocus>
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ========== FOOTER ========== -->
-<footer class="footer-shopee">
-    <div class="footer-top">
-        <div class="section-wrapper">
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">CHĂM SÓC KHÁCH HÀNG</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Trung Tâm Trợ Giúp</a></li>
-                        <li><a href="#">Hướng Dẫn Mua Hàng</a></li>
-                        <li><a href="#">Chính Sách Đổi Trả</a></li>
-                        <li><a href="#">Chính Sách Bảo Hành</a></li>
-                        <li><a href="#">Liên Hệ</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">VỀ NICESPORT</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Giới Thiệu</a></li>
-                        <li><a href="#">Tuyển Dụng</a></li>
-                        <li><a href="#">Điều Khoản</a></li>
-                        <li><a href="#">Chính Sách Bảo Mật</a></li>
-                        <li><a href="#">Flash Sale</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">THANH TOÁN</h6>
-                    <div class="payment-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/d4bbea4570b93bfd5fc652ca82a262a8" alt="COD">
-                        <img src="https://down-vn.img.susercontent.com/file/a0a9062ebe19b45c1ae0506f16af5c16" alt="Card">
-                        <img src="https://down-vn.img.susercontent.com/file/38fd98e55806c3b2e4535c4e4a6c4c08" alt="ATM">
-                        <img src="https://down-vn.img.susercontent.com/file/9263fa8c83628f5deff55e2a90758b06" alt="Momo">
-                    </div>
-                    <h6 class="footer-heading mt-3">VẬN CHUYỂN</h6>
-                    <div class="shipping-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/5e3f0bee86058637ff23cfdf2e14ca09" alt="GHN">
-                        <img src="https://down-vn.img.susercontent.com/file/d10b0ec09f0322f9201a4f3daf378ed2" alt="Giao Hàng Nhanh">
-                        <img src="https://down-vn.img.susercontent.com/file/59270fb2f3fbb7cbc92fca3877edde3f" alt="Grab">
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-heading">THEO DÕI CHÚNG TÔI</h6>
-                    <ul class="footer-links">
-                        <li><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
-                        <li><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
-                        <li><a href="#"><i class="fab fa-tiktok me-2"></i>TikTok</a></li>
-                        <li><a href="#"><i class="fab fa-youtube me-2"></i>YouTube</a></li>
-                    </ul>
-                </div>
             </div>
         </div>
     </div>
 
-    <div class="footer-bottom">
-        <div class="section-wrapper">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="mb-2">© 2025 NiceSport. Tất cả các quyền được bảo lưu.</p>
-                    <p class="footer-address">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        Địa chỉ: 123 Đường ABC, Quận 1, TP. Hồ Chí Minh |
-                        <i class="fas fa-phone ms-3 me-2"></i>
-                        Hotline: 1900-xxxx
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
+    <!-- ========== FOOTER ========== -->
+    <div th:replace="~{/components/footer.html}"></div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Custom JS -->
-<script th:src="@{/js/product-detail.js}"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/product-detail.js}"></script>
 
-<!-- Inline Script -->
-<script>
-    // Change main image
-    function changeImage(src) {
-        document.getElementById('mainImage').src = src;
-    }
-
-    // Select color
-    function selectColor(element) {
-        document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('active'));
-        element.classList.add('active');
-    }
-
-    // Select size
-    function selectSize(element) {
-        document.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('active'));
-        element.classList.add('active');
-    }
-
-    // Quantity controls
-    function decreaseQuantity() {
-        const input = document.getElementById('quantity');
-        if (input.value > 1) {
-            input.value = parseInt(input.value) - 1;
-        }
-    }
-
-    function increaseQuantity() {
-        const input = document.getElementById('quantity');
-        if (input.value < 10) {
-            input.value = parseInt(input.value) + 1;
-        }
-    }
-
-    // Add to cart
-    function addToCart() {
-        const selectedSize = document.querySelector('.size-option.active');
-        const quantity = document.getElementById('quantity').value;
-
-        if (!selectedSize) {
-            alert('Vui lòng chọn kích thước!');
-            return;
+    <!-- Inline Script -->
+    <script>
+        // Change main image
+        function changeImage(src) {
+            document.getElementById('mainImage').src = src;
         }
 
-        const variantId = selectedSize.getAttribute('data-variant-id');
-
-        alert('Đã thêm ' + quantity + ' sản phẩm vào giỏ hàng!');
-        // TODO: Call API to add to cart
-    }
-
-    let lastScrollTop = 0;
-    const navbar = document.querySelector('.navbar');
-
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-        if (scrollTop > lastScrollTop && scrollTop > 80) {
-            // Cuộn xuống -> ẩn navbar
-            navbar.classList.add('hide');
-        } else if (scrollTop < lastScrollTop - 5) {
-            // Cuộn lên -> hiện lại navbar
-            navbar.classList.remove('hide');
+        // Select color
+        function selectColor(element) {
+            document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
         }
 
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-    });
-</script>
+        // Select size
+        function selectSize(element) {
+            document.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Quantity controls
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            if (input.value > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            if (input.value < 10) {
+                input.value = parseInt(input.value) + 1;
+            }
+        }
+
+        // Add to cart
+        function addToCart() {
+            const selectedSize = document.querySelector('.size-option.active');
+            const quantity = document.getElementById('quantity').value;
+
+            if (!selectedSize) {
+                alert('Vui lòng chọn kích thước!');
+                return;
+            }
+
+            const variantId = selectedSize.getAttribute('data-variant-id');
+
+            alert('Đã thêm ' + quantity + ' sản phẩm vào giỏ hàng!');
+            // TODO: Call API to add to cart
+        }
+
+        let lastScrollTop = 0;
+        const navbar = document.querySelector('.navbar');
+
+        window.addEventListener('scroll', function () {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop > lastScrollTop && scrollTop > 80) {
+                // Cuộn xuống -> ẩn navbar
+                navbar.classList.add('hide');
+            } else if (scrollTop < lastScrollTop - 5) {
+                // Cuộn lên -> hiện lại navbar
+                navbar.classList.remove('hide');
+            }
+
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+    </script>
 
 </body>
+
 </html>
