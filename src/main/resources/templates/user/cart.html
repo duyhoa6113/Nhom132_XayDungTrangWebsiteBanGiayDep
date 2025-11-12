@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,437 +18,409 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/cart.css}">
 </head>
+
 <body>
 
-<!-- Header / Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
-            <div class="logo-icon">
-                <i class="fas fa-running"></i>
-            </div>
-            <span class="logo-text ms-2">NiceSport</span>
-        </a>
+    <!-- Header / Navigation -->
+    <div th:replace="~{/components/header.html}"></div>
 
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/Index}">Trang chủ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Sản phẩm</a>
-                </li>
-            </ul>
-
-            <div class="d-flex align-items-center gap-3">
-                <a th:href="@{/cart}" class="btn-icon position-relative">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="cart-badge" id="cartBadge">3</span>
-                </a>
-            </div>
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-section py-3 bg-light">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a th:href="@{/Index}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+                </ol>
+            </nav>
         </div>
-    </div>
-</nav>
+    </section>
 
-<!-- Breadcrumb -->
-<section class="breadcrumb-section py-3 bg-light">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a th:href="@{/Index}">Trang chủ</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
-            </ol>
-        </nav>
-    </div>
-</section>
+    <!-- Cart Section -->
+    <section class="cart-section py-5">
+        <div class="container">
+            <h2 class="mb-4">Giỏ hàng của bạn</h2>
 
-<!-- Cart Section -->
-<section class="cart-section py-5">
-    <div class="container">
-        <h2 class="mb-4">Giỏ hàng của bạn</h2>
+            <!-- Cart Content -->
+            <div class="row">
+                <!-- Cart Items -->
+                <div class="col-lg-8 mb-4">
+                    <div class="cart-items">
 
-        <!-- Cart Content -->
-        <div class="row">
-            <!-- Cart Items -->
-            <div class="col-lg-8 mb-4">
-                <div class="cart-items">
+                        <!-- Cart Item 1 -->
+                        <div class="cart-item">
+                            <div class="row align-items-center">
+                                <!-- Product Image -->
+                                <div class="col-md-2 col-3">
+                                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200"
+                                        alt="Product" class="img-fluid rounded">
+                                </div>
 
-                    <!-- Cart Item 1 -->
-                    <div class="cart-item">
-                        <div class="row align-items-center">
-                            <!-- Product Image -->
-                            <div class="col-md-2 col-3">
-                                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200"
-                                     alt="Product"
-                                     class="img-fluid rounded">
-                            </div>
+                                <!-- Product Info -->
+                                <div class="col-md-4 col-9">
+                                    <h6 class="mb-1">Nike Air Zoom Pegasus 40</h6>
+                                    <p class="text-muted small mb-1">Màu: Đen | Size: 42</p>
+                                    <p class="text-primary fw-bold mb-0">3.200.000₫</p>
+                                </div>
 
-                            <!-- Product Info -->
-                            <div class="col-md-4 col-9">
-                                <h6 class="mb-1">Nike Air Zoom Pegasus 40</h6>
-                                <p class="text-muted small mb-1">Màu: Đen | Size: 42</p>
-                                <p class="text-primary fw-bold mb-0">3.200.000₫</p>
-                            </div>
+                                <!-- Quantity -->
+                                <div class="col-md-3 col-6 mt-3 mt-md-0">
+                                    <div class="quantity-selector">
+                                        <button class="btn-quantity" onclick="decreaseQuantity('item1')">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="item1" value="1" min="1" max="10"
+                                            class="quantity-input" onchange="updateItemTotal('item1', 3200000)">
+                                        <button class="btn-quantity" onclick="increaseQuantity('item1')">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-                            <!-- Quantity -->
-                            <div class="col-md-3 col-6 mt-3 mt-md-0">
-                                <div class="quantity-selector">
-                                    <button class="btn-quantity" onclick="decreaseQuantity('item1')">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" id="item1" value="1" min="1" max="10" class="quantity-input" onchange="updateItemTotal('item1', 3200000)">
-                                    <button class="btn-quantity" onclick="increaseQuantity('item1')">
-                                        <i class="fas fa-plus"></i>
+                                <!-- Total & Remove -->
+                                <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
+                                    <p class="fw-bold mb-2" id="total-item1">3.200.000₫</p>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item1')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
-
-                            <!-- Total & Remove -->
-                            <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
-                                <p class="fw-bold mb-2" id="total-item1">3.200.000₫</p>
-                                <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item1')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
                         </div>
-                    </div>
 
-                    <!-- Cart Item 2 -->
-                    <div class="cart-item">
-                        <div class="row align-items-center">
-                            <div class="col-md-2 col-3">
-                                <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200"
-                                     alt="Product"
-                                     class="img-fluid rounded">
-                            </div>
+                        <!-- Cart Item 2 -->
+                        <div class="cart-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-2 col-3">
+                                    <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200"
+                                        alt="Product" class="img-fluid rounded">
+                                </div>
 
-                            <div class="col-md-4 col-9">
-                                <h6 class="mb-1">Adidas Ultraboost 23</h6>
-                                <p class="text-muted small mb-1">Màu: Trắng | Size: 41</p>
-                                <p class="text-primary fw-bold mb-0">4.500.000₫</p>
-                            </div>
+                                <div class="col-md-4 col-9">
+                                    <h6 class="mb-1">Adidas Ultraboost 23</h6>
+                                    <p class="text-muted small mb-1">Màu: Trắng | Size: 41</p>
+                                    <p class="text-primary fw-bold mb-0">4.500.000₫</p>
+                                </div>
 
-                            <div class="col-md-3 col-6 mt-3 mt-md-0">
-                                <div class="quantity-selector">
-                                    <button class="btn-quantity" onclick="decreaseQuantity('item2')">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" id="item2" value="2" min="1" max="10" class="quantity-input" onchange="updateItemTotal('item2', 4500000)">
-                                    <button class="btn-quantity" onclick="increaseQuantity('item2')">
-                                        <i class="fas fa-plus"></i>
+                                <div class="col-md-3 col-6 mt-3 mt-md-0">
+                                    <div class="quantity-selector">
+                                        <button class="btn-quantity" onclick="decreaseQuantity('item2')">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="item2" value="2" min="1" max="10"
+                                            class="quantity-input" onchange="updateItemTotal('item2', 4500000)">
+                                        <button class="btn-quantity" onclick="increaseQuantity('item2')">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
+                                    <p class="fw-bold mb-2" id="total-item2">9.000.000₫</p>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item2')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
-
-                            <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
-                                <p class="fw-bold mb-2" id="total-item2">9.000.000₫</p>
-                                <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item2')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
                         </div>
-                    </div>
 
-                    <!-- Cart Item 3 -->
-                    <div class="cart-item">
-                        <div class="row align-items-center">
-                            <div class="col-md-2 col-3">
-                                <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200"
-                                     alt="Product"
-                                     class="img-fluid rounded">
-                            </div>
+                        <!-- Cart Item 3 -->
+                        <div class="cart-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-2 col-3">
+                                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200"
+                                        alt="Product" class="img-fluid rounded">
+                                </div>
 
-                            <div class="col-md-4 col-9">
-                                <h6 class="mb-1">Nike Air Force 1</h6>
-                                <p class="text-muted small mb-1">Màu: Trắng | Size: 40</p>
-                                <p class="text-primary fw-bold mb-0">2.800.000₫</p>
-                            </div>
+                                <div class="col-md-4 col-9">
+                                    <h6 class="mb-1">Nike Air Force 1</h6>
+                                    <p class="text-muted small mb-1">Màu: Trắng | Size: 40</p>
+                                    <p class="text-primary fw-bold mb-0">2.800.000₫</p>
+                                </div>
 
-                            <div class="col-md-3 col-6 mt-3 mt-md-0">
-                                <div class="quantity-selector">
-                                    <button class="btn-quantity" onclick="decreaseQuantity('item3')">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" id="item3" value="1" min="1" max="10" class="quantity-input" onchange="updateItemTotal('item3', 2800000)">
-                                    <button class="btn-quantity" onclick="increaseQuantity('item3')">
-                                        <i class="fas fa-plus"></i>
+                                <div class="col-md-3 col-6 mt-3 mt-md-0">
+                                    <div class="quantity-selector">
+                                        <button class="btn-quantity" onclick="decreaseQuantity('item3')">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="item3" value="1" min="1" max="10"
+                                            class="quantity-input" onchange="updateItemTotal('item3', 2800000)">
+                                        <button class="btn-quantity" onclick="increaseQuantity('item3')">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
+                                    <p class="fw-bold mb-2" id="total-item3">2.800.000₫</p>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item3')">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
-
-                            <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
-                                <p class="fw-bold mb-2" id="total-item3">2.800.000₫</p>
-                                <button class="btn btn-sm btn-outline-danger" onclick="removeItem('item3')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
                         </div>
+
                     </div>
 
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Tiếp tục mua hàng
+                        </a>
+                        <button class="btn btn-outline-danger" onclick="clearCart()">
+                            <i class="fas fa-trash me-2"></i>
+                            Xóa tất cả
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="d-flex justify-content-between mt-4">
-                    <a th:href="@{/}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>
-                        Tiếp tục mua hàng
-                    </a>
-                    <button class="btn btn-outline-danger" onclick="clearCart()">
-                        <i class="fas fa-trash me-2"></i>
-                        Xóa tất cả
-                    </button>
-                </div>
-            </div>
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="order-summary">
+                        <h5 class="mb-4">Tóm tắt đơn hàng</h5>
 
-            <!-- Order Summary -->
-            <div class="col-lg-4">
-                <div class="order-summary">
-                    <h5 class="mb-4">Tóm tắt đơn hàng</h5>
-
-                    <div class="summary-row">
-                        <span>Tạm tính</span>
-                        <span class="fw-bold" id="subtotal">15.000.000₫</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Giảm giá</span>
-                        <span class="text-danger" id="discount">-0₫</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Phí vận chuyển</span>
-                        <span id="shipping">Miễn phí</span>
-                    </div>
-
-                    <hr>
-
-                    <div class="summary-row total">
-                        <span>Tổng cộng</span>
-                        <span class="text-primary fw-bold fs-4" id="total">15.000.000₫</span>
-                    </div>
-
-                    <button class="btn btn-primary w-100 btn-lg mt-4" onclick="checkout()">
-                        <i class="fas fa-credit-card me-2"></i>
-                        Thanh toán
-                    </button>
-
-                    <!-- Discount Code -->
-                    <div class="mt-4">
-                        <label class="form-label">Mã giảm giá</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Nhập mã giảm giá" id="discountCode">
-                            <button class="btn btn-outline-secondary" onclick="applyDiscount()">
-                                Áp dụng
-                            </button>
+                        <div class="summary-row">
+                            <span>Tạm tính</span>
+                            <span class="fw-bold" id="subtotal">15.000.000₫</span>
                         </div>
-                    </div>
 
-                    <!-- Payment Methods -->
-                    <div class="payment-methods mt-4">
-                        <p class="small text-muted mb-2">Phương thức thanh toán</p>
-                        <div class="d-flex gap-2">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" height="30">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" height="30">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" height="30">
+                        <div class="summary-row">
+                            <span>Giảm giá</span>
+                            <span class="text-danger" id="discount">-0₫</span>
                         </div>
-                    </div>
 
-                    <!-- Security Badge -->
-                    <div class="security-badge mt-4 p-3 bg-light rounded">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-shield-alt text-success fa-2x me-3"></i>
-                            <div>
-                                <p class="mb-0 small fw-bold">Thanh toán an toàn</p>
-                                <p class="mb-0 small text-muted">Mã hóa SSL 256-bit</p>
+                        <div class="summary-row">
+                            <span>Phí vận chuyển</span>
+                            <span id="shipping">Miễn phí</span>
+                        </div>
+
+                        <hr>
+
+                        <div class="summary-row total">
+                            <span>Tổng cộng</span>
+                            <span class="text-primary fw-bold fs-4" id="total">15.000.000₫</span>
+                        </div>
+
+                        <button class="btn btn-primary w-100 btn-lg mt-4" onclick="checkout()">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Thanh toán
+                        </button>
+
+                        <!-- Discount Code -->
+                        <div class="mt-4">
+                            <label class="form-label">Mã giảm giá</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Nhập mã giảm giá"
+                                    id="discountCode">
+                                <button class="btn btn-outline-secondary" onclick="applyDiscount()">
+                                    Áp dụng
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Payment Methods -->
+                        <div class="payment-methods mt-4">
+                            <p class="small text-muted mb-2">Phương thức thanh toán</p>
+                            <div class="d-flex gap-2">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+                                    alt="Visa" height="30">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                                    alt="Mastercard" height="30">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal"
+                                    height="30">
+                            </div>
+                        </div>
+
+                        <!-- Security Badge -->
+                        <div class="security-badge mt-4 p-3 bg-light rounded">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-shield-alt text-success fa-2x me-3"></i>
+                                <div>
+                                    <p class="mb-0 small fw-bold">Thanh toán an toàn</p>
+                                    <p class="mb-0 small text-muted">Mã hóa SSL 256-bit</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Empty Cart Message (Hidden by default) -->
-<section class="empty-cart-section py-5 d-none" id="emptyCart">
-    <div class="container text-center">
-        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-        <h3 class="mb-3">Giỏ hàng trống</h3>
-        <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
-        <a th:href="@{/}" class="btn btn-primary btn-lg">
-            <i class="fas fa-shopping-bag me-2"></i>
-            Mua sắm ngay
-        </a>
-    </div>
-</section>
+    <!-- Empty Cart Message (Hidden by default) -->
+    <section class="empty-cart-section py-5 d-none" id="emptyCart">
+        <div class="container text-center">
+            <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+            <h3 class="mb-3">Giỏ hàng trống</h3>
+            <p class="text-muted mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+            <a th:href="@{/}" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-bag me-2"></i>
+                Mua sắm ngay
+            </a>
+        </div>
+    </section>
 
-<!-- Footer -->
-<footer class="footer py-4 bg-dark text-white mt-5">
-    <div class="container text-center">
-        <p class="mb-0">© 2025 NiceSport. All rights reserved.</p>
-    </div>
-</footer>
+    <!-- Footer -->
+    <div th:replace="~{/components/footer.html}"></div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Custom JS -->
-<script th:src="@{/js/Cart.js}"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Inline JavaScript -->
-<script>
-    // Initialize cart on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        updateCartTotal();
-        updateCartBadge();
-    });
+    <!-- Custom JS -->
+    <script th:src="@{/js/Cart.js}"></script>
 
-    // Decrease quantity
-    function decreaseQuantity(itemId) {
-        const input = document.getElementById(itemId);
-        if (input.value > 1) {
-            input.value = parseInt(input.value) - 1;
-            const price = getItemPrice(itemId);
-            updateItemTotal(itemId, price);
-        }
-    }
-
-    // Increase quantity
-    function increaseQuantity(itemId) {
-        const input = document.getElementById(itemId);
-        if (input.value < 10) {
-            input.value = parseInt(input.value) + 1;
-            const price = getItemPrice(itemId);
-            updateItemTotal(itemId, price);
-        }
-    }
-
-    // Get item price
-    function getItemPrice(itemId) {
-        const prices = {
-            'item1': 3200000,
-            'item2': 4500000,
-            'item3': 2800000
-        };
-        return prices[itemId] || 0;
-    }
-
-    // Update item total
-    function updateItemTotal(itemId, price) {
-        const quantity = parseInt(document.getElementById(itemId).value);
-        const total = price * quantity;
-        document.getElementById('total-' + itemId).textContent = formatCurrency(total);
-        updateCartTotal();
-    }
-
-    // Update cart total
-    function updateCartTotal() {
-        let subtotal = 0;
-
-        // Calculate subtotal
-        const items = ['item1', 'item2', 'item3'];
-        items.forEach(itemId => {
-            const element = document.getElementById(itemId);
-            if (element && element.closest('.cart-item').style.display !== 'none') {
-                const quantity = parseInt(element.value);
-                const price = getItemPrice(itemId);
-                subtotal += price * quantity;
-            }
+    <!-- Inline JavaScript -->
+    <script>
+        // Initialize cart on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            updateCartTotal();
+            updateCartBadge();
         });
 
-        // Update display
-        document.getElementById('subtotal').textContent = formatCurrency(subtotal);
-        document.getElementById('total').textContent = formatCurrency(subtotal);
-
-        updateCartBadge();
-    }
-
-    // Format currency
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'decimal'
-        }).format(amount) + '₫';
-    }
-
-    // Remove item
-    function removeItem(itemId) {
-        if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-            const cartItem = document.getElementById(itemId).closest('.cart-item');
-            cartItem.style.display = 'none';
-            updateCartTotal();
-
-            // Check if cart is empty
-            checkEmptyCart();
+        // Decrease quantity
+        function decreaseQuantity(itemId) {
+            const input = document.getElementById(itemId);
+            if (input.value > 1) {
+                input.value = parseInt(input.value) - 1;
+                const price = getItemPrice(itemId);
+                updateItemTotal(itemId, price);
+            }
         }
-    }
 
-    // Clear cart
-    function clearCart() {
-        if (confirm('Bạn có chắc muốn xóa tất cả sản phẩm?')) {
-            document.querySelectorAll('.cart-item').forEach(item => {
-                item.style.display = 'none';
+        // Increase quantity
+        function increaseQuantity(itemId) {
+            const input = document.getElementById(itemId);
+            if (input.value < 10) {
+                input.value = parseInt(input.value) + 1;
+                const price = getItemPrice(itemId);
+                updateItemTotal(itemId, price);
+            }
+        }
+
+        // Get item price
+        function getItemPrice(itemId) {
+            const prices = {
+                'item1': 3200000,
+                'item2': 4500000,
+                'item3': 2800000
+            };
+            return prices[itemId] || 0;
+        }
+
+        // Update item total
+        function updateItemTotal(itemId, price) {
+            const quantity = parseInt(document.getElementById(itemId).value);
+            const total = price * quantity;
+            document.getElementById('total-' + itemId).textContent = formatCurrency(total);
+            updateCartTotal();
+        }
+
+        // Update cart total
+        function updateCartTotal() {
+            let subtotal = 0;
+
+            // Calculate subtotal
+            const items = ['item1', 'item2', 'item3'];
+            items.forEach(itemId => {
+                const element = document.getElementById(itemId);
+                if (element && element.closest('.cart-item').style.display !== 'none') {
+                    const quantity = parseInt(element.value);
+                    const price = getItemPrice(itemId);
+                    subtotal += price * quantity;
+                }
             });
-            updateCartTotal();
-            checkEmptyCart();
+
+            // Update display
+            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('total').textContent = formatCurrency(subtotal);
+
+            updateCartBadge();
         }
-    }
 
-    // Check if cart is empty
-    function checkEmptyCart() {
-        const visibleItems = Array.from(document.querySelectorAll('.cart-item'))
-            .filter(item => item.style.display !== 'none');
-
-        if (visibleItems.length === 0) {
-            document.querySelector('.cart-section').classList.add('d-none');
-            document.querySelector('.empty-cart-section').classList.remove('d-none');
-            document.getElementById('cartBadge').textContent = '0';
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'decimal'
+            }).format(amount) + '₫';
         }
-    }
 
-    // Update cart badge
-    function updateCartBadge() {
-        const visibleItems = Array.from(document.querySelectorAll('.cart-item'))
-            .filter(item => item.style.display !== 'none');
-        document.getElementById('cartBadge').textContent = visibleItems.length;
-    }
+        // Remove item
+        function removeItem(itemId) {
+            if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+                const cartItem = document.getElementById(itemId).closest('.cart-item');
+                cartItem.style.display = 'none';
+                updateCartTotal();
 
-    // Apply discount
-    function applyDiscount() {
-        const code = document.getElementById('discountCode').value.trim().toUpperCase();
-        const discountCodes = {
-            'NICE10': 0.1,  // 10%
-            'NICE20': 0.2,  // 20%
-            'FREESHIP': 0.05 // 5%
-        };
-
-        if (discountCodes[code]) {
-            const subtotalText = document.getElementById('subtotal').textContent;
-            const subtotal = parseInt(subtotalText.replace(/\D/g, ''));
-            const discount = subtotal * discountCodes[code];
-            const total = subtotal - discount;
-
-            document.getElementById('discount').textContent = '-' + formatCurrency(discount);
-            document.getElementById('total').textContent = formatCurrency(total);
-
-            alert('Áp dụng mã giảm giá thành công!');
-            document.getElementById('discountCode').value = '';
-        } else {
-            alert('Mã giảm giá không hợp lệ!');
+                // Check if cart is empty
+                checkEmptyCart();
+            }
         }
-    }
 
-    // Checkout
-    function checkout() {
-        const total = document.getElementById('total').textContent;
-        alert('Tổng thanh toán: ' + total + '\n\nChức năng thanh toán đang được phát triển...');
-        // TODO: Navigate to checkout page
-        // window.location.href = '/checkout';
-    }
-</script>
+        // Clear cart
+        function clearCart() {
+            if (confirm('Bạn có chắc muốn xóa tất cả sản phẩm?')) {
+                document.querySelectorAll('.cart-item').forEach(item => {
+                    item.style.display = 'none';
+                });
+                updateCartTotal();
+                checkEmptyCart();
+            }
+        }
+
+        // Check if cart is empty
+        function checkEmptyCart() {
+            const visibleItems = Array.from(document.querySelectorAll('.cart-item'))
+                .filter(item => item.style.display !== 'none');
+
+            if (visibleItems.length === 0) {
+                document.querySelector('.cart-section').classList.add('d-none');
+                document.querySelector('.empty-cart-section').classList.remove('d-none');
+                document.getElementById('cartBadge').textContent = '0';
+            }
+        }
+
+        // Update cart badge
+        function updateCartBadge() {
+            const visibleItems = Array.from(document.querySelectorAll('.cart-item'))
+                .filter(item => item.style.display !== 'none');
+            document.getElementById('cartBadge').textContent = visibleItems.length;
+        }
+
+        // Apply discount
+        function applyDiscount() {
+            const code = document.getElementById('discountCode').value.trim().toUpperCase();
+            const discountCodes = {
+                'NICE10': 0.1,  // 10%
+                'NICE20': 0.2,  // 20%
+                'FREESHIP': 0.05 // 5%
+            };
+
+            if (discountCodes[code]) {
+                const subtotalText = document.getElementById('subtotal').textContent;
+                const subtotal = parseInt(subtotalText.replace(/\D/g, ''));
+                const discount = subtotal * discountCodes[code];
+                const total = subtotal - discount;
+
+                document.getElementById('discount').textContent = '-' + formatCurrency(discount);
+                document.getElementById('total').textContent = formatCurrency(total);
+
+                alert('Áp dụng mã giảm giá thành công!');
+                document.getElementById('discountCode').value = '';
+            } else {
+                alert('Mã giảm giá không hợp lệ!');
+            }
+        }
+
+        // Checkout
+        function checkout() {
+            const total = document.getElementById('total').textContent;
+            alert('Tổng thanh toán: ' + total + '\n\nChức năng thanh toán đang được phát triển...');
+            // TODO: Navigate to checkout page
+            // window.location.href = '/checkout';
+        }
+    </script>
 
 </body>
+
 </html>
