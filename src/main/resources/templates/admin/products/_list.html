@@ -1,10 +1,96 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<!-- admin/products/_list.html -->
+<div class="table-responsive mt-2">
+    <table class="table table-bordered align-middle text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Số lượng</th>
+                <th>Giá</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Hard-coded sample rows -->
+            <tr data-id="101"
+                data-json='{"productID":"101","productName":"Nike Air Zoom Pegasus 38","categoryId":"1","categoryName":"Running","brandName":"Nike","stockQuantity":120,"price":2490000,"description":"Giày chạy bộ"}'>
+                <td>101</td>
+                <td><img src="/images/sample/shoe1.jpg" width="60" height="60" class="img-thumbnail"></td>
+                <td>Nike Air Zoom Pegasus 38</td>
+                <td>Running</td>
+                <td>120</td>
+                <td>2,490,000₫</td>
+                <td>
+                    <button class="btn btn-sm btn-warning btn-edit" type="button"><i
+                            class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn btn-sm btn-danger btn-delete" type="button"><i
+                            class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
 
-</body>
-</html>
+            <tr data-id="102"
+                data-json='{"productID":"102","productName":"Adidas Ultraboost 21","categoryId":"1","categoryName":"Running","brandName":"Adidas","stockQuantity":80,"price":3590000,"description":"Ultraboost"}'>
+                <td>102</td>
+                <td><img src="/images/sample/shoe2.jpg" width="60" height="60" class="img-thumbnail"></td>
+                <td>Adidas Ultraboost 21</td>
+                <td>Running</td>
+                <td>80</td>
+                <td>3,590,000₫</td>
+                <td>
+                    <button class="btn btn-sm btn-warning btn-edit" type="button"><i
+                            class="fa-solid fa-pen-to-square"></i></button>
+                    <button class="btn btn-sm btn-danger btn-delete" type="button"><i
+                            class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- pagination mock -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            <form method="get" class="d-flex align-items-center gap-2 mb-0">
+                <label class="m-0 small">Hiển thị</label>
+                <select class="form-select form-select-sm w-auto" name="size">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
+            </form>
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled"><span class="page-link">«</span></li>
+                <li class="page-item active"><span class="page-link">1</span></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">»</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const row = this.closest('tr');
+                const json = row.getAttribute('data-json');
+                let data = {};
+                try { data = JSON.parse(json); } catch { }
+                // Dispatch event so module index can handle populate + switch tab
+                window.dispatchEvent(new CustomEvent('products:edit', { detail: data }));
+            });
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function () {
+                if (!confirm('Bạn có chắc muốn xóa mục này?')) return;
+                const row = this.closest('tr');
+                row.remove(); // hard delete on UI (demo)
+            });
+        });
+    });
+</script>

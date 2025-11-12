@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<div class="mt-2">
+  <table class="table table-sm">
+    <thead><tr><th>ID</th><th>Tên vai trò</th><th>Mô tả</th><th>Hành động</th></tr></thead>
+    <tbody>
+      <tr data-json='{"roleId":"1","roleName":"Admin","description":"Toàn quyền"}'>
+        <td>1</td><td>Admin</td><td>Toàn quyền</td>
+        <td><button class="btn btn-sm btn-warning role-edit">Sửa</button></td>
+      </tr>
+      <tr data-json='{"roleId":"2","roleName":"Staff","description":"Quản lý sản phẩm"}'>
+        <td>2</td><td>Staff</td><td>Quản lý sản phẩm</td>
+        <td><button class="btn btn-sm btn-warning role-edit">Sửa</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-</body>
-</html>
+<script>
+  document.querySelectorAll('.role-edit').forEach(b => b.addEventListener('click', function(){
+    const d = JSON.parse(this.closest('tr').getAttribute('data-json') || '{}');
+    window.dispatchEvent(new CustomEvent('role:edit', { detail: d }));
+  }));
+</script>

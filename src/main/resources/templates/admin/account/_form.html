@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="mt-2">
+  <form id="accountForm">
+    <input type="hidden" name="accountId">
+    <div class="mb-3"><label class="form-label">Họ tên</label><input class="form-control" name="fullname" required></div>
+    <div class="mb-3"><label class="form-label">Email</label><input class="form-control" name="email" required></div>
+    <div class="mb-3">
+      <label class="form-label">Vai trò</label>
+      <select class="form-select" name="role">
+        <option>Admin</option><option>Staff</option>
+      </select>
+    </div>
+    <div>
+      <button class="btn btn-primary" type="submit">Lưu</button>
+      <button class="btn btn-secondary" type="reset">Làm mới</button>
+    </div>
+  </form>
+</div>

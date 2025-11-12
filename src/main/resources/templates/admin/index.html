@@ -5,10 +5,84 @@
     <meta charset="UTF-8">
     <title>NiceSport • Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap + FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     <link th:href="@{/css/index.css}" rel="stylesheet">
     <link th:href="@{/css/admin/index.css}" rel="stylesheet">
+    <link th:href="@{/css/admin/sidebar.css}" rel="stylesheet">
+
+    <style>
+        /* Small tweaks specific to dashboard inside admin page */
+        .stat-card {
+            border-radius: 12px;
+            padding: 18px;
+            background: white;
+            box-shadow: 0 6px 18px rgba(11, 22, 39, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-card .label {
+            color: rgba(0, 0, 0, 0.6);
+            font-weight: 600;
+        }
+
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-top: 6px;
+            color: #111827;
+        }
+
+        .card-small {
+            border-radius: 12px;
+            padding: 12px;
+            background: var(--light-bg);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        /* Top products table */
+        .top-products-table tbody tr td {
+            vertical-align: middle;
+        }
+
+        .rank-badge {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #f3f4f6;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        /* Make chart container visually matching site */
+        .chart-card {
+            border-radius: 12px;
+            padding: 16px;
+            background: white;
+            box-shadow: 0 6px 18px rgba(11, 22, 39, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            .stat-card {
+                text-align: center;
+            }
+
+            .stat-card .label {
+                display: block;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -27,39 +101,230 @@
             </div>
 
             <div class="content-card">
-                <div class="tab-toolbar" id="tabToolbar">
-                    <!-- Sẽ thay theo module: List / Form -->
+                <!-- <div class="tab-toolbar" id="tabToolbar">
                     <button class="btn btn-primary btn-sm" data-tab="list"><i
                             class="fa-regular fa-rectangle-list me-1"></i>Danh sách</button>
                     <button class="btn btn-outline-secondary btn-sm" data-tab="form"><i
                             class="fa-solid fa-plus me-1"></i>Thêm / Sửa</button>
                     <div class="ms-auto small text-muted" id="tabHint">Chọn module ở sidebar</div>
-                </div>
+                </div> -->
                 <div class="content-body">
                     <!-- vùng chứa nội dung động -->
                     <div id="tabContainer">
                         <!-- mặc định hiển thị dashboard -->
                         <div id="pane-dashboard">
-                            <div class="row g-3">
+                            <!-- Top stats -->
+                            <div class="row g-3 mb-4">
                                 <div class="col-md-4">
-                                    <div class="p-3 rounded-3 border" style="background:var(--light-bg)">
-                                        <div class="fw-bold">Doanh thu hôm nay</div>
-                                        <div class="fs-3 mt-1">₫0</div>
+                                    <div class="stat-card">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="label">Tổng doanh thu (tháng)</div>
+                                                <div class="value">₫125,430,000</div>
+                                                <div class="text-muted small mt-1">So với tháng trước:
+                                                    <strong>+12.4%</strong></div>
+                                            </div>
+                                            <div class="text-end">
+                                                <div class="badge bg-success rounded-pill">Tốt</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-4">
-                                    <div class="p-3 rounded-3 border" style="background:var(--light-bg)">
-                                        <div class="fw-bold">Đơn hàng</div>
-                                        <div class="fs-3 mt-1">0</div>
+                                    <div class="stat-card">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="label">Tổng đơn hàng</div>
+                                                <div class="value">1,234</div>
+                                                <div class="text-muted small mt-1">Đơn hàng trong tháng</div>
+                                            </div>
+                                            <div class="text-end">
+                                                <div class="badge bg-primary rounded-pill">₫</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-4">
-                                    <div class="p-3 rounded-3 border" style="background:var(--light-bg)">
-                                        <div class="fw-bold">Sản phẩm</div>
-                                        <div class="fs-3 mt-1">0</div>
+                                    <div class="stat-card">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="label">Tổng sản phẩm</div>
+                                                <div class="value">542</div>
+                                                <div class="text-muted small mt-1">Sản phẩm đang bán</div>
+                                            </div>
+                                            <div class="text-end">
+                                                <div class="badge bg-warning text-dark rounded-pill">Số lượng</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Chart + Top products -->
+                            <div class="row g-3">
+                                <div class="col-xl-8 col-lg-7">
+                                    <div class="chart-card h-100">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div>
+                                                <h6 class="mb-0">Biểu đồ doanh thu (12 tháng gần nhất)</h6>
+                                                <div class="small text-muted">Doanh thu theo tháng (₫)</div>
+                                            </div>
+                                            <div class="small text-muted">Tổng: <strong>₫125,430,000</strong></div>
+                                        </div>
+                                        <canvas id="revenueChart" height="180"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-lg-5">
+                                    <div class="chart-card h-100">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div>
+                                                <h6 class="mb-0">Top 10 sản phẩm bán chạy</h6>
+                                                <div class="small text-muted">Theo số lượng bán (tháng)</div>
+                                            </div>
+                                            <div class="small text-muted">Total units: <strong>4,321</strong></div>
+                                        </div>
+
+                                        <div class="table-responsive"
+                                            style="max-height:360px; overflow:auto; padding-right:6px;">
+                                            <table class="table table-borderless top-products-table mb-0">
+                                                <thead>
+                                                    <tr class="text-muted small">
+                                                        <th>#</th>
+                                                        <th>Sản phẩm</th>
+                                                        <th class="text-end">Đã bán</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><span class="rank-badge">1</span></td>
+                                                        <td>Giày Nike Air Zoom Pegasus 38</td>
+                                                        <td class="text-end">512</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">2</span></td>
+                                                        <td>Adidas Ultraboost 21</td>
+                                                        <td class="text-end">461</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">3</span></td>
+                                                        <td>Puma Velocity Nitro</td>
+                                                        <td class="text-end">389</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">4</span></td>
+                                                        <td>New Balance 1080v11</td>
+                                                        <td class="text-end">342</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">5</span></td>
+                                                        <td>Asics Gel-Kayano 28</td>
+                                                        <td class="text-end">320</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">6</span></td>
+                                                        <td>Nike React Infinity Run</td>
+                                                        <td class="text-end">312</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">7</span></td>
+                                                        <td>Adidas SolarBoost</td>
+                                                        <td class="text-end">295</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">8</span></td>
+                                                        <td>Puma Speed 600</td>
+                                                        <td class="text-end">240</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">9</span></td>
+                                                        <td>Reebok Floatride</td>
+                                                        <td class="text-end">188</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="rank-badge">10</span></td>
+                                                        <td>Skechers GOrun MaxRoad</td>
+                                                        <td class="text-end">150</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent orders mini -->
+                            <div class="row g-3 mt-3">
+                                <div class="col-12">
+                                    <div class="chart-card">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div>
+                                                <h6 class="mb-0">Đơn hàng gần đây</h6>
+                                                <div class="small text-muted">Danh sách 5 đơn hàng mới nhất (hard-coded)
+                                                </div>
+                                            </div>
+                                            <div class="small text-muted">Trạng thái: <strong>Đang xử lý</strong></div>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-sm align-middle mb-0">
+                                                <thead>
+                                                    <tr class="small text-muted">
+                                                        <th>Mã đơn</th>
+                                                        <th>Khách hàng</th>
+                                                        <th>Số tiền</th>
+                                                        <th>Ngày</th>
+                                                        <th>Trạng thái</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>#ORD-10234</td>
+                                                        <td>Nguyễn Văn A</td>
+                                                        <td>₫1,250,000</td>
+                                                        <td>2025-11-10</td>
+                                                        <td><span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>#ORD-10233</td>
+                                                        <td>Trần Thị B</td>
+                                                        <td>₫899,000</td>
+                                                        <td>2025-11-09</td>
+                                                        <td><span class="badge bg-success">Hoàn tất</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>#ORD-10232</td>
+                                                        <td>Phạm C</td>
+                                                        <td>₫2,350,000</td>
+                                                        <td>2025-11-09</td>
+                                                        <td><span class="badge bg-danger">Hủy</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>#ORD-10231</td>
+                                                        <td>Ngô D</td>
+                                                        <td>₫499,000</td>
+                                                        <td>2025-11-08</td>
+                                                        <td><span class="badge bg-primary">Đang vận chuyển</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>#ORD-10230</td>
+                                                        <td>Võ E</td>
+                                                        <td>₫1,120,000</td>
+                                                        <td>2025-11-07</td>
+                                                        <td><span class="badge bg-success">Hoàn tất</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <!-- Các pane động (products/categories/orders/account/role) sẽ được inject -->
                     </div>
@@ -85,31 +350,106 @@
             index: `/admin/${m}/index.html`
         });
 
+        function initDashboard() {
+            // Hard-coded monthly revenue data (₫)
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const data = [8500000, 9200000, 12500000, 9800000, 14300000, 13200000, 15200000, 16200000, 14100000, 17200000, 12300000, 10500000];
+
+            const ctx = document.getElementById('revenueChart');
+            if (!ctx) return;
+
+            // Destroy previous instance if exists
+            if (ctx._chartInstance) {
+                ctx._chartInstance.destroy();
+            }
+
+            ctx._chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh thu (₫)',
+                        data: data,
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: (ctx) => {
+                            // gradient
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                            gradient.addColorStop(0, 'rgba(37,99,235,0.18)');
+                            gradient.addColorStop(1, 'rgba(37,99,235,0.02)');
+                            return gradient;
+                        },
+                        borderColor: '#2563eb',
+                        pointRadius: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const v = context.parsed.y || 0;
+                                    return '₫' + v.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#6b7280' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: {
+                                callback: function (value) { return '₫' + value / 1000000 + 'M'; },
+                                color: '#6b7280'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         async function renderModule() {
             tabHint.textContent = '';
             pageTitle.textContent = titleOf(state.module);
 
             if (state.module === 'dashboard') {
+                // set dashboard markup (we keep the template from initial DOM)
                 tabContainer.innerHTML = document.getElementById('pane-dashboard').outerHTML;
+
+                // initialize chart and any dashboard-specific JS
+                // Defer slightly to ensure canvas in DOM
+                setTimeout(() => initDashboard(), 50);
                 return;
             }
 
             const urls = partials(state.module);
 
             tabContainer.innerHTML = `
-        <div id="pane-list" class="${state.tab === 'list' ? '' : 'hidden'}"></div>
-        <div id="pane-form" class="${state.tab === 'form' ? '' : 'hidden'}"></div>
-      `;
+                <div id="pane-list" class="${state.tab === 'list' ? '' : 'hidden'}"></div>
+                <div id="pane-form" class="${state.tab === 'form' ? '' : 'hidden'}"></div>
+            `;
 
             try {
                 const resL = await fetch(urls.list, { headers: { 'X-Requested-With': 'fetch' } });
                 document.getElementById('pane-list').innerHTML = await resL.text();
-            } catch { document.getElementById('pane-list').innerHTML = `<div class="text-muted">Chưa có _list.html</div>`; }
+            } catch {
+                document.getElementById('pane-list').innerHTML = `<div class="text-muted">Chưa có _list.html</div>`;
+            }
 
             try {
                 const resF = await fetch(urls.form, { headers: { 'X-Requested-With': 'fetch' } });
                 document.getElementById('pane-form').innerHTML = await resF.text();
-            } catch { document.getElementById('pane-form').innerHTML = `<div class="text-muted">Chưa có _form.html</div>`; }
+            } catch {
+                document.getElementById('pane-form').innerHTML = `<div class="text-muted">Chưa có _form.html</div>`;
+            }
 
             if (state.payload) {
                 window.dispatchEvent(new CustomEvent('admin:form:load', { detail: state.payload }));
@@ -162,6 +502,7 @@
             }
         });
 
+        // Initial render
         renderModule();
     </script>
 </body>

@@ -1,10 +1,76 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<!-- admin/products/_form.html -->
+<div class="mt-2">
+    <form action="#" method="post" enctype="multipart/form-data" id="productsForm">
+        <input type="hidden" id="productID" name="productID">
 
-</body>
-</html>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Tên sản phẩm</label>
+                <input type="text" class="form-control" name="productName" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Danh mục</label>
+                <select class="form-select" name="categoryId" required>
+                    <option value="">-- Chọn --</option>
+                    <option value="1">Running</option>
+                    <option value="2">Sneakers</option>
+                    <option value="3">Lifestyle</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Hãng</label>
+                <input type="text" class="form-control" name="brandName">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Giá</label>
+                <input type="number" class="form-control" name="price" step="1000" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mô tả</label>
+            <textarea class="form-control" name="description" rows="3"></textarea>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Số lượng</label>
+                <input type="number" class="form-control" name="stockQuantity" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ảnh đại diện</label>
+                <input type="file" class="form-control" name="thumbnailFile" accept="image/*">
+            </div>
+        </div>
+
+        <div>
+            <button class="btn btn-primary" type="submit">Lưu</button>
+            <button class="btn btn-secondary" type="reset">Làm mới</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // When the form is reset, clear hidden id
+    document.getElementById('productsForm')?.addEventListener('reset', () => {
+        const id = document.getElementById('productID');
+        if (id) id.value = '';
+    });
+
+    // allow external event to populate the form (global admin:edit as fallback)
+    window.addEventListener('products:edit', (e) => {
+        const data = e.detail || {};
+        setTimeout(() => {
+            document.getElementById('productID').value = data.productID || '';
+            document.querySelector('[name="productName"]').value = data.productName || '';
+            document.querySelector('[name="categoryId"]').value = data.categoryId || '';
+            document.querySelector('[name="brandName"]').value = data.brandName || '';
+            document.querySelector('[name="price"]').value = data.price || '';
+            document.querySelector('[name="stockQuantity"]').value = data.stockQuantity || '';
+            document.querySelector('[name="description"]').value = data.description || '';
+        }, 10);
+    });
+</script>

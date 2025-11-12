@@ -1,10 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<div class="mt-2">
+  <form id="orderForm">
+    <div class="row mb-2">
+      <div class="col-md-4"><label class="form-label">Mã đơn</label><input class="form-control" name="orderId" readonly></div>
+      <div class="col-md-4"><label class="form-label">Khách hàng</label><input class="form-control" name="customerName" readonly></div>
+      <div class="col-md-4"><label class="form-label">Tổng tiền</label><input class="form-control" name="total" readonly></div>
+    </div>
 
-</body>
-</html>
+    <div class="mb-3">
+      <label class="form-label">Trạng thái</label>
+      <select class="form-select" name="status">
+        <option value="pending">Chờ xử lý</option>
+        <option value="processing">Đang xử lý</option>
+        <option value="shipped">Đang vận chuyển</option>
+        <option value="completed">Hoàn tất</option>
+      </select>
+    </div>
+
+    <div>
+      <button class="btn btn-primary" type="submit">Cập nhật trạng thái</button>
+    </div>
+  </form>
+</div>

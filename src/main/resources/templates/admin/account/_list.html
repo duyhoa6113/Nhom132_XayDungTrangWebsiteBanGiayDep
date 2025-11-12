@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<div class="table-responsive mt-2">
+  <table class="table table-hover">
+    <thead><tr><th>ID</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Hành động</th></tr></thead>
+    <tbody>
+      <tr data-json='{"accountId":"1","fullname":"Admin One","email":"admin@site.vn","role":"Admin"}'>
+        <td>1</td><td>Admin One</td><td>admin@site.vn</td><td>Admin</td>
+        <td>
+          <button class="btn btn-sm btn-warning acc-edit">Sửa</button>
+        </td>
+      </tr>
+      <tr data-json='{"accountId":"2","fullname":"Staff Two","email":"staff@site.vn","role":"Staff"}'>
+        <td>2</td><td>Staff Two</td><td>staff@site.vn</td><td>Staff</td>
+        <td><button class="btn btn-sm btn-warning acc-edit">Sửa</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-</body>
-</html>
+<script>
+  document.querySelectorAll('.acc-edit').forEach(b => b.addEventListener('click', function(){
+    const data = JSON.parse(this.closest('tr').getAttribute('data-json') || '{}');
+    window.dispatchEvent(new CustomEvent('account:edit', { detail: data }));
+  }));
+</script>

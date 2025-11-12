@@ -54,3 +54,4 @@ tmp/
 .classpath
 .settings/
 .vscode/
+.factorypath

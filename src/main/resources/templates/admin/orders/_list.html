@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<div class="table-responsive mt-2">
+  <table class="table table-hover">
+    <thead><tr><th>Mã</th><th>Khách</th><th>Tiền</th><th>Ngày</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>#ORD-10234</td><td>Nguyễn Văn A</td><td>₫1,250,000</td><td>2025-11-10</td><td><span class="badge bg-warning text-dark">Chờ xử lý</span></td>
+        <td>
+          <button class="btn btn-sm btn-info order-view" type="button">Xem</button>
+        </td>
+      </tr>
+      <tr>
+        <td>#ORD-10233</td><td>Trần Thị B</td><td>₫899,000</td><td>2025-11-09</td><td><span class="badge bg-success">Hoàn tất</span></td>
+        <td><button class="btn btn-sm btn-info order-view">Xem</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-</body>
-</html>
+<script>
+  document.querySelectorAll('.order-view').forEach(b => b.addEventListener('click', function(){
+    const row = this.closest('tr');
+    const order = {
+      orderId: row.cells[0].innerText.trim(),
+      customerName: row.cells[1].innerText.trim(),
+      total: row.cells[2].innerText.trim()
+    };
+    window.dispatchEvent(new CustomEvent('orders:open', { detail: order }));
+  }));
+</script>
