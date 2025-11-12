@@ -22,50 +22,7 @@
 <body>
 
     <!-- ========== NAVBAR (Shopee Style) ========== -->
-    <nav class="navbar navbar-light bg-white shadow-sm sticky-top">
-        <!-- Top Bar -->
-        <div th:replace="~{/components/header.html}"></div>
-
-        <!-- Main Navbar -->
-        <div class="navbar-main">
-            <div class="section-wrapper">
-                <div class="row align-items-center w-100 g-3">
-                    <!-- Logo -->
-                    <div class="col-auto">
-                        <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
-                            <div class="logo-icon">
-                                <i class="fas fa-running"></i>
-                            </div>
-                            <span class="logo-text ms-2">NiceSport</span>
-                        </a>
-                    </div>
-
-                    <!-- Search Box -->
-                    <div class="col">
-                        <form action="/search" method="get" class="search-form">
-                            <div class="search-box-main">
-                                <input type="text" name="q" class="search-input-main"
-                                    placeholder="Tìm giày thể thao, sneaker, sandals..." th:value="${keyword}"
-                                    autocomplete="off" required>
-                                <button type="submit" class="btn-search-main">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Cart -->
-                    <div class="col-auto">
-                        <a th:href="@{/cart}" class="cart-icon-main position-relative">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge-main" th:if="${cartCount != null && cartCount > 0}"
-                                th:text="${cartCount}">0</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="~{/components/header.html}"></div>
 
     <!-- ========== HERO BANNER ========== -->
     <section class="hero-banner" id="home">
