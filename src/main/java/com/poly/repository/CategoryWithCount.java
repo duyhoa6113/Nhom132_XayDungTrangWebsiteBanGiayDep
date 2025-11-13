@@ -1,4 +1,4 @@
-package com.poly.dto;
+package com.poly.repository;
 
 /**
  * DTO Interface cho danh mục kèm số lượng sản phẩm

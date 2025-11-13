@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.util.Locale;
 
 @Entity
 @Table(name = "GioHang")
@@ -22,18 +20,18 @@ public class GioHang {
     @Column(name = "GioHangId")
     private Integer gioHangId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "KhachHangId", nullable = false)
     private KhachHang khachHang;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "VariantId", nullable = false)
     private SanPhamChiTiet variant;
 
     @Column(name = "SoLuong", nullable = false)
     private Integer soLuong;
 
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    @Column(name = "CreatedAt")
     private LocalDateTime createdAt;
 
     @Column(name = "UpdatedAt")
@@ -41,9 +39,8 @@ public class GioHang {
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
@@ -51,33 +48,17 @@ public class GioHang {
         updatedAt = LocalDateTime.now();
     }
 
-    /*#
-     * Tính thành tiền
-     */
+    // Calculated field
     @Transient
-    public BigDecimal getThanhTien() {
+    public BigDecimal getTongTien() {
         if (variant != null && variant.getGiaBan() != null && soLuong != null) {
-            return variant.getGiaBan().multiply(new BigDecimal(soLuong));
+            return variant.getGiaBan().multiply(BigDecimal.valueOf(soLuong));
         }
         return BigDecimal.ZERO;
     }
 
-    /**
-     * Format thành tiền
-     */
     @Transient
-    public String getThanhTienFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(getThanhTien());
-    }
-
-
-
-    /**
-     * Lấy hình ảnh
-     */
-    @Transient
-    public String getHinhAnh() {
-        return variant != null ? variant.getHinhAnh() : null;
+    public BigDecimal getGiaTaiThoidiem() {
+        return variant != null ? variant.getGiaBan() : BigDecimal.ZERO;
     }
 }

@@ -21,8 +21,138 @@
 
 <body>
 
-    <!-- ========== NAVBAR (Shopee Style) ========== -->
-    <div th:replace="~{/components/header.html}"></div>
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-light bg-white shadow-sm sticky-top">
+    <!-- Top Bar -->
+    <div class="navbar-top">
+        <div class="section-wrapper">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="top-links">
+                    <a href="/seller" class="top-link">Trang chủ</a>
+                    <span class="divider">|</span>
+                    <a href="/download" class="top-link">Tải ứng dụng</a>
+                    <span class="divider">|</span>
+                    <span class="top-link">Kết nối</span>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="top-links">
+                    <a href="#" class="top-link">
+                        <i class="far fa-bell me-1"></i>Thông Báo
+                    </a>
+                    <a href="#" class="top-link">
+                        <i class="far fa-question-circle me-1"></i>Hỗ Trợ
+                    </a>
+                    <a href="#" class="top-link">
+                        <i class="fas fa-globe me-1"></i>Tiếng Việt
+                        <i class="fas fa-chevron-down ms-1 small"></i>
+                    </a>
+
+                    <!-- USER DROPDOWN -->
+                    <div th:if="${session.khachHang != null}" class="dropdown d-inline">
+                        <a href="#" class="top-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="far fa-user-circle me-1"></i>
+                            <span th:text="${session.khachHangTen}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu shadow-lg" aria-labelledby="userDropdown">
+                            <li class="dropdown-header">
+                                <div class="user-info">
+                                    <div class="user-avatar-large">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name-large" th:text="${session.khachHangTen}">User Name</div>
+                                        <div class="user-email" th:text="${session.khachHang.email}">user@example.com</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li>
+                                <a class="dropdown-item" href="/profile">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>Tài khoản của tôi</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/orders">
+                                    <i class="fas fa-box"></i>
+                                    <span>Đơn hàng</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/wishlist">
+                                    <i class="fas fa-heart"></i>
+                                    <span>Yêu thích</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/admin">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Quản trị viên</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Đăng xuất</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- NÚT ĐĂNG NHẬP -->
+                    <a th:if="${session.khachHang == null}" th:href="@{/login}" class="top-link">
+                        <i class="far fa-user-circle me-1"></i>Đăng nhập
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <div class="navbar-main">
+        <div class="section-wrapper">
+            <div class="row align-items-center w-100 g-3">
+                <!-- Logo -->
+                <div class="col-auto">
+                    <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
+                        <div class="logo-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <span class="logo-text ms-2">NiceSport</span>
+                    </a>
+                </div>
+
+                <!-- Search Box -->
+                <div class="col">
+                    <form action="/search" method="get" class="search-form">
+                        <div class="search-box-main">
+                            <input type="text"
+                                   name="q"
+                                   class="search-input-main"
+                                   placeholder="Tìm giày thể thao, sneaker, sandals..."
+                                   th:value="${keyword}" required>
+                            <button type="submit" class="btn-search-main">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-auto">
+                    <a th:href="@{/cart}" class="cart-icon-main position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge-main"
+                              th:text="${cartCount != null ? cartCount : 0}"
+                              th:classappend="${cartCount == null or cartCount == 0} ? 'd-none' : ''">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
 
     <!-- ========== HERO BANNER ========== -->
     <section class="hero-banner" id="home">
@@ -279,8 +409,75 @@
         </div>
     </section>
 
-    <!-- ========== FOOTER ========== -->
-    <div th:replace="~{/components/footer.html}"></div>
+<!-- ========== FOOTER ========== -->
+<footer class="footer-shopee">
+    <div class="footer-top">
+        <div class="section-wrapper">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">CHĂM SÓC KHÁCH HÀNG</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Trung Tâm Trợ Giúp</a></li>
+                        <li><a href="#">Hướng Dẫn Mua Hàng</a></li>
+                        <li><a href="#">Chính Sách Đổi Trả</a></li>
+                        <li><a href="#">Chính Sách Bảo Hành</a></li>
+                        <li><a href="#">Liên Hệ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">VỀ NICESPORT</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Giới Thiệu</a></li>
+                        <li><a href="#">Tuyển Dụng</a></li>
+                        <li><a href="#">Điều Khoản</a></li>
+                        <li><a href="#">Chính Sách Bảo Mật</a></li>
+                        <li><a href="#">Flash Sale</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">THANH TOÁN</h6>
+                    <div class="payment-methods">
+                        <img src="https://down-vn.img.susercontent.com/file/d4bbea4570b93bfd5fc652ca82a262a8" alt="COD">
+                        <img src="https://down-vn.img.susercontent.com/file/a0a9062ebe19b45c1ae0506f16af5c16" alt="Card">
+                        <img src="https://down-vn.img.susercontent.com/file/38fd98e55806c3b2e4535c4e4a6c4c08" alt="ATM">
+                        <img src="https://down-vn.img.susercontent.com/file/9263fa8c83628f5deff55e2a90758b06" alt="Momo">
+                    </div>
+                    <h6 class="footer-heading mt-3">VẬN CHUYỂN</h6>
+                    <div class="shipping-methods">
+                        <img src="https://down-vn.img.susercontent.com/file/5e3f0bee86058637ff23cfdf2e14ca09" alt="GHN">
+                        <img src="https://down-vn.img.susercontent.com/file/d10b0ec09f0322f9201a4f3daf378ed2" alt="Giao Hàng Nhanh">
+                        <img src="https://down-vn.img.susercontent.com/file/59270fb2f3fbb7cbc92fca3877edde3f" alt="Grab">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">THEO DÕI CHÚNG TÔI</h6>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
+                        <li><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
+                        <li><a href="#"><i class="fab fa-tiktok me-2"></i>TikTok</a></li>
+                        <li><a href="#"><i class="fab fa-youtube me-2"></i>YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="section-wrapper">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-2">© 2025 NiceSport. Tất cả các quyền được bảo lưu.</p>
+                    <p class="footer-address">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Địa chỉ: 123 Đường ABC, Quận 1, TP. Hồ Chí Minh |
+                        <i class="fas fa-phone ms-3 me-2"></i>
+                        Hotline: 1900-xxxx
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 
     <!-- Scroll to Top Button -->
     <button class="scroll-to-top" id="scrollToTop">

@@ -191,4 +191,11 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer>,
             countQuery = "SELECT COUNT(*) FROM SanPham WHERE TrangThai = 1",
             nativeQuery = true)
     Page<SanPham> findAllOrderByPriceDesc(Pageable pageable);
+
+    /**
+     * Tìm sản phẩm theo tên (search)
+     */
+    @Query("SELECT s FROM SanPham s WHERE LOWER(s.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "AND s.trangThai = 1")
+    Page<SanPham> searchByTen(String keyword, Pageable pageable);
 }

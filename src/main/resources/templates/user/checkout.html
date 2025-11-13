@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán - NiceSport</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/Checkout.css}">
+</head>
+<body style="background: #f5f5f5;">
+
+<!-- ========== NAVBAR - SIMPLIFIED ========== -->
+<nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container-fluid px-4">
+        <div class="d-flex align-items-center gap-4">
+            <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
+                <div class="logo-icon" style="background: #ee4d2d; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-running"></i>
+                </div>
+                <span class="logo-text ms-2" style="font-size: 24px; font-weight: 500; color: #ee4d2d;">NiceSport</span>
+            </a>
+            <div class="vr" style="height: 30px;"></div>
+            <h5 class="mb-0" style="font-size: 24px; font-weight: 300; color: #333;">Thanh Toán</h5>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a href="#" style="color: #05a; text-decoration: none; font-size: 14px;">
+                <i class="far fa-question-circle me-1"></i>Cần trợ giúp?
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ========== CHECKOUT SECTION ========== -->
+<section class="checkout-section py-4">
+    <div class="container">
+        <div class="row g-3">
+            <!-- Left Column - Shipping & Payment Info -->
+            <div class="col-lg-8">
+                <!-- Delivery Address -->
+                <div class="checkout-card bg-white p-3 mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="mb-0 d-flex align-items-center gap-2">
+                            <i class="fas fa-map-marker-alt" style="color: #ee4d2d;"></i>
+                            <span style="font-size: 18px; color: #ee4d2d;">Địa Chỉ Nhận Hàng</span>
+                        </h6>
+                        <button class="btn-change" onclick="changeAddress()" style="color: #05a; background: transparent; border: none; cursor: pointer; font-size: 14px;">
+                            Thay Đổi
+                        </button>
+                    </div>
+
+                    <div class="address-info">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="flex-grow-1">
+                                <div class="mb-1">
+                                    <strong style="font-size: 16px;">Nguyễn Văn A</strong>
+                                    <span class="text-muted ms-2">|</span>
+                                    <span class="ms-2" style="font-size: 14px;">(+84) 123 456 789</span>
+                                </div>
+                                <p class="mb-1" style="font-size: 14px; color: #333; line-height: 1.6;">
+                                    123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh
+                                </p>
+                                <span class="badge" style="background: #ee4d2d; font-size: 12px; padding: 2px 8px;">Mặc định</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products -->
+                <div class="checkout-card bg-white p-3 mb-3">
+                    <!-- Header -->
+                    <div class="products-header pb-2 mb-3" style="border-bottom: 1px solid #f0f0f0;">
+                        <div class="row">
+                            <div class="col-6">
+                                <span style="font-size: 14px; color: #888;">Sản Phẩm</span>
+                            </div>
+                            <div class="col-2 text-center d-none d-md-block">
+                                <span style="font-size: 14px; color: #888;">Đơn Giá</span>
+                            </div>
+                            <div class="col-2 text-center d-none d-md-block">
+                                <span style="font-size: 14px; color: #888;">Số Lượng</span>
+                            </div>
+                            <div class="col-2 text-end d-none d-md-block">
+                                <span style="font-size: 14px; color: #888;">Thành Tiền</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Items -->
+                    <div class="product-item pb-3 mb-3" style="border-bottom: 1px solid #f0f0f0;">
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md-6">
+                                <div class="d-flex gap-3">
+                                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200"
+                                         alt="Product"
+                                         style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #f0f0f0; border-radius: 2px;">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1" style="font-size: 14px; font-weight: 400; line-height: 1.4;">
+                                            Nike Air Force 1 '07 Low White Black Panda
+                                        </h6>
+                                        <p class="mb-0" style="font-size: 12px; color: #888;">
+                                            Phân loại: Trắng, 42
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 col-md-2 text-start text-md-center mt-2 mt-md-0">
+                                <span class="d-block d-md-none" style="font-size: 12px; color: #888;">Đơn giá:</span>
+                                <span style="font-size: 14px; color: #333;">₫2.800.000</span>
+                            </div>
+                            <div class="col-4 col-md-2 text-center mt-2 mt-md-0">
+                                <span class="d-block d-md-none" style="font-size: 12px; color: #888;">SL:</span>
+                                <span style="font-size: 14px; color: #333;">1</span>
+                            </div>
+                            <div class="col-4 col-md-2 text-end mt-2 mt-md-0">
+                                <span class="d-block d-md-none" style="font-size: 12px; color: #888;">Tổng:</span>
+                                <span style="font-size: 14px; color: #333;">₫2.800.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-item pb-3 mb-3" style="border-bottom: 1px solid #f0f0f0;">
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md-6">
+                                <div class="d-flex gap-3">
+                                    <img src="https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=200"
+                                         alt="Product"
+                                         style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #f0f0f0; border-radius: 2px;">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1" style="font-size: 14px; font-weight: 400; line-height: 1.4;">
+                                            Adidas Ultraboost 22 Running Shoes
+                                        </h6>
+                                        <p class="mb-0" style="font-size: 12px; color: #888;">
+                                            Phân loại: Đen, 41
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 col-md-2 text-start text-md-center mt-2 mt-md-0">
+                                <span class="d-block d-md-none" style="font-size: 12px; color: #888;">Đơn giá:</span>
+                                <span style="font-size: 14px; color: #333;">₫3.200.000</span>
+                            </div>
+                            <div class="col-4 col-md-2 text-center mt-2 mt-md-0">
+                                <span class="d-block d-md-none" style="font-size: 12px; color: #888;">SL:</span>
+                                <span style="font-size: 14px; color: #333;">2</span>
+                            </div>
+                            <div class="col-4 col-md-2 text-end mt-2 mt-md-0">
+                                <span class="d-block d-md-none" style="font-size: 12px; color: #888;">Tổng:</span>
+                                <span style="font-size: 14px; color: #333;">₫6.400.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Message -->
+                    <div class="shipping-message p-2" style="background: #fffefb; border-radius: 2px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-file-invoice" style="color: #ee4d2d; font-size: 14px;"></i>
+                            <span style="font-size: 13px; color: #333;">
+                                Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo
+                                <a href="#" style="color: #05a;">Điều khoản NiceSport</a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="checkout-card bg-white p-3 mb-3">
+                    <h6 class="mb-3" style="font-size: 16px; font-weight: 500;">Phương Thức Thanh Toán</h6>
+
+                    <div class="payment-methods">
+                        <!-- COD -->
+                        <label class="payment-option d-flex align-items-center p-3 mb-2" style="border: 1px solid #d9d9d9; border-radius: 2px; cursor: pointer; transition: all 0.2s;">
+                            <input type="radio" name="payment" value="cod" checked class="me-3" style="width: 18px; height: 18px; accent-color: #ee4d2d;">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <i class="fas fa-money-bill-wave" style="color: #ee4d2d; font-size: 20px;"></i>
+                                <span style="font-size: 14px; color: #333;">Thanh toán khi nhận hàng (COD)</span>
+                            </div>
+                        </label>
+
+                        <!-- Bank Transfer -->
+                        <label class="payment-option d-flex align-items-center p-3 mb-2" style="border: 1px solid #d9d9d9; border-radius: 2px; cursor: pointer; transition: all 0.2s;">
+                            <input type="radio" name="payment" value="bank" class="me-3" style="width: 18px; height: 18px; accent-color: #ee4d2d;">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <i class="fas fa-university" style="color: #05a; font-size: 20px;"></i>
+                                <span style="font-size: 14px; color: #333;">Chuyển khoản ngân hàng</span>
+                            </div>
+                        </label>
+
+                        <!-- Credit Card -->
+                        <label class="payment-option d-flex align-items-center p-3 mb-2" style="border: 1px solid #d9d9d9; border-radius: 2px; cursor: pointer; transition: all 0.2s;">
+                            <input type="radio" name="payment" value="card" class="me-3" style="width: 18px; height: 18px; accent-color: #ee4d2d;">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <i class="fas fa-credit-card" style="color: #26aa99; font-size: 20px;"></i>
+                                <span style="font-size: 14px; color: #333;">Thẻ tín dụng / Ghi nợ</span>
+                            </div>
+                        </label>
+
+                        <!-- E-Wallet -->
+                        <label class="payment-option d-flex align-items-center p-3" style="border: 1px solid #d9d9d9; border-radius: 2px; cursor: pointer; transition: all 0.2s;">
+                            <input type="radio" name="payment" value="momo" class="me-3" style="width: 18px; height: 18px; accent-color: #ee4d2d;">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <i class="fas fa-wallet" style="color: #d82d8b; font-size: 20px;"></i>
+                                <span style="font-size: 14px; color: #333;">Ví điện tử (MoMo, ZaloPay)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="col-lg-4">
+                <div class="checkout-card bg-white p-3 sticky-summary" style="position: sticky; top: 20px;">
+                    <!-- Voucher -->
+                    <div class="voucher-section mb-3 pb-3" style="border-bottom: 1px solid #f0f0f0;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-ticket-alt" style="color: #ee4d2d;"></i>
+                                <span style="font-size: 14px; color: #333;">NiceSport Voucher</span>
+                            </div>
+                            <button class="btn-select-voucher" onclick="selectVoucher()" style="background: transparent; border: none; color: #05a; cursor: pointer; font-size: 13px;">
+                                Chọn voucher
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Price Details -->
+                    <div class="price-details mb-3 pb-3" style="border-bottom: 1px solid #f0f0f0;">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-size: 14px; color: #888;">Tổng tiền hàng</span>
+                            <span style="font-size: 14px; color: #333;">₫9.200.000</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-size: 14px; color: #888;">Phí vận chuyển</span>
+                            <span style="font-size: 14px; color: #333;">₫30.000</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-size: 14px; color: #888;">Voucher giảm giá</span>
+                            <span style="font-size: 14px; color: #26aa99;">-₫0</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Amount -->
+                    <div class="total-amount mb-3 pb-3" style="border-bottom: 1px solid #f0f0f0;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span style="font-size: 14px; color: #333;">Tổng thanh toán</span>
+                            <div class="text-end">
+                                <div style="font-size: 24px; color: #ee4d2d; font-weight: 500;">₫9.230.000</div>
+                                <div style="font-size: 12px; color: #888;">(Đã bao gồm VAT nếu có)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Place Order Button -->
+                    <button class="btn-place-order w-100" onclick="placeOrder()"
+                            style="background: #ee4d2d; color: white; border: none; padding: 12px; border-radius: 2px; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+                        Đặt Hàng
+                    </button>
+
+                    <!-- Terms -->
+                    <p class="text-center mt-3 mb-0" style="font-size: 12px; color: #888; line-height: 1.6;">
+                        Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo
+                        <a href="#" style="color: #05a;">Điều khoản NiceSport</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Checkout JavaScript -->
+<script th:src="@{/js/checkout.js}"></script>
+
+</body>
+</html>

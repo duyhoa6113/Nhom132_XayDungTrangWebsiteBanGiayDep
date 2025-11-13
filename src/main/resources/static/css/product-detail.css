@@ -1455,3 +1455,36 @@ a {
         padding: 6px 12px;
     }
 }
+/* Stock Display Styles */
+#stockInfo {
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+#outOfStockWarning,
+#lowStockWarning {
+    padding: 8px 12px;
+    background: #fff5f5;
+    border-left: 3px solid #ee4d2d;
+    border-radius: 2px;
+    animation: fadeIn 0.3s;
+}
+
+#lowStockWarning {
+    background: #fff9f0;
+    border-left-color: #ff6b00;
+}
+
+.btn-quantity:hover:not(:disabled) {
+    background: #f5f5f5 !important;
+}
+
+.btn-quantity:disabled {
+    background: #f5f5f5 !important;
+    cursor: not-allowed !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

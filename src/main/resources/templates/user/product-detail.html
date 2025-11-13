@@ -20,7 +20,7 @@
 </head>
 <body>
 
-<!-- ========== NAVBAR (Shopee Style) ========== -->
+<!-- ========== NAVBAR ========== -->
 <nav class="navbar navbar-light bg-white shadow-sm sticky-top">
     <!-- Top Bar -->
     <div class="navbar-top">
@@ -353,7 +353,28 @@
                                         style="width: 32px; height: 32px; border: 1px solid rgba(0,0,0,.09); background: white; border-radius: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s;">
                                     <i class="fas fa-plus" style="font-size: 10px; color: #666;"></i>
                                 </button>
+
+                                <!-- Hiển thị tồn kho -->
+                                <span id="stockInfo" class="ms-3" style="font-size: 14px; color: #757575;">
+                <span id="currentStock">0</span> sản phẩm có sẵn
+            </span>
                             </div>
+                        </div>
+
+                        <!-- Thông báo hết hàng (ẩn mặc định) -->
+                        <div id="outOfStockWarning" class="mt-2" style="display: none;">
+                            <small style="color: #ee4d2d;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Sản phẩm này hiện đã hết hàng
+                            </small>
+                        </div>
+
+                        <!-- Thông báo tồn kho thấp (ẩn mặc định) -->
+                        <div id="lowStockWarning" class="mt-2" style="display: none;">
+                            <small style="color: #ff6b00;">
+                                <i class="fas fa-fire"></i>
+                                Chỉ còn <span id="lowStockNumber"></span> sản phẩm!
+                            </small>
                         </div>
                     </div>
 
@@ -361,12 +382,13 @@
                     <div class="product-actions d-flex gap-3 mb-4">
                         <button class="btn d-flex align-items-center justify-content-center gap-2"
                                 onclick="addToCart()"
-                                style="border: 1px solid #ee4d2d; background: rgba(255, 87, 34, 0.1); color: #ee4d2d; padding: 12px 24px; border-radius: 2px; font-size: 14px; transition: all 0.1s; flex: 1;">
+                                style="border: 1px solid #ee4d2d; background: rgba(255, 87, 34, 0.1); color: #ee4d2d; padding: 12px 24px; border-radius: 2px; font-size: 14px; transition: all 0.1s; flex: 1; cursor: pointer;">
                             <i class="fas fa-cart-plus" style="font-size: 16px;"></i>
                             <span>Thêm Vào Giỏ Hàng</span>
                         </button>
                         <button class="btn"
-                                style="border: none; background: #ee4d2d; color: white; padding: 12px 24px; border-radius: 2px; font-size: 14px; transition: all 0.1s; flex: 1;">
+                                onclick="buyNow()"
+                                style="border: none; background: #ee4d2d; color: white; padding: 12px 24px; border-radius: 2px; font-size: 14px; transition: all 0.1s; flex: 1; cursor: pointer;">
                             Mua Ngay
                         </button>
                     </div>
@@ -587,6 +609,9 @@ s"></script>
     window.imagesByColor = [[${imagesByColor}]];
     window.variantsData = [[${variantsData}]];
     /*]]>*/
+
+    console.log('Images by color:', window.imagesByColor);
+    console.log('Variants data:', window.variantsData);
 </script>
 
 

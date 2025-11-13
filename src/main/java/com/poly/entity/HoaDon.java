@@ -1,15 +1,14 @@
 package com.poly.entity;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "HoaDon")
@@ -23,28 +22,28 @@ public class HoaDon {
     @Column(name = "HoaDonId")
     private Integer hoaDonId;
 
-    @Column(name = "MaHoaDon", nullable = false, unique = true, length = 50)
+    @Column(name = "MaHoaDon", unique = true, length = 50, nullable = false)
     private String maHoaDon;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "KhachHangId", nullable = false)
     private KhachHang khachHang;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "NhanVienId")
     private NhanVien nhanVien;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "KhuyenMaiId")
     private KhuyenMai khuyenMai;
 
-    @Column(name = "HoTenNhan", nullable = false, length = 150)
+    @Column(name = "HoTenNhan", length = 150, nullable = false)
     private String hoTenNhan;
 
-    @Column(name = "SdtNhan", nullable = false, length = 20)
+    @Column(name = "SdtNhan", length = 20, nullable = false)
     private String sdtNhan;
 
-    @Column(name = "DiaChiNhan", nullable = false, length = 500)
+    @Column(name = "DiaChiNhan", length = 500, nullable = false)
     private String diaChiNhan;
 
     @Column(name = "PhuongXa", length = 150)
@@ -56,47 +55,40 @@ public class HoaDon {
     @Column(name = "TinhTP", length = 150)
     private String tinhTP;
 
-    @Column(name = "PhuongThucThanhToan", nullable = false, length = 50)
+    @Column(name = "PhuongThucThanhToan", length = 50, nullable = false)
     private String phuongThucThanhToan;
 
-    @Column(name = "TrangThai", nullable = false, length = 50)
+    @Column(name = "TrangThai", length = 50, nullable = false)
     private String trangThai;
 
-    @Column(name = "TongTien", nullable = false, precision = 18, scale = 2)
+    @Column(name = "TongTien", precision = 18, scale = 2, nullable = false)
     private BigDecimal tongTien;
 
-    @Column(name = "GiamGia", nullable = false, precision = 18, scale = 2)
+    @Column(name = "GiamGia", precision = 18, scale = 2, nullable = false)
     private BigDecimal giamGia;
 
-    @Column(name = "PhiVanChuyen", nullable = false, precision = 18, scale = 2)
+    @Column(name = "PhiVanChuyen", precision = 18, scale = 2, nullable = false)
     private BigDecimal phiVanChuyen;
 
-    @Column(name = "TongThanhToan", nullable = false, precision = 18, scale = 2)
+    @Column(name = "TongThanhToan", precision = 18, scale = 2, nullable = false)
     private BigDecimal tongThanhToan;
 
     @Column(name = "GhiChu", columnDefinition = "NVARCHAR(MAX)")
     private String ghiChu;
 
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
+    @Column(name = "CreatedAt")
     private LocalDateTime createdAt;
 
     @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<HoaDonChiTiet> hoaDonChiTiets;
-
-    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LichSuTrangThai> lichSuTrangThais;
-
-    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<DanhGia> danhGias;
+    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HoaDonChiTiet> chiTietList = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
         if (trangThai == null) {
             trangThai = "ChoXuLy";
         }
@@ -113,138 +105,8 @@ public class HoaDon {
         updatedAt = LocalDateTime.now();
     }
 
-    // ==================== TRANSIENT FIELDS ====================
-
-    /**
-     * Lấy tên khách hàng
-     */
-    @Transient
-    public String getTenKhachHang() {
-        return khachHang != null ? khachHang.getHoTen() : "";
-    }
-
-    /**
-     * Lấy tên nhân viên
-     */
-    @Transient
-    public String getTenNhanVien() {
-        return nhanVien != null ? nhanVien.getHoTen() : "";
-    }
-
-    /**
-     * Lấy địa chỉ đầy đủ
-     */
-    @Transient
-    public String getDiaChiDayDu() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(diaChiNhan);
-        if (phuongXa != null && !phuongXa.isEmpty()) {
-            sb.append(", ").append(phuongXa);
-        }
-        if (quanHuyen != null && !quanHuyen.isEmpty()) {
-            sb.append(", ").append(quanHuyen);
-        }
-        if (tinhTP != null && !tinhTP.isEmpty()) {
-            sb.append(", ").append(tinhTP);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Format tổng tiền
-     */
-    @Transient
-    public String getTongTienFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(tongTien);
-    }
-
-    /**
-     * Format giảm giá
-     */
-    @Transient
-    public String getGiamGiaFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(giamGia);
-    }
-
-    /**
-     * Format phí vận chuyển
-     */
-    @Transient
-    public String getPhiVanChuyenFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(phiVanChuyen);
-    }
-
-    /**
-     * Format tổng thanh toán
-     */
-    @Transient
-    public String getTongThanhToanFormatted() {
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return formatter.format(tongThanhToan);
-    }
-
-    /**
-     * Format ngày tạo
-     */
-    @Transient
-    public String getCreatedAtFormatted() {
-        if (createdAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            return createdAt.format(formatter);
-        }
-        return "";
-    }
-
-    /**
-     * Lấy tên trạng thái tiếng Việt
-     */
-    @Transient
-    public String getTenTrangThai() {
-        switch (trangThai) {
-            case "ChoXuLy": return "Chờ xử lý";
-            case "DaXacNhan": return "Đã xác nhận";
-            case "DangChuanBi": return "Đang chuẩn bị";
-            case "DangGiao": return "Đang giao";
-            case "DaGiao": return "Đã giao";
-            case "HoanThanh": return "Hoàn thành";
-            case "DaHuy": return "Đã hủy";
-            default: return trangThai;
-        }
-    }
-
-    /**
-     * Lấy màu trạng thái
-     */
-    @Transient
-    public String getColorTrangThai() {
-        switch (trangThai) {
-            case "ChoXuLy": return "warning";
-            case "DaXacNhan": return "info";
-            case "DangChuanBi": return "primary";
-            case "DangGiao": return "primary";
-            case "DaGiao": return "success";
-            case "HoanThanh": return "success";
-            case "DaHuy": return "danger";
-            default: return "secondary";
-        }
-    }
-
-    /**
-     * Kiểm tra có thể hủy không
-     */
-    @Transient
-    public boolean isCoTheHuy() {
-        return "ChoXuLy".equals(trangThai) || "DaXacNhan".equals(trangThai);
-    }
-
-    /**
-     * Kiểm tra có thể đánh giá không
-     */
-    @Transient
-    public boolean isCoDanhGia() {
-        return "HoanThanh".equals(trangThai);
+    public void addChiTiet(HoaDonChiTiet chiTiet) {
+        chiTietList.add(chiTiet);
+        chiTiet.setHoaDon(this);
     }
 }

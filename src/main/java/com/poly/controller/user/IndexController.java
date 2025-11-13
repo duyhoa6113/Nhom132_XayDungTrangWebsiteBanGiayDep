@@ -1,12 +1,15 @@
 package com.poly.controller.user;
 
 import com.poly.entity.DanhMuc;
+import com.poly.entity.KhachHang;
 import com.poly.entity.SanPham;
 import com.poly.entity.ThuongHieu;
 import com.poly.repository.DanhMucRepository;
 import com.poly.repository.SanPhamRepository;
 import com.poly.repository.ThuongHieuRepository;
+import com.poly.service.CartService;
 import com.poly.service.SanPhamService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,13 +41,17 @@ public class IndexController {
     @Autowired
     private SanPhamService sanPhamService;
 
+    @Autowired
+    private CartService cartService;  // THÊM DÒNG NÀY
+
     @GetMapping({"/Index"})
     public String index(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) Integer category,
             @RequestParam(required = false) String search,
-            Model model) {
+            Model model,
+            HttpSession session) {  // THÊM HttpSession
 
         Pageable pageable = PageRequest.of(page, size);
         Page<SanPham> productsPage;
@@ -77,6 +84,20 @@ public class IndexController {
         // Lấy danh mục và thương hiệu
         List<DanhMuc> categories = danhMucRepository.findByTrangThai(1);
         List<ThuongHieu> brands = thuongHieuRepository.findByTrangThai(1);
+
+        // ========== THÊM CART COUNT - QUAN TRỌNG ==========
+        try {
+            KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
+            if (khachHang != null) {
+                Integer cartCount = cartService.getCartCount(khachHang);
+                model.addAttribute("cartCount", cartCount != null ? cartCount : 0);
+            } else {
+                model.addAttribute("cartCount", 0);
+            }
+        } catch (Exception e) {
+            model.addAttribute("cartCount", 0);
+        }
+        // ===================================================
 
         // Đưa dữ liệu vào model
         model.addAttribute("productsPage", productsPage);

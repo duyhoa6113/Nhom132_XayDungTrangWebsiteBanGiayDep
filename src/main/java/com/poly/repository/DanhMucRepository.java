@@ -1,6 +1,5 @@
 package com.poly.repository;
 
-import com.poly.dto.CategoryWithCount;
 import com.poly.entity.DanhMuc;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -95,7 +95,7 @@ public class SanPhamChiTiet {
      * Số lượng tồn kho
      */
     @Column(name = "SoLuongTon", nullable = false)
-    private Integer soLuongTon = 0;
+    private Integer soLuongTon;
 
     /**
      * URL hình ảnh của variant
@@ -121,6 +121,10 @@ public class SanPhamChiTiet {
      */
     @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
+
+    public String getSKU() {
+        return this.sku;
+    }
 
     // ============================================
     // LIFECYCLE CALLBACKS
