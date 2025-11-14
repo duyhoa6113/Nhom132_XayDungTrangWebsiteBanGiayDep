@@ -1,5 +1,6 @@
 package com.poly.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class DiaChi {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "KhachHangId", nullable = false)
+    @JsonIgnoreProperties({"diaChis", "gioHang", "donHangs", "danhGias", "password", "hibernateLazyInitializer", "handler"})
     private KhachHang khachHang;
 
     @Column(name = "HoTenNhan", nullable = false, length = 150)
@@ -41,10 +43,6 @@ public class DiaChi {
     @Column(name = "TinhTP", length = 150)
     private String tinhTP;
 
-    /**
-     * MacDinh: BIT trong SQL Server tương thích với Boolean trong JPA
-     * 0 = false, 1 = true
-     */
     @Column(name = "MacDinh", nullable = false)
     private Boolean macDinh;
 
@@ -69,9 +67,6 @@ public class DiaChi {
         updatedAt = LocalDateTime.now();
     }
 
-    /**
-     * Lấy địa chỉ đầy đủ
-     */
     @Transient
     public String getDiaChiDayDu() {
         StringBuilder sb = new StringBuilder();
@@ -88,9 +83,6 @@ public class DiaChi {
         return sb.toString();
     }
 
-    /**
-     * Kiểm tra có phải địa chỉ mặc định không
-     */
     @Transient
     public boolean isDiaChinMacDinh() {
         return macDinh != null && macDinh;
