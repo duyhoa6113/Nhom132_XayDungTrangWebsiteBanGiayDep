@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poly.entity.*;
 import com.poly.repository.SanPhamChiTietRepository;
 import com.poly.repository.SanPhamRepository;
+import com.poly.service.CartService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,9 @@ public class ProductDetailController {
 
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
+
+    @Autowired
+    private CartService cartService;  // THÊM DÒNG NÀY
 
     /**
      * Hiển thị trang chi tiết sản phẩm
@@ -185,6 +189,20 @@ public class ProductDetailController {
                     .getContent();
             relatedProducts.addAll(moreProducts);
         }
+
+
+        // ========== THÊM CART COUNT - QUAN TRỌNG ==========
+        try {
+            if (khachHang != null) {
+                Integer cartCount = cartService.getCartCount(khachHang);
+                model.addAttribute("cartCount", cartCount != null ? cartCount : 0);
+            } else {
+                model.addAttribute("cartCount", 0);
+            }
+        } catch (Exception e) {
+            model.addAttribute("cartCount", 0);
+        }
+        // ===================================================
 
         // ============================================
         // THÊM DỮ LIỆU VÀO MODEL

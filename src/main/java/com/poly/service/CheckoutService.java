@@ -174,7 +174,7 @@ public class CheckoutService {
     }
 
     /**
-     * LẤY ĐƠN HÀNG CHO TRANG SUCCESS — ĐÚNG CONTROLLER GỌI
+     * LẤY ĐƠN HÀNG CHO TRANG SUCCESS — ĐÃ FIX LAZY LOADING
      */
     @Transactional(readOnly = true)
     public HoaDon getOrderById(Integer orderId, KhachHang khachHang) {
@@ -184,6 +184,25 @@ public class CheckoutService {
 
         if (!hoaDon.getKhachHang().getKhachHangId().equals(khachHang.getKhachHangId())) {
             throw new RuntimeException("Bạn không có quyền xem đơn này");
+        }
+
+        // ✅ FIX: FORCE FETCH LAZY LOADING
+        if (hoaDon.getChiTietList() != null) {
+            hoaDon.getChiTietList().size(); // Trigger lazy loading
+
+            // Fetch nested relationships
+            hoaDon.getChiTietList().forEach(item -> {
+                if (item.getVariant() != null) {
+                    // Force load variant details
+                    item.getVariant().getSanPham().getTen();
+                    if (item.getVariant().getMauSac() != null) {
+                        item.getVariant().getMauSac().getTen();
+                    }
+                    if (item.getVariant().getKichThuoc() != null) {
+                        item.getVariant().getKichThuoc().getTen();
+                    }
+                }
+            });
         }
 
         return hoaDon;
