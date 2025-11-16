@@ -2,6 +2,7 @@ package com.poly.controller.user;
 
 import com.poly.entity.HoaDon;
 import com.poly.entity.KhachHang;
+import com.poly.service.CartService;
 import com.poly.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
+    private final CartService cartService;
 
     /**
      * HIỂN THỊ DANH SÁCH ĐƠN HÀNG
@@ -60,6 +62,16 @@ public class OrderController {
             } else {
                 orders = orderService.getAllOrders(khachHang, pageable);
             }
+
+            // ========== THÊM CART COUNT - QUAN TRỌNG ==========
+            try {
+                Integer cartCount = cartService.getCartCount(khachHang);
+                model.addAttribute("cartCount", cartCount != null ? cartCount : 0);
+            } catch (Exception e) {
+                log.error("Lỗi khi lấy cart count", e);
+                model.addAttribute("cartCount", 0);
+            }
+            // ===================================================
 
             // Đưa dữ liệu vào model
             model.addAttribute("orders", orders.getContent());

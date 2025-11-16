@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Hồ Sơ Của Tôi - NiceSport</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/index.css}"/>
+    <link rel="stylesheet" th:href="@{/css/profile.css}"/>
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-light bg-white shadow-sm sticky-top">
+    <!-- Top Bar -->
+    <div class="navbar-top">
+        <div class="section-wrapper">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="top-links">
+                    <a href="/seller" class="top-link">Trang cá nhân</a>
+                    <span class="divider">|</span>
+                    <a href="/download" class="top-link">Tải ứng dụng</a>
+                    <span class="divider">|</span>
+                    <span class="top-link">Kết nối</span>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="top-links">
+                    <a href="#" class="top-link">
+                        <i class="far fa-bell me-1"></i>Thông Báo
+                    </a>
+                    <a href="#" class="top-link">
+                        <i class="far fa-question-circle me-1"></i>Hỗ Trợ
+                    </a>
+                    <a href="#" class="top-link">
+                        <i class="fas fa-globe me-1"></i>Tiếng Việt
+                        <i class="fas fa-chevron-down ms-1 small"></i>
+                    </a>
+
+                    <!-- USER DROPDOWN -->
+                    <div th:if="${session.khachHang != null}" class="dropdown d-inline">
+                        <a href="#" class="top-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="far fa-user-circle me-1"></i>
+                            <span th:text="${session.khachHangTen}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu shadow-lg" aria-labelledby="userDropdown">
+                            <li class="dropdown-header">
+                                <div class="user-info">
+                                    <div class="user-avatar-large">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name-large" th:text="${session.khachHangTen}">User Name</div>
+                                        <div class="user-email" th:text="${session.khachHang.email}">user@example.com</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li>
+                                <a class="dropdown-item" href="/profile">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>Tài khoản của tôi</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/orders">
+                                    <i class="fas fa-box"></i>
+                                    <span>Đơn hàng</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/admin">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Quản trị viên</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Đăng xuất</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- NÚT ĐĂNG NHẬP -->
+                    <a th:if="${session.khachHang == null}" th:href="@{/login}" class="top-link">
+                        <i class="far fa-user-circle me-1"></i>Đăng nhập
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <div class="navbar-main">
+        <div class="section-wrapper">
+            <div class="row align-items-center w-100 g-3">
+                <!-- Logo -->
+                <div class="col-auto">
+                    <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
+                        <div class="logo-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <span class="logo-text ms-2">NiceSport</span>
+                    </a>
+                </div>
+
+                <!-- Search Box -->
+                <div class="col">
+                    <form action="/search" method="get" class="search-form">
+                        <div class="search-box-main">
+                            <input type="text"
+                                   name="q"
+                                   class="search-input-main"
+                                   placeholder="Tìm giày thể thao, sneaker, sandals..."
+                                   th:value="${keyword}" required>
+                            <button type="submit" class="btn-search-main">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-auto">
+                    <a th:href="@{/cart}" class="cart-icon-main position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge-main"
+                              th:text="${cartCount != null ? cartCount : 0}"
+                              th:classappend="${cartCount == null or cartCount == 0} ? 'd-none' : ''">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="profile-wrapper">
+    <div class="container">
+        <div class="row">
+
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="profile-sidebar">
+                    <!-- User Info -->
+                    <div class="sidebar-user">
+                        <div class="user-avatar-box">
+                            <img th:src="${khachHang.avatar != null && !khachHang.avatar.isEmpty() ? khachHang.avatar : '/img/default-avatar.png'}"
+                                 alt="Avatar" class="sidebar-avatar"/>
+                        </div>
+                        <div class="user-info-box">
+                            <h6 class="username" th:text="${khachHang.hoTen}">ducly060</h6>
+                            <a href="#" class="edit-profile-link">
+                                <i class="far fa-edit"></i>
+                                Sửa Hồ Sơ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Menu -->
+                    <div class="sidebar-menu">
+                        <!-- Thông Báo -->
+                        <div class="menu-item-group">
+                            <a href="#" class="menu-item-parent">
+                                <i class="far fa-bell text-primary"></i>
+                                <span>Thông Báo</span>
+                            </a>
+                        </div>
+
+                        <!-- Tài Khoản Của Tôi -->
+                        <div class="menu-item-group">
+                            <div class="menu-item-parent">
+                                <i class="far fa-user text-primary"></i>
+                                <span>Tài Khoản Của Tôi</span>
+                            </div>
+                            <ul class="submenu-list">
+                                <li><a href="#" class="submenu-item active" data-tab="profile">Hồ Sơ</a></li>
+                                <li><a href="#" class="submenu-item" data-tab="bank">Ngân Hàng</a></li>
+                                <li><a href="#" class="submenu-item" data-tab="address">Địa Chỉ</a></li>
+                                <li><a href="#" class="submenu-item" data-tab="password">Đổi Mật Khẩu</a></li>
+                                <li><a href="#" class="submenu-item">Cài Đặt Thông Báo</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Đơn Mua -->
+                        <div class="menu-item-group">
+                            <a href="/orders" class="menu-item-parent">
+                                <i class="far fa-file-alt text-primary"></i>
+                                <span>Đơn Mua</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-lg-9">
+
+                <!-- Profile Tab -->
+                <div class="tab-content active" id="profileTab">
+                    <div class="profile-content">
+                        <div class="content-header">
+                            <h5 class="content-title">Hồ Sơ Của Tôi</h5>
+                            <p class="content-subtitle">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+                        </div>
+
+                        <div class="content-body">
+                            <div class="row">
+                                <!-- Form -->
+                                <div class="col-lg-8">
+                                    <form id="profileForm">
+                                        <!-- Tên đăng nhập -->
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">Tên đăng nhập</label>
+                                            <div class="form-value">
+                                                <span th:text="${khachHang.hoTen}">ducly060</span>
+                                                <p class="form-note">Tên Đăng nhập chỉ có thể thay đổi một lần.</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tên -->
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">Tên</label>
+                                            <div class="form-value">
+                                                <input type="text" class="form-control-custom" name="hoTen"
+                                                       th:value="${khachHang.hoTen}" placeholder="Nhập tên của bạn"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Email -->
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">Email</label>
+                                            <div class="form-value">
+                                                <span class="email-masked" th:text="${khachHang.email}">ly******@gmail.com</span>
+                                                <a href="#" class="change-link" onclick="showChangeEmailModal(event)">Thay Đổi</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Số điện thoại -->
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">Số điện thoại</label>
+                                            <div class="form-value">
+                                                <span class="phone-masked" th:text="${khachHang.sdt != null ? khachHang.sdt : '**********'}">**********25</span>
+                                                <a href="#" class="change-link" onclick="showChangePhoneModal(event)">Thay Đổi</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Giới tính -->
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">
+                                                Giới tính
+                                                <i class="far fa-question-circle text-muted"></i>
+                                            </label>
+                                            <div class="form-value">
+                                                <div class="gender-options">
+                                                    <label class="gender-option">
+                                                        <input type="radio" name="gioiTinh" value="Nam"
+                                                               th:checked="${khachHang.gioiTinh == 'Nam'}"/>
+                                                        <span>Nam</span>
+                                                    </label>
+                                                    <label class="gender-option">
+                                                        <input type="radio" name="gioiTinh" value="Nữ"
+                                                               th:checked="${khachHang.gioiTinh == 'Nữ'}"/>
+                                                        <span>Nữ</span>
+                                                    </label>
+                                                    <label class="gender-option">
+                                                        <input type="radio" name="gioiTinh" value="Khác"
+                                                               th:checked="${khachHang.gioiTinh == 'Khác'}"/>
+                                                        <span>Khác</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Ngày sinh -->
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">
+                                                Ngày sinh
+                                                <i class="far fa-question-circle text-muted"></i>
+                                            </label>
+                                            <div class="form-value">
+                                                <div class="birthday-inputs">
+                                                    <select class="form-select-custom" name="ngay">
+                                                        <option value="">Ngày</option>
+                                                        <option th:each="i : ${#numbers.sequence(1, 31)}"
+                                                                th:value="${i}" th:text="${i}">1</option>
+                                                    </select>
+                                                    <select class="form-select-custom" name="thang">
+                                                        <option value="">Tháng</option>
+                                                        <option th:each="i : ${#numbers.sequence(1, 12)}"
+                                                                th:value="${i}" th:text="${i}">1</option>
+                                                    </select>
+                                                    <select class="form-select-custom" name="nam">
+                                                        <option value="">Năm</option>
+                                                        <option th:each="i : ${#numbers.sequence(2024, 1950, -1)}"
+                                                                th:value="${i}" th:text="${i}">2024</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Button -->
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom"></label>
+                                            <div class="form-value">
+                                                <button type="submit" class="btn-save">Lưu</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Avatar Upload -->
+                                <div class="col-lg-4">
+                                    <div class="avatar-upload-section">
+                                        <div class="avatar-preview">
+                                            <img th:src="${khachHang.avatar != null && !khachHang.avatar.isEmpty() ? khachHang.avatar : '/img/default-avatar.png'}"
+                                                 alt="Avatar"
+                                                 id="avatarPreview"
+                                                 onerror="this.src='/img/default-avatar.png'"/>
+                                        </div>
+                                        <input type="file"
+                                               id="avatarInput"
+                                               accept="image/jpeg,image/jpg,image/png"
+                                               style="display: none;"
+                                               onchange="previewAndUploadAvatar(this)"/>
+                                        <button type="button"
+                                                class="btn-choose-image"
+                                                onclick="document.getElementById('avatarInput').click()">
+                                            Chọn Ảnh
+                                        </button>
+                                        <div class="avatar-note">
+                                            <p>Dung lượng file tối đa 1 MB</p>
+                                            <p>Định dạng: .JPEG, .PNG</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Tab -->
+                <div class="tab-content" id="addressTab">
+                    <div class="profile-content">
+                        <div class="content-header">
+                            <h5 class="content-title">Địa Chỉ Của Tôi</h5>
+                        </div>
+                        <div class="content-body">
+                            <button class="btn-add-address" onclick="showAddAddressModal()">
+                                <i class="fas fa-plus"></i>
+                                Thêm Địa Chỉ Mới
+                            </button>
+
+                            <!-- Address List -->
+                            <div class="address-list-wrapper mt-4">
+                                <div th:if="${!#lists.isEmpty(addresses)}">
+                                    <div th:each="addr : ${addresses}" class="address-item-box">
+                                        <div class="address-info">
+                                            <div class="address-header-row">
+                                                <span class="address-name" th:text="${addr.hoTenNhan}">Nguyễn Văn A</span>
+                                                <span class="address-phone" th:text="${addr.sdtNhan}">0123456789</span>
+                                                <span th:if="${addr.macDinh}" class="badge-default">Mặc định</span>
+                                            </div>
+                                            <div class="address-detail">
+                                                <p th:text="${addr.getDiaChiDayDu()}">123 Đường ABC, Phường 1, Quận 1, TP.HCM</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn btn-link btn-sm text-primary"
+                                                    th:onclick="'editAddress(event, ' + ${addr.diaChiId} + ')'">
+                                                Thay đổi
+                                            </button>
+                                            <button type="button" class="btn btn-link btn-sm text-danger"
+                                                    th:onclick="'deleteAddress(event, ' + ${addr.diaChiId} + ')'">
+                                                Xóa
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:if="${#lists.isEmpty(addresses)}" class="text-center py-5">
+                                    <p class="text-muted">Bạn chưa có địa chỉ nào</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Tab -->
+                <div class="tab-content" id="passwordTab">
+                    <div class="profile-content">
+                        <div class="content-header">
+                            <h5 class="content-title">Đổi Mật Khẩu</h5>
+                            <p class="content-subtitle">Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác</p>
+                        </div>
+                        <div class="content-body">
+                            <form id="passwordForm" class="password-form">
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">Mật khẩu hiện tại</label>
+                                    <div class="form-value">
+                                        <input type="password" class="form-control-custom" name="currentPassword" required/>
+                                    </div>
+                                </div>
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">Mật khẩu mới</label>
+                                    <div class="form-value">
+                                        <input type="password" class="form-control-custom" name="newPassword" required minlength="6"/>
+                                    </div>
+                                </div>
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">Xác nhận mật khẩu</label>
+                                    <div class="form-value">
+                                        <input type="password" class="form-control-custom" name="confirmPassword" required minlength="6"/>
+                                    </div>
+                                </div>
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom"></label>
+                                    <div class="form-value">
+                                        <button type="submit" class="btn-save">Xác Nhận</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Địa Chỉ Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm">
+                    <div class="mb-3">
+                        <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="hoTenNhan" required/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" name="sdtNhan" required/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tỉnh/Thành phố</label>
+                        <input type="text" class="form-control" name="tinhTP"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quận/Huyện</label>
+                        <input type="text" class="form-control" name="quanHuyen"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phường/Xã</label>
+                        <input type="text" class="form-control" name="phuongXa"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ cụ thể <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="diaChi" rows="2" required></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="macDinh"/>
+                        <label class="form-check-label">Đặt làm địa chỉ mặc định</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button class="btn btn-primary" onclick="saveAddress()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Email Modal - Step 1: Nhập Email -->
+<div class="modal fade" id="changeEmailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thay Đổi Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changeEmailForm">
+                    <div class="mb-3">
+                        <label class="form-label">Email hiện tại</label>
+                        <input type="text" class="form-control" th:value="${khachHang.email}" readonly disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email mới <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" name="newEmail" id="newEmail" required
+                               placeholder="Nhập email mới"/>
+                        <small class="text-muted">Mã OTP sẽ được gửi tới email này</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="sendOtpForEmailChange()">
+                    <i class="fas fa-paper-plane me-2"></i>Gửi Mã OTP
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Verify OTP Modal - Step 2: Nhập OTP -->
+<div class="modal fade" id="verifyOtpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác Thực OTP</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-envelope-open-text fa-3x text-primary mb-3"></i>
+                    <p class="mb-2">Mã OTP đã được gửi tới:</p>
+                    <strong class="text-primary" id="otpEmailDisplay"></strong>
+                </div>
+                <form id="verifyOtpForm">
+                    <div class="mb-3">
+                        <label class="form-label text-center d-block">Nhập mã OTP (6 số)</label>
+                        <div class="otp-input-group">
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp1" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp2" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp3" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp4" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp5" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp6" autocomplete="off"/>
+                        </div>
+                        <small class="text-muted d-block text-center mt-2">
+                            Mã OTP có hiệu lực trong <strong>5 phút</strong>
+                        </small>
+                    </div>
+                    <div class="text-center mt-4">
+                        <p class="mb-2 text-muted">Không nhận được mã?</p>
+                        <button type="button" class="btn btn-link text-primary" id="resendOtpBtn" onclick="resendOtp()">
+                            <i class="fas fa-redo me-1"></i>Gửi lại mã OTP
+                        </button>
+                        <p class="text-danger small fw-bold" id="resendTimer"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="verifyAndChangeEmail()">
+                    <i class="fas fa-check me-2"></i>Xác Nhận
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Phone Modal (Simple - No OTP) -->
+<div class="modal fade" id="changePhoneModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thay Đổi Số Điện Thoại</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePhoneForm">
+                    <div class="mb-3">
+                        <label class="form-label">Số điện thoại hiện tại</label>
+                        <input type="text" class="form-control"
+                               th:value="${khachHang.sdt != null ? khachHang.sdt : 'Chưa cập nhật'}"
+                               readonly disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số điện thoại mới <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" name="newPhone" id="newPhone" required
+                               pattern="[0-9]{10,11}" placeholder="Nhập 10-11 chữ số" maxlength="11"/>
+                        <small class="text-muted">Số điện thoại phải có 10-11 chữ số</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="submitChangePhone()">Xác Nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Email Modal - Step 1 -->
+<div class="modal fade" id="changeEmailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thay Đổi Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changeEmailForm">
+                    <div class="mb-3">
+                        <label class="form-label">Email hiện tại</label>
+                        <input type="text" class="form-control" th:value="${khachHang.email}" readonly disabled/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email mới <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" name="newEmail" id="newEmail" required
+                               placeholder="Nhập email mới"/>
+                        <small class="text-muted">Mã OTP sẽ được gửi tới email này</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="sendOtpForEmailChange()">
+                    Gửi Mã OTP
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Verify OTP Modal - Step 2 -->
+<div class="modal fade" id="verifyOtpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác Thực OTP</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-envelope-open-text fa-3x text-primary mb-3"></i>
+                    <p class="mb-2">Mã OTP đã được gửi tới:</p>
+                    <strong id="otpEmailDisplay"></strong>
+                </div>
+                <form id="verifyOtpForm">
+                    <div class="mb-3">
+                        <label class="form-label text-center d-block">Nhập mã OTP (6 số)</label>
+                        <div class="otp-input-group">
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp1" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp2" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp3" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp4" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp5" autocomplete="off"/>
+                            <input type="text" class="form-control form-control-lg text-center otp-input"
+                                   maxlength="1" id="otp6" autocomplete="off"/>
+                        </div>
+                        <small class="text-muted d-block text-center mt-2">
+                            Mã OTP có hiệu lực trong 5 phút
+                        </small>
+                    </div>
+                    <div class="text-center">
+                        <p class="mb-2">Không nhận được mã?</p>
+                        <button type="button" class="btn btn-link" id="resendOtpBtn" onclick="resendOtp()">
+                            Gửi lại mã OTP
+                        </button>
+                        <p class="text-muted small" id="resendTimer"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="verifyAndChangeEmail()">
+                    Xác Nhận
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ========== FOOTER ========== -->
+<footer class="footer-shopee">
+    <div class="footer-top">
+        <div class="section-wrapper">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">CHĂM SÓC KHÁCH HÀNG</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Trung Tâm Trợ Giúp</a></li>
+                        <li><a href="#">Hướng Dẫn Mua Hàng</a></li>
+                        <li><a href="#">Chính Sách Đổi Trả</a></li>
+                        <li><a href="#">Chính Sách Bảo Hành</a></li>
+                        <li><a href="#">Liên Hệ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">VỀ NICESPORT</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Giới Thiệu</a></li>
+                        <li><a href="#">Tuyển Dụng</a></li>
+                        <li><a href="#">Điều Khoản</a></li>
+                        <li><a href="#">Chính Sách Bảo Mật</a></li>
+                        <li><a href="#">Flash Sale</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">THANH TOÁN</h6>
+                    <div class="payment-methods">
+                        <img src="https://down-vn.img.susercontent.com/file/d4bbea4570b93bfd5fc652ca82a262a8" alt="COD">
+                        <img src="https://down-vn.img.susercontent.com/file/a0a9062ebe19b45c1ae0506f16af5c16" alt="Card">
+                        <img src="https://down-vn.img.susercontent.com/file/38fd98e55806c3b2e4535c4e4a6c4c08" alt="ATM">
+                        <img src="https://down-vn.img.susercontent.com/file/9263fa8c83628f5deff55e2a90758b06" alt="Momo">
+                    </div>
+                    <h6 class="footer-heading mt-3">VẬN CHUYỂN</h6>
+                    <div class="shipping-methods">
+                        <img src="https://down-vn.img.susercontent.com/file/5e3f0bee86058637ff23cfdf2e14ca09" alt="GHN">
+                        <img src="https://down-vn.img.susercontent.com/file/d10b0ec09f0322f9201a4f3daf378ed2" alt="Giao Hàng Nhanh">
+                        <img src="https://down-vn.img.susercontent.com/file/59270fb2f3fbb7cbc92fca3877edde3f" alt="Grab">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">THEO DÕI CHÚNG TÔI</h6>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
+                        <li><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
+                        <li><a href="#"><i class="fab fa-tiktok me-2"></i>TikTok</a></li>
+                        <li><a href="#"><i class="fab fa-youtube me-2"></i>YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="section-wrapper">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-2">© 2025 NiceSport. Tất cả các quyền được bảo lưu.</p>
+                    <p class="footer-address">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Địa chỉ: 123 Đường ABC, Quận 1, TP. Hồ Chí Minh |
+                        <i class="fas fa-phone ms-3 me-2"></i>
+                        Hotline: 1900-xxxx
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<input type="hidden" id="khachHangId" th:value="${khachHang.khachHangId}"/>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/profile.js}"></script>
+<script th:src="@{/js/checkout.js}"></script>
+
+</body>
+</html>

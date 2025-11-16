@@ -73,10 +73,6 @@ public class KhachHang {
 
     @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<YeuThich> yeuThichs = new java.util.ArrayList<>();
-
-    @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
     private List<DanhGia> danhGias = new java.util.ArrayList<>();
 
     @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
