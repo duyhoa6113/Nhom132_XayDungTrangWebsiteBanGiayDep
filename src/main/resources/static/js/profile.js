@@ -70,71 +70,6 @@ async function submitChangeEmail() {
     }
 }
 
-// ==================== CHANGE PHONE ====================
-
-function showChangePhoneModal(event) {
-    event.preventDefault();
-    const modal = new bootstrap.Modal(document.getElementById('changePhoneModal'));
-    document.getElementById('changePhoneForm').reset();
-    modal.show();
-}
-
-async function submitChangePhone() {
-    const form = document.getElementById('changePhoneForm');
-
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-
-    const newPhone = document.getElementById('newPhone').value.trim();
-    const password = document.getElementById('phonePassword').value;
-
-    // Validate phone format
-    const phoneRegex = /^[0-9]{10,11}$/;
-    if (!phoneRegex.test(newPhone)) {
-        showErrorToast('Số điện thoại phải có 10-11 chữ số');
-        return;
-    }
-
-    try {
-        showLoading();
-
-        const response = await fetch('/profile/change-phone', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                newPhone: newPhone,
-                password: password
-            })
-        });
-
-        const result = await response.json();
-        hideLoading();
-
-        if (result.success) {
-            // Đóng modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('changePhoneModal'));
-            modal.hide();
-
-            // Hiển thị thành công
-            showSuccessAnimation(() => {
-                showSuccessToast('Thay đổi số điện thoại thành công');
-                setTimeout(() => location.reload(), 1000);
-            });
-        } else {
-            showErrorToast(result.message || 'Có lỗi xảy ra');
-        }
-
-    } catch (error) {
-        hideLoading();
-        console.error('Error:', error);
-        showErrorToast('Có lỗi xảy ra khi thay đổi số điện thoại');
-    }
-}
-
 // ==================== TAB NAVIGATION ====================
 
 function initTabs() {
@@ -700,9 +635,13 @@ function startResendCountdown(seconds) {
 // ==================== PHONE CHANGE (Simple) ====================
 
 async function submitChangePhone() {
+    console.log('=== submitChangePhone called ===');
+
     const form = document.getElementById('changePhoneForm');
+    console.log('Form:', form);
 
     if (!form.checkValidity()) {
+        console.log('Form not valid');
         form.reportValidity();
         return;
     }
@@ -710,7 +649,11 @@ async function submitChangePhone() {
     const newPhone = document.getElementById('newPhone').value.trim();
     const password = document.getElementById('phonePassword').value;
 
+    console.log('New Phone:', newPhone);
+    console.log('Password:', password ? '***' : 'empty');
+
     if (!/^[0-9]{10,11}$/.test(newPhone)) {
+        console.log('Phone validation failed');
         showErrorToast('Số điện thoại phải có 10-11 chữ số');
         return;
     }
@@ -718,13 +661,19 @@ async function submitChangePhone() {
     try {
         showLoading();
 
+        console.log('Sending request...');
+
         const response = await fetch('/profile/change-phone', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ newPhone, password })
         });
 
+        console.log('Response status:', response.status);
+
         const result = await response.json();
+        console.log('Result:', result);
+
         hideLoading();
 
         if (result.success) {
@@ -736,11 +685,13 @@ async function submitChangePhone() {
                 setTimeout(() => location.reload(), 1000);
             });
         } else {
+            console.log('Error message:', result.message);
             showErrorToast(result.message);
         }
 
     } catch (error) {
         hideLoading();
-        showErrorToast('Có lỗi xảy ra');
+        console.error('Catch error:', error);
+        showErrorToast('Có lỗi xảy ra: ' + error.message);
     }
 }

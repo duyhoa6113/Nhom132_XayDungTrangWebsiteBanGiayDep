@@ -250,7 +250,9 @@ public class ProfileController {
             khachHangRepository.save(khachHang);
 
             // Cập nhật session
+            khachHang = khachHangService.findById(khachHang.getKhachHangId());
             session.setAttribute("khachHang", khachHang);
+
 
             log.info("Thay đổi email thành công cho khách hàng: {}", khachHang.getKhachHangId());
 
@@ -259,6 +261,41 @@ public class ProfileController {
         } catch (Exception e) {
             log.error("Lỗi khi verify OTP và thay đổi email", e);
             return ResponseEntity.ok(createResponse(false, "Có lỗi xảy ra"));
+        }
+    }
+
+    /**
+     * Thay đổi số điện thoại - API
+     */
+    @PostMapping("/change-phone")
+    @ResponseBody
+    public ResponseEntity<?> changePhone(
+            @RequestBody Map<String, String> request,
+            HttpSession session) {
+
+        KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
+
+        if (khachHang == null) {
+            return ResponseEntity.ok(createResponse(false, "Vui lòng đăng nhập"));
+        }
+
+        try {
+            String newPhone = request.get("newPhone");
+            String password = request.get("password");
+
+            log.info("Thay đổi số điện thoại cho khách hàng: {}", khachHang.getKhachHangId());
+
+            khachHangService.changePhone(khachHang.getKhachHangId(), newPhone, password);
+
+            // Cập nhật session
+            khachHang = khachHangService.findById(khachHang.getKhachHangId());
+            session.setAttribute("khachHang", khachHang);
+
+            return ResponseEntity.ok(createResponse(true, "Thay đổi số điện thoại thành công"));
+
+        } catch (Exception e) {
+            log.error("Lỗi khi thay đổi số điện thoại", e);
+            return ResponseEntity.ok(createResponse(false, e.getMessage()));
         }
     }
 }

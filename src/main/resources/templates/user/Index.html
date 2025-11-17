@@ -112,7 +112,7 @@
                 <div class="col-auto">
                     <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
                         <div class="logo-icon">
-                            <i class="fas fa-running"></i>
+                            <img th:src="@{/img/logo.png}" alt="Logo" class="logo-icon">
                         </div>
                         <span class="logo-text ms-2">NiceSport</span>
                     </a>
@@ -146,7 +146,6 @@
         </div>
     </div>
 </nav>
-
 
     <!-- ========== HERO BANNER ========== -->
     <section class="hero-banner" id="home">
@@ -377,28 +376,77 @@
             <!-- Pagination -->
             <nav th:if="${productsPage.totalPages > 1}" class="mt-4">
                 <ul class="pagination-shopee">
+                    <!-- Previous Button -->
                     <li class="page-item-shopee" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
                         <a class="page-link-shopee"
-                            th:href="@{/(page=${currentPage - 1}, size=24, category=${category}, search=${search})}">
+                           th:href="@{/Index(page=${currentPage - 1}, size=12, category=${category}, search=${search})}"
+                           th:if="${currentPage > 0}">
                             <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <span class="page-link-shopee disabled-link" th:if="${currentPage == 0}">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+                    </li>
+
+                    <!-- First Page -->
+                    <li class="page-item-shopee" th:if="${currentPage > 2}">
+                        <a class="page-link-shopee"
+                           th:href="@{/Index(page=0, size=12, category=${category}, search=${search})}">
+                            1
                         </a>
                     </li>
 
-                    <li class="page-item-shopee" th:each="i : ${#numbers.sequence(0, productsPage.totalPages - 1)}"
-                        th:classappend="${i == currentPage ? 'active' : ''}">
-                        <a class="page-link-shopee"
-                            th:href="@{/(page=${i}, size=24, category=${category}, search=${search})}"
-                            th:text="${i + 1}">1</a>
+                    <!-- Dots Before -->
+                    <li class="page-item-shopee disabled" th:if="${currentPage > 3}">
+                        <span class="page-link-shopee">...</span>
                     </li>
 
+                    <!-- Page Numbers (show 5 pages max) -->
+                    <li class="page-item-shopee"
+                        th:each="i : ${#numbers.sequence(
+                currentPage - 2 >= 0 ? currentPage - 2 : 0,
+                currentPage + 2 < productsPage.totalPages ? currentPage + 2 : productsPage.totalPages - 1
+            )}"
+                        th:classappend="${i == currentPage ? 'active' : ''}">
+                        <a class="page-link-shopee"
+                           th:href="@{/Index(page=${i}, size=12, category=${category}, search=${search})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+
+                    <!-- Dots After -->
+                    <li class="page-item-shopee disabled" th:if="${currentPage < productsPage.totalPages - 4}">
+                        <span class="page-link-shopee">...</span>
+                    </li>
+
+                    <!-- Last Page -->
+                    <li class="page-item-shopee" th:if="${currentPage < productsPage.totalPages - 3}">
+                        <a class="page-link-shopee"
+                           th:href="@{/Index(page=${productsPage.totalPages - 1}, size=12, category=${category}, search=${search})}"
+                           th:text="${productsPage.totalPages}">10</a>
+                    </li>
+
+                    <!-- Next Button -->
                     <li class="page-item-shopee"
                         th:classappend="${currentPage == productsPage.totalPages - 1 ? 'disabled' : ''}">
                         <a class="page-link-shopee"
-                            th:href="@{/(page=${currentPage + 1}, size=24, category=${category}, search=${search})}">
+                           th:href="@{/Index(page=${currentPage + 1}, size=12, category=${category}, search=${search})}"
+                           th:if="${currentPage < productsPage.totalPages - 1}">
                             <i class="fas fa-chevron-right"></i>
                         </a>
+                        <span class="page-link-shopee disabled-link" th:if="${currentPage == productsPage.totalPages - 1}">
+                <i class="fas fa-chevron-right"></i>
+            </span>
                     </li>
                 </ul>
+
+                <!-- Page Info -->
+                <div class="pagination-info text-center mt-3">
+        <span class="text-muted">
+            Trang <strong th:text="${currentPage + 1}">1</strong> /
+            <strong th:text="${productsPage.totalPages}">10</strong>
+            (Tổng <strong th:text="${productsPage.totalElements}"></strong> sản phẩm)
+        </span>
+                </div>
             </nav>
         </div>
     </section>
@@ -430,18 +478,6 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h6 class="footer-heading">THANH TOÁN</h6>
-                    <div class="payment-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/d4bbea4570b93bfd5fc652ca82a262a8" alt="COD">
-                        <img src="https://down-vn.img.susercontent.com/file/a0a9062ebe19b45c1ae0506f16af5c16" alt="Card">
-                        <img src="https://down-vn.img.susercontent.com/file/38fd98e55806c3b2e4535c4e4a6c4c08" alt="ATM">
-                        <img src="https://down-vn.img.susercontent.com/file/9263fa8c83628f5deff55e2a90758b06" alt="Momo">
-                    </div>
-                    <h6 class="footer-heading mt-3">VẬN CHUYỂN</h6>
-                    <div class="shipping-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/5e3f0bee86058637ff23cfdf2e14ca09" alt="GHN">
-                        <img src="https://down-vn.img.susercontent.com/file/d10b0ec09f0322f9201a4f3daf378ed2" alt="Giao Hàng Nhanh">
-                        <img src="https://down-vn.img.susercontent.com/file/59270fb2f3fbb7cbc92fca3877edde3f" alt="Grab">
-                    </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h6 class="footer-heading">THEO DÕI CHÚNG TÔI</h6>
@@ -625,6 +661,24 @@
 
                     suggestionsDiv.classList.add('show');
                 }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page');
+
+            // Nếu có tham số page và không phải trang 0, scroll xuống phần products
+            if (page && page !== '0') {
+                setTimeout(function() {
+                    const productsSection = document.getElementById('products');
+                    if (productsSection) {
+                        productsSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }, 100);
             }
         });
     </script>

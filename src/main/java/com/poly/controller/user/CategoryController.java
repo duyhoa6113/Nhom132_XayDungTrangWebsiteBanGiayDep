@@ -1,8 +1,11 @@
 package com.poly.controller.user;
 
+import com.poly.entity.KhachHang;
 import com.poly.entity.SanPham;
+import com.poly.service.CartService;
 import com.poly.service.CategoryService;
 import com.poly.service.ProductService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +29,9 @@ public class CategoryController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CartService cartService;
+
     @GetMapping("/{categoryId}")
     public String showCategory(
             @PathVariable("categoryId") Integer categoryId,
@@ -37,7 +43,7 @@ public class CategoryController {
             @RequestParam(required = false) List<Integer> size_filter,
             @RequestParam(required = false) List<Integer> color,
             @RequestParam(required = false) List<Integer> material,
-            Model model
+            Model model,  HttpSession session
     ) {
         try {
             // 1. Lấy thông tin danh mục
@@ -134,6 +140,20 @@ public class CategoryController {
             model.addAttribute("selectedColors", color);
             model.addAttribute("selectedMaterials", material);
             model.addAttribute("selectedSort", sort);
+
+            // Lấy cart count
+            try {
+                KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
+                if (khachHang != null) {
+                    Integer cartCount = cartService.getCartCount(khachHang);
+                    model.addAttribute("cartCount", cartCount != null ? cartCount : 0);
+                } else {
+                    model.addAttribute("cartCount", 0);
+                }
+            } catch (Exception e) {
+                model.addAttribute("cartCount", 0);
+            }
+
 
             return "user/category";
 

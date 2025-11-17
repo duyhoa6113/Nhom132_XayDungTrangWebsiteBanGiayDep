@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public class IndexController {
     private SanPhamService sanPhamService;
 
     @Autowired
-    private CartService cartService;  // THÊM DÒNG NÀY
+    private CartService cartService;
 
     @GetMapping({"/Index"})
     public String index(
@@ -51,7 +52,13 @@ public class IndexController {
             @RequestParam(required = false) Integer category,
             @RequestParam(required = false) String search,
             Model model,
-            HttpSession session) {  // THÊM HttpSession
+            HttpSession session) {
+
+        System.out.println("========== DEBUG PAGINATION ==========");
+        System.out.println("Page: " + page);
+        System.out.println("Size: " + size);
+        System.out.println("Category: " + category);
+        System.out.println("Search: " + search);
 
         Pageable pageable = PageRequest.of(page, size);
         Page<SanPham> productsPage;
@@ -76,16 +83,20 @@ public class IndexController {
             model.addAttribute("pageTitle", "Tất Cả Sản Phẩm");
         }
 
-        // ===== THÊM PHẦN NÀY - Lấy sản phẩm nổi bật =====
+        System.out.println("Total Elements: " + productsPage.getTotalElements());
+        System.out.println("Total Pages: " + productsPage.getTotalPages());
+        System.out.println("Content Size: " + productsPage.getContent().size());
+        System.out.println("======================================");
+
+        // Lấy sản phẩm nổi bật
         List<SanPham> featuredProducts = sanPhamService.getFeaturedProducts(6);
         model.addAttribute("featuredProducts", featuredProducts);
-        // ================================================
 
         // Lấy danh mục và thương hiệu
         List<DanhMuc> categories = danhMucRepository.findByTrangThai(1);
         List<ThuongHieu> brands = thuongHieuRepository.findByTrangThai(1);
 
-        // ========== THÊM CART COUNT - QUAN TRỌNG ==========
+        // Lấy cart count
         try {
             KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
             if (khachHang != null) {
@@ -97,9 +108,50 @@ public class IndexController {
         } catch (Exception e) {
             model.addAttribute("cartCount", 0);
         }
-        // ===================================================
 
-        // Đưa dữ liệu vào model
+        // Logic phân trang
+        int totalPages = productsPage.getTotalPages();
+        int currentPage = page;
+        List<Integer> pageNumbers = new ArrayList<>();
+        int maxPagesToShow = 7;
+
+        if (totalPages <= maxPagesToShow) {
+            for (int i = 0; i < totalPages; i++) {
+                pageNumbers.add(i);
+            }
+        } else {
+            int startPage, endPage;
+            if (currentPage <= 3) {
+                startPage = 0;
+                endPage = 4;
+            } else if (currentPage >= totalPages - 4) {
+                startPage = totalPages - 5;
+                endPage = totalPages - 1;
+            } else {
+                startPage = currentPage - 1;
+                endPage = currentPage + 1;
+            }
+
+            pageNumbers.add(0);
+            if (startPage > 1) {
+                pageNumbers.add(-1);
+            }
+            for (int i = startPage; i <= endPage; i++) {
+                if (i > 0 && i < totalPages - 1) {
+                    pageNumbers.add(i);
+                }
+            }
+            if (endPage < totalPages - 2) {
+                pageNumbers.add(-1);
+            }
+            if (totalPages > 1) {
+                pageNumbers.add(totalPages - 1);
+            }
+        }
+
+        model.addAttribute("pageNumbers", pageNumbers);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", productsPage.getTotalElements());
         model.addAttribute("productsPage", productsPage);
         model.addAttribute("categories", categories);
         model.addAttribute("brands", brands);

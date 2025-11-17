@@ -76,12 +76,6 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="/wishlist">
-                                    <i class="fas fa-heart"></i>
-                                    <span>Yêu thích</span>
-                                </a>
-                            </li>
-                            <li>
                                 <a class="dropdown-item" href="/admin">
                                     <i class="fas fa-cog"></i>
                                     <span>Quản trị viên</span>
@@ -107,28 +101,47 @@
     </div>
 
     <!-- Main Navbar -->
-    <div class="navbar-ma">
+    <div class="navbar-main">
         <div class="section-wrapper">
             <div class="row align-items-center w-100 g-3">
                 <!-- Logo -->
                 <div class="col-auto">
                     <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
                         <div class="logo-icon">
-                            <i class="fas fa-running"></i>
+                            <img th:src="@{/img/logo.png}" alt="Logo" class="logo-icon">
                         </div>
-                        <span class="logo-1">NiceSport</span>
+                        <span class="logo-text ms-2">NiceSport</span>
                     </a>
                 </div>
 
                 <!-- Search Box -->
                 <div class="col">
-                    <span style="font-size: 24px; color: #f53d2d;">Thanh Toán</span>
+                    <form action="/search" method="get" class="search-form">
+                        <div class="search-box-main">
+                            <input type="text"
+                                   name="q"
+                                   class="search-input-main"
+                                   placeholder="Tìm giày thể thao, sneaker, sandals..."
+                                   th:value="${keyword}" required>
+                            <button type="submit" class="btn-search-main">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-auto">
+                    <a th:href="@{/cart}" class="cart-icon-main position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge-main"
+                              th:text="${cartCount != null ? cartCount : 0}"
+                              th:classappend="${cartCount == null or cartCount == 0} ? 'd-none' : ''">0</span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </nav>
-
 <!-- Main Content -->
 <div class="checkout-content">
     <div class="container-fluid py-4">
@@ -398,7 +411,7 @@
 </div>
 
 <!-- ========== FOOTER ========== -->
-<footer class="footer-shopee">
+<footer class="footer-shopee mt-5">
     <div class="footer-top">
         <div class="section-wrapper">
             <div class="row g-4">
@@ -408,8 +421,6 @@
                         <li><a href="#">Trung Tâm Trợ Giúp</a></li>
                         <li><a href="#">Hướng Dẫn Mua Hàng</a></li>
                         <li><a href="#">Chính Sách Đổi Trả</a></li>
-                        <li><a href="#">Chính Sách Bảo Hành</a></li>
-                        <li><a href="#">Liên Hệ</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -418,23 +429,11 @@
                         <li><a href="#">Giới Thiệu</a></li>
                         <li><a href="#">Tuyển Dụng</a></li>
                         <li><a href="#">Điều Khoản</a></li>
-                        <li><a href="#">Chính Sách Bảo Mật</a></li>
-                        <li><a href="#">Flash Sale</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h6 class="footer-heading">THANH TOÁN</h6>
                     <div class="payment-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/d4bbea4570b93bfd5fc652ca82a262a8" alt="COD">
-                        <img src="https://down-vn.img.susercontent.com/file/a0a9062ebe19b45c1ae0506f16af5c16" alt="Card">
-                        <img src="https://down-vn.img.susercontent.com/file/38fd98e55806c3b2e4535c4e4a6c4c08" alt="ATM">
-                        <img src="https://down-vn.img.susercontent.com/file/9263fa8c83628f5deff55e2a90758b06" alt="Momo">
-                    </div>
-                    <h6 class="footer-heading mt-3">VẬN CHUYỂN</h6>
-                    <div class="shipping-methods">
-                        <img src="https://down-vn.img.susercontent.com/file/5e3f0bee86058637ff23cfdf2e14ca09" alt="GHN">
-                        <img src="https://down-vn.img.susercontent.com/file/d10b0ec09f0322f9201a4f3daf378ed2" alt="Giao Hàng Nhanh">
-                        <img src="https://down-vn.img.susercontent.com/file/59270fb2f3fbb7cbc92fca3877edde3f" alt="Grab">
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -442,8 +441,6 @@
                     <ul class="footer-links">
                         <li><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
                         <li><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
-                        <li><a href="#"><i class="fab fa-tiktok me-2"></i>TikTok</a></li>
-                        <li><a href="#"><i class="fab fa-youtube me-2"></i>YouTube</a></li>
                     </ul>
                 </div>
             </div>
@@ -455,12 +452,6 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <p class="mb-2">© 2025 NiceSport. Tất cả các quyền được bảo lưu.</p>
-                    <p class="footer-address">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        Địa chỉ: 123 Đường ABC, Quận 1, TP. Hồ Chí Minh |
-                        <i class="fas fa-phone ms-3 me-2"></i>
-                        Hotline: 1900-xxxx
-                    </p>
                 </div>
             </div>
         </div>

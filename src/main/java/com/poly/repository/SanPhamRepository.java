@@ -198,4 +198,8 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer>,
     @Query("SELECT s FROM SanPham s WHERE LOWER(s.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "AND s.trangThai = 1")
     Page<SanPham> searchByTen(String keyword, Pageable pageable);
+
+    // Trong SanPhamRepository
+    @Query("SELECT sp FROM SanPham sp WHERE sp.trangThai = ?1")
+    Page<SanPham> findByTrangThai(Integer trangThai, Pageable pageable);
 }

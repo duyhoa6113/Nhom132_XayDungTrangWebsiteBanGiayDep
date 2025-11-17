@@ -1,9 +1,12 @@
 package com.poly.controller.user;
 
+import com.poly.entity.KhachHang;
 import com.poly.entity.SanPham;
+import com.poly.service.CartService;
 import com.poly.service.CategoryService;
 import com.poly.service.SearchService;
 import com.poly.repository.SanPhamRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.print.PrintService;
 import java.util.List;
 
 /**
@@ -30,6 +34,9 @@ public class SearchController {
     @Autowired
     private SanPhamRepository sanPhamRepository;
 
+    @Autowired
+    private CartService cartService;
+
     /**
      * Trang tìm kiếm chính
      */
@@ -37,14 +44,14 @@ public class SearchController {
     public String search(
             @RequestParam(value = "q", required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "24") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "popular") String sort,
             @RequestParam(required = false) Integer category,
             @RequestParam(required = false) List<Integer> brand,
             @RequestParam(required = false) String priceRange,
             @RequestParam(required = false) Integer rating,
-            Model model
-    ) {
+            Model model, HttpSession session) {
+
         // 1. Nếu không có keyword, redirect về trang chủ
         if (keyword == null || keyword.trim().isEmpty()) {
             return "redirect:/";
@@ -106,6 +113,19 @@ public class SearchController {
         if (productsPage.getTotalElements() == 0) {
             var suggestions = searchService.getSuggestedKeywords(keyword);
             model.addAttribute("suggestions", suggestions);
+        }
+
+        // Lấy cart count
+        try {
+            KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
+            if (khachHang != null) {
+                Integer cartCount = cartService.getCartCount(khachHang);
+                model.addAttribute("cartCount", cartCount != null ? cartCount : 0);
+            } else {
+                model.addAttribute("cartCount", 0);
+            }
+        } catch (Exception e) {
+            model.addAttribute("cartCount", 0);
         }
 
         return "user/search";

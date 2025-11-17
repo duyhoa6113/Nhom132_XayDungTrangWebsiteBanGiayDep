@@ -164,4 +164,29 @@ public class KhachHangService {
             throw new RuntimeException("Không thể upload ảnh: " + e.getMessage());
         }
     }
+
+    /**
+     * Thay đổi số điện thoại
+     */
+    @Transactional
+    public void changePhone(Integer khachHangId, String newPhone, String password) {
+        KhachHang khachHang = findById(khachHangId);
+
+        // Kiểm tra mật khẩu
+        if (!passwordEncoder.matches(password, khachHang.getMatKhauHash())) {
+            throw new RuntimeException("Mật khẩu không đúng");
+        }
+
+        // Validate phone format
+        if (!newPhone.matches("^[0-9]{10,11}$")) {
+            throw new RuntimeException("Số điện thoại phải có 10-11 chữ số");
+        }
+
+        // Cập nhật số điện thoại
+        khachHang.setSdt(newPhone);
+        khachHang.setUpdatedAt(LocalDateTime.now());
+        khachHangRepository.save(khachHang);
+
+        log.info("Thay đổi số điện thoại thành công cho khách hàng: {}", khachHangId);
+    }
 }

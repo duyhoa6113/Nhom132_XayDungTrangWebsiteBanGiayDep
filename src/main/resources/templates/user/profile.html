@@ -108,7 +108,7 @@
                 <div class="col-auto">
                     <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
                         <div class="logo-icon">
-                            <i class="fas fa-running"></i>
+                            <img th:src="@{/img/logo.png}" alt="Logo" class="logo-icon">
                         </div>
                         <span class="logo-text ms-2">NiceSport</span>
                     </a>
@@ -142,6 +142,7 @@
         </div>
     </div>
 </nav>
+
 
 <!-- Main Content -->
 <div class="profile-wrapper">
@@ -592,6 +593,13 @@
                         <input type="tel" class="form-control" name="newPhone" id="newPhone" required
                                pattern="[0-9]{10,11}" placeholder="Nhập 10-11 chữ số" maxlength="11"/>
                         <small class="text-muted">Số điện thoại phải có 10-11 chữ số</small>
+                    </div>
+                    <!-- THÊM PHẦN NÀY -->
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password" id="phonePassword" required
+                               placeholder="Nhập mật khẩu để xác nhận"/>
+                        <small class="text-muted">Để bảo mật, vui lòng nhập mật khẩu</small>
                     </div>
                 </form>
             </div>
