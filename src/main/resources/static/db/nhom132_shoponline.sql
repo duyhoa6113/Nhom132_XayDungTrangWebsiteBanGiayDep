@@ -308,20 +308,6 @@ CREATE INDEX IX_DanhGia_SanPham ON dbo.DanhGia(SanPhamId);
 CREATE INDEX IX_DanhGia_KhachHang ON dbo.DanhGia(KhachHangId);
 CREATE INDEX IX_DanhGia_TrangThai ON dbo.DanhGia(TrangThai);
 
--- YeuThich
-CREATE TABLE dbo.YeuThich
-(
-    YeuThichId  INT IDENTITY(1,1) PRIMARY KEY,
-    KhachHangId INT NOT NULL
-        FOREIGN KEY REFERENCES dbo.KhachHang(KhachHangId) ON DELETE CASCADE,
-    SanPhamId   INT NOT NULL
-        FOREIGN KEY REFERENCES dbo.SanPham(SanPhamId) ON DELETE CASCADE,
-    CreatedAt   DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
-    CONSTRAINT UQ_YeuThich_KH_SP UNIQUE (KhachHangId, SanPhamId)
-);
-CREATE INDEX IX_YeuThich_KhachHang ON dbo.YeuThich(KhachHangId);
-CREATE INDEX IX_YeuThich_SanPham ON dbo.YeuThich(SanPhamId);
-
 /* =============== NOTIFICATIONS =============== */
 
 -- ThongBao
@@ -342,19 +328,6 @@ CREATE TABLE dbo.ThongBao
 CREATE INDEX IX_ThongBao_KhachHang ON dbo.ThongBao(KhachHangId);
 CREATE INDEX IX_ThongBao_NhanVien ON dbo.ThongBao(NhanVienId);
 CREATE INDEX IX_ThongBao_DaDoc ON dbo.ThongBao(DaDoc);
-
--- Newsletter
-CREATE TABLE dbo.Newsletter
-(
-    NewsletterID    INT IDENTITY(1,1) PRIMARY KEY,
-    Email           NVARCHAR(255) NOT NULL UNIQUE,
-    IsActive        BIT NOT NULL DEFAULT 1,
-    SubscribedAt    DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
-    UnsubscribedAt  DATETIME2(0) NULL,
-    CreatedAt       DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME()
-);
-CREATE INDEX IX_Newsletter_Email ON dbo.Newsletter(Email);
-CREATE INDEX IX_Newsletter_IsActive ON dbo.Newsletter(IsActive);
 
 -- ==================== VAI TRÒ ====================
 PRINT N'Đang thêm Vai Trò...';
@@ -744,19 +717,6 @@ INSERT INTO dbo.KhuyenMai (Ma, Ten, MoTa, Loai, GiaTri, GiamToiDa, DieuKienApDun
 (N'BLACKFRIDAY', N'Giảm 500k Black Friday', N'Giảm cố định 500k cho đơn từ 3 triệu', N'fixed', 500000, NULL, 3000000, 50, '2024-11-24', '2024-11-30', 1);
 GO
 
-GO
-
--- ==================== NEWSLETTER ====================
-PRINT N'Đang thêm Newsletter...';
-
-INSERT INTO dbo.Newsletter (Email, IsActive) VALUES
-(N'subscriber1@gmail.com', 1),
-(N'subscriber2@gmail.com', 1),
-(N'subscriber3@gmail.com', 1);
-GO
-
-GO
-
 -- ==================== THỐNG KÊ ====================
 SELECT 'VaiTro' AS [Bảng], COUNT(*) AS [Số Lượng] FROM dbo.VaiTro
 UNION ALL
@@ -781,8 +741,6 @@ UNION ALL
 SELECT 'DiaChi', COUNT(*) FROM dbo.DiaChi
 UNION ALL
 SELECT 'KhuyenMai', COUNT(*) FROM dbo.KhuyenMai
-UNION ALL
-SELECT 'Newsletter', COUNT(*) FROM dbo.Newsletter;
 GO
 
 PRINT N'- Tài khoản khách hàng: nguyenvanan@gmail.com / 123456';

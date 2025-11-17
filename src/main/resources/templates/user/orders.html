@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Đơn Hàng Của Tôi - NiceSport</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/index.css}"/>
+
+    <style>
+        .orders-container {
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .orders-header {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .status-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-tab {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .status-tab:hover {
+            background: #f8f9fa;
+            border-color: #f53d2d;
+        }
+
+        .status-tab.active {
+            background: #f53d2d;
+            color: white;
+            border-color: #f53d2d;
+        }
+
+        .order-card {
+            background: white;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .order-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-code {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .order-status {
+            font-size: 13px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .status-ChoXuLy {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-DangGiao {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-HoanThanh {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-DaHuy {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .order-body {
+            padding: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-variant {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .product-price {
+            text-align: right;
+        }
+
+        .product-price .price {
+            font-size: 16px;
+            color: #f53d2d;
+            font-weight: 600;
+        }
+
+        .product-price .quantity {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .order-footer {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-total {
+            font-size: 16px;
+        }
+
+        .order-total .label {
+            color: #666;
+        }
+
+        .order-total .amount {
+            color: #f53d2d;
+            font-size: 20px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .pagination-wrapper {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-light bg-white shadow-sm sticky-top">
+    <!-- Top Bar -->
+    <div class="navbar-top">
+        <div class="section-wrapper">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="top-links">
+                    <a href="/seller" class="top-link">oder</a>
+                    <span class="divider">|</span>
+                    <a href="/download" class="top-link">Tải ứng dụng</a>
+                    <span class="divider">|</span>
+                    <span class="top-link">Kết nối</span>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="top-links">
+                    <a href="#" class="top-link">
+                        <i class="far fa-bell me-1"></i>Thông Báo
+                    </a>
+                    <a href="#" class="top-link">
+                        <i class="far fa-question-circle me-1"></i>Hỗ Trợ
+                    </a>
+                    <a href="#" class="top-link">
+                        <i class="fas fa-globe me-1"></i>Tiếng Việt
+                        <i class="fas fa-chevron-down ms-1 small"></i>
+                    </a>
+
+                    <!-- USER DROPDOWN -->
+                    <div th:if="${session.khachHang != null}" class="dropdown d-inline">
+                        <a href="#" class="top-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="far fa-user-circle me-1"></i>
+                            <span th:text="${session.khachHangTen}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu shadow-lg" aria-labelledby="userDropdown">
+                            <li class="dropdown-header">
+                                <div class="user-info">
+                                    <div class="user-avatar-large">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name-large" th:text="${session.khachHangTen}">User Name</div>
+                                        <div class="user-email" th:text="${session.khachHang.email}">user@example.com</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li>
+                                <a class="dropdown-item" href="/profile">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>Tài khoản của tôi</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/orders">
+                                    <i class="fas fa-box"></i>
+                                    <span>Đơn hàng</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/admin">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Quản trị viên</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider m-0"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Đăng xuất</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- NÚT ĐĂNG NHẬP -->
+                    <a th:if="${session.khachHang == null}" th:href="@{/login}" class="top-link">
+                        <i class="far fa-user-circle me-1"></i>Đăng nhập
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <div class="navbar-main">
+        <div class="section-wrapper">
+            <div class="row align-items-center w-100 g-3">
+                <!-- Logo -->
+                <div class="col-auto">
+                    <a class="navbar-brand d-flex align-items-center" th:href="@{/Index}">
+                        <div class="logo-icon">
+                            <img th:src="@{/img/logo.png}" alt="Logo" class="logo-icon">
+                        </div>
+                        <span class="logo-text ms-2">NiceSport</span>
+                    </a>
+                </div>
+
+                <!-- Search Box -->
+                <div class="col">
+                    <form action="/search" method="get" class="search-form">
+                        <div class="search-box-main">
+                            <input type="text"
+                                   name="q"
+                                   class="search-input-main"
+                                   placeholder="Tìm giày thể thao, sneaker, sandals..."
+                                   th:value="${keyword}" required>
+                            <button type="submit" class="btn-search-main">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-auto">
+                    <a th:href="@{/cart}" class="cart-icon-main position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge-main"
+                              th:text="${cartCount != null ? cartCount : 0}"
+                              th:classappend="${cartCount == null or cartCount == 0} ? 'd-none' : ''">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<!-- MAIN CONTENT -->
+<div class="orders-container">
+    <div class="container">
+
+        <!-- Alert Messages -->
+        <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            Hủy đơn hàng thành công!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${param.error}">Có lỗi xảy ra</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Status Tabs -->
+        <div class="orders-header">
+            <div class="status-tabs">
+                <a href="/orders"
+                   th:class="${currentStatus == null ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-list me-1"></i>
+                    Tất cả
+                </a>
+                <a href="/orders?status=ChoXuLy"
+                   th:class="${currentStatus == 'ChoXuLy' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-clock me-1"></i>
+                    Chờ xử lý
+                </a>
+                <a href="/orders?status=DangGiao"
+                   th:class="${currentStatus == 'DangGiao' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-truck me-1"></i>
+                    Đang giao
+                </a>
+                <a href="/orders?status=HoanThanh"
+                   th:class="${currentStatus == 'HoanThanh' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-check-circle me-1"></i>
+                    Hoàn thành
+                </a>
+                <a href="/orders?status=DaHuy"
+                   th:class="${currentStatus == 'DaHuy' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-times-circle me-1"></i>
+                    Đã hủy
+                </a>
+            </div>
+        </div>
+
+        <!-- Order List -->
+        <div th:if="${!#lists.isEmpty(orders)}">
+            <div th:each="order : ${orders}" class="order-card">
+                <!-- Order Header -->
+                <div class="order-header">
+                    <div>
+                        <span class="order-code">
+                            <i class="fas fa-receipt me-2"></i>
+                            <span th:text="${order.maHoaDon}">DH001</span>
+                        </span>
+                        <span class="text-muted ms-3" style="font-size: 13px;">
+                            <i class="far fa-calendar-alt me-1"></i>
+                            <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">15/11/2025 14:30</span>
+                        </span>
+                    </div>
+                    <div>
+                        <span th:class="'order-status status-' + ${order.trangThai}"
+                              th:text="${order.trangThai == 'ChoXuLy' ? 'Chờ xử lý' :
+                                       (order.trangThai == 'DangGiao' ? 'Đang giao' :
+                                       (order.trangThai == 'HoanThanh' ? 'Hoàn thành' :
+                                       (order.trangThai == 'DaHuy' ? 'Đã hủy' : order.trangThai)))}">
+                            Chờ xử lý
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Order Body - Products -->
+                <div class="order-body">
+                    <div th:each="item, iterStat : ${order.chiTietList}"
+                         th:if="${iterStat.index < 3}"
+                         class="product-item">
+                        <img th:if="${item.variant != null and item.variant.hinhAnh != null}"
+                             th:src="${item.variant.hinhAnh}"
+                             class="product-image"
+                             onerror="this.src='/img/no-image.png'"/>
+                        <img th:if="${item.variant == null or item.variant.hinhAnh == null}"
+                             src="/img/no-image.png"
+                             class="product-image"/>
+
+                        <div class="product-info">
+                            <div class="product-name"
+                                 th:text="${item.variant != null and item.variant.sanPham != null ? item.variant.sanPham.ten : 'Sản phẩm'}">
+                                Giày thể thao
+                            </div>
+                            <div class="product-variant">
+                                <span th:if="${item.variant != null and item.variant.mauSac != null}"
+                                      th:text="${item.variant.mauSac.ten}">Đen</span>
+                                <span th:if="${item.variant == null or item.variant.mauSac == null}">N/A</span>
+                                <span> | </span>
+                                <span th:if="${item.variant != null and item.variant.kichThuoc != null}"
+                                      th:text="${item.variant.kichThuoc.ten}">42</span>
+                                <span th:if="${item.variant == null or item.variant.kichThuoc == null}">N/A</span>
+                            </div>
+                        </div>
+
+                        <div class="product-price">
+                            <div class="price" th:text="'₫' + ${#numbers.formatDecimal(item.donGia, 0, 'COMMA', 0, 'POINT')}">₫500,000</div>
+                            <div class="quantity">x<span th:text="${item.soLuong}">1</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Show more products -->
+                    <div th:if="${#lists.size(order.chiTietList) > 3}" class="text-center mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-ellipsis-h"></i>
+                            Và <span th:text="${#lists.size(order.chiTietList) - 3}">2</span> sản phẩm khác
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Order Footer -->
+                <div class="order-footer">
+                    <div class="order-total">
+                        <span class="label">Tổng tiền:</span>
+                        <span class="amount" th:text="'₫' + ${#numbers.formatDecimal(order.tongThanhToan, 0, 'COMMA', 0, 'POINT')}">₫2,500,000</span>
+                    </div>
+
+                    <div class="order-actions">
+                        <a th:href="@{/orders/{id}(id=${order.hoaDonId})}"
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>
+                            Xem chi tiết
+                        </a>
+
+                        <form th:if="${order.trangThai == 'ChoXuLy'}"
+                              th:action="@{/orders/{id}/cancel(id=${order.hoaDonId})}"
+                              method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-times me-1"></i>
+                                Hủy đơn
+                            </button>
+                        </form>
+
+                        <a th:if="${order.trangThai == 'HoanThanh'}"
+                           href="#"
+                           class="btn btn-danger">
+                            <i class="fas fa-redo me-1"></i>
+                            Mua lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div th:if="${totalPages > 1}" class="pagination-wrapper">
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                            <a class="page-link"
+                               th:href="@{/orders(status=${currentStatus}, page=${currentPage - 1})}">
+                                Trước
+                            </a>
+                        </li>
+
+                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:if="${i >= currentPage - 2 and i <= currentPage + 2}"
+                            class="page-item"
+                            th:classappend="${i == currentPage ? 'active' : ''}">
+                            <a class="page-link"
+                               th:href="@{/orders(status=${currentStatus}, page=${i})}"
+                               th:text="${i + 1}">1</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                            <a class="page-link"
+                               th:href="@{/orders(status=${currentStatus}, page=${currentPage + 1})}">
+                                Sau
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(orders)}" class="empty-state">
+            <i class="fas fa-shopping-bag"></i>
+            <h3>Chưa có đơn hàng</h3>
+            <p class="text-muted">Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
+            <a href="/Index" class="btn btn-primary mt-3">
+                <i class="fas fa-shopping-cart me-2"></i>
+                Mua sắm ngay
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer-shopee">
+    <div class="footer-top">
+        <div class="section-wrapper">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">CHĂM SÓC KHÁCH HÀNG</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Trung Tâm Trợ Giúp</a></li>
+                        <li><a href="#">Hướng Dẫn Mua Hàng</a></li>
+                        <li><a href="#">Chính Sách Đổi Trả</a></li>
+                        <li><a href="#">Chính Sách Bảo Hành</a></li>
+                        <li><a href="#">Liên Hệ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">VỀ NICESPORT</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Giới Thiệu</a></li>
+                        <li><a href="#">Tuyển Dụng</a></li>
+                        <li><a href="#">Điều Khoản</a></li>
+                        <li><a href="#">Chính Sách Bảo Mật</a></li>
+                        <li><a href="#">Flash Sale</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">THANH TOÁN</h6>
+                    <div class="payment-methods">
+                        <img src="https://down-vn.img.susercontent.com/file/d4bbea4570b93bfd5fc652ca82a262a8" alt="COD">
+                        <img src="https://down-vn.img.susercontent.com/file/a0a9062ebe19b45c1ae0506f16af5c16" alt="Card">
+                        <img src="https://down-vn.img.susercontent.com/file/38fd98e55806c3b2e4535c4e4a6c4c08" alt="ATM">
+                        <img src="https://down-vn.img.susercontent.com/file/9263fa8c83628f5deff55e2a90758b06" alt="Momo">
+                    </div>
+                    <h6 class="footer-heading mt-3">VẬN CHUYỂN</h6>
+                    <div class="shipping-methods">
+                        <img src="https://down-vn.img.susercontent.com/file/5e3f0bee86058637ff23cfdf2e14ca09" alt="GHN">
+                        <img src="https://down-vn.img.susercontent.com/file/d10b0ec09f0322f9201a4f3daf378ed2" alt="Giao Hàng Nhanh">
+                        <img src="https://down-vn.img.susercontent.com/file/59270fb2f3fbb7cbc92fca3877edde3f" alt="Grab">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">THEO DÕI CHÚNG TÔI</h6>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
+                        <li><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
+                        <li><a href="#"><i class="fab fa-tiktok me-2"></i>TikTok</a></li>
+                        <li><a href="#"><i class="fab fa-youtube me-2"></i>YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="section-wrapper">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-2">© 2025 NiceSport. Tất cả các quyền được bảo lưu.</p>
+                    <p class="footer-address">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Địa chỉ: 123 Đường ABC, Quận 1, TP. Hồ Chí Minh |
+                        <i class="fas fa-phone ms-3 me-2"></i>
+                        Hotline: 1900-xxxx
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let lastScrollTop = 0;
+    const navbar = document.querySelector('.navbar');
+
+    window.addEventListener('scroll', function () {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (scrollTop > lastScrollTop && scrollTop > 80) {
+            // Cuộn xuống -> ẩn navbar
+            navbar.classList.add('hide');
+        } else if (scrollTop < lastScrollTop - 5) {
+            // Cuộn lên -> hiện lại navbar
+            navbar.classList.remove('hide');
+        }
+
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    });
+
+</script>
+</body>
+</html>

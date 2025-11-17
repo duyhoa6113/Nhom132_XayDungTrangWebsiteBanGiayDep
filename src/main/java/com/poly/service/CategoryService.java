@@ -1,7 +1,7 @@
 package com.poly.service;
 
-import com.poly.dto.BrandWithCount;
-import com.poly.dto.CategoryWithCount;
+import com.poly.repository.BrandWithCount;
+import com.poly.repository.CategoryWithCount;
 import com.poly.entity.*;
 import com.poly.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;

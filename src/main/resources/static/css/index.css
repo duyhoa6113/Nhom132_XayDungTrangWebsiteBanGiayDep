@@ -836,6 +836,37 @@ a {
     transform: translateY(-3px);
 }
 
+/* ===== LOGO STYLES ===== */
+.navbar-brand {
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent; /* Xóa nền trắng */
+    border-radius: 0; /* Bỏ border-radius nếu có */
+    padding: 0;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Giữ tỷ lệ ảnh */
+    display: block;
+}
+
+.logo-text {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 991px) {
     .navbar-main {
@@ -843,14 +874,25 @@ a {
     }
 
     .logo-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 22px;
+        width: 42px;
+        height: 42px;
     }
 
     .logo-text {
         font-size: 22px;
     }
+}
+
+@media (max-width: 576px) {
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .logo-text {
+        font-size: 20px;
+    }
+}
 
     /* Autocomplete dropdown for home page search */
     .search-form {
@@ -923,7 +965,6 @@ a {
     .banner-subtitle {
         font-size: 18px;
     }
-}
 
 @media (max-width: 768px) {
     .top-links {

@@ -1,0 +1,438 @@
+/* ==================== ORDER SUCCESS PAGE ==================== */
+
+:root {
+    --success-green: #4CAF50;
+    --primary-orange: #ee4d2d;
+    --text-dark: #333;
+    --text-muted: #757575;
+    --border-color: #e5e5e5;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+.order-success-container {
+    min-height: calc(100vh - 200px);
+}
+
+/* ==================== SUCCESS CARD ==================== */
+
+.success-card {
+    background: white;
+    border-radius: 12px;
+    padding: 60px 40px 40px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.success-card.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==================== SUCCESS CHECKMARK ANIMATION ==================== */
+
+.success-icon-wrapper {
+    margin-bottom: 30px;
+}
+
+.success-checkmark {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.check-icon {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    border-radius: 50%;
+    box-sizing: content-box;
+    border: 5px solid var(--success-green);
+    animation: scaleIn 0.5s ease-in-out;
+}
+
+.icon-line {
+    height: 6px;
+    background-color: var(--success-green);
+    display: block;
+    border-radius: 3px;
+    position: absolute;
+    z-index: 10;
+}
+
+.icon-line.line-tip {
+    top: 52px;
+    left: 18px;
+    width: 30px;
+    transform: rotate(45deg);
+    animation: checkTip 0.75s ease-in-out 0.3s forwards;
+    opacity: 0;
+}
+
+.icon-line.line-long {
+    top: 46px;
+    right: 10px;
+    width: 58px;
+    transform: rotate(-45deg);
+    animation: checkLong 0.75s ease-in-out 0.5s forwards;
+    opacity: 0;
+}
+
+.icon-circle {
+    top: -5px;
+    left: -5px;
+    z-index: 10;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    position: absolute;
+    box-sizing: content-box;
+    border: 5px solid rgba(76, 175, 80, 0.3);
+}
+
+.icon-fix {
+    top: 10px;
+    width: 6px;
+    left: 32px;
+    z-index: 1;
+    height: 100px;
+    position: absolute;
+    transform: rotate(-45deg);
+    background-color: white;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes checkTip {
+    0% {
+        width: 0;
+        left: 3px;
+        top: 24px;
+        opacity: 1;
+    }
+    54% {
+        width: 0;
+        left: 3px;
+        top: 24px;
+    }
+    70% {
+        width: 60px;
+        left: -12px;
+        top: 45px;
+    }
+    84% {
+        width: 22px;
+        left: 25px;
+        top: 60px;
+    }
+    100% {
+        width: 30px;
+        left: 18px;
+        top: 52px;
+        opacity: 1;
+    }
+}
+
+@keyframes checkLong {
+    0% {
+        width: 0;
+        right: 56px;
+        top: 65px;
+        opacity: 1;
+    }
+    65% {
+        width: 0;
+        right: 56px;
+        top: 65px;
+    }
+    84% {
+        width: 68px;
+        right: 2px;
+        top: 42px;
+    }
+    100% {
+        width: 58px;
+        right: 10px;
+        top: 46px;
+        opacity: 1;
+    }
+}
+
+/* ==================== SUCCESS TEXT ==================== */
+
+.success-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--success-green);
+    margin-bottom: 12px;
+    animation: fadeInUp 0.6s ease 0.8s both;
+}
+
+.success-message {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    animation: fadeInUp 0.6s ease 0.9s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== ORDER INFO BOX ==================== */
+
+.order-info-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    animation: fadeInUp 0.6s ease 1s both;
+}
+
+.order-code, .order-total {
+    text-align: center;
+}
+
+.order-info-box .label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.order-info-box .value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* ==================== ORDER DETAILS CARD ==================== */
+
+.order-details-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* ==================== INFO SECTION ==================== */
+
+.info-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    height: 100%;
+}
+
+.info-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.info-content p {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ==================== PRODUCT LIST ==================== */
+
+.product-list {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.product-item {
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.product-item:last-child {
+    margin-bottom: 0;
+}
+
+.product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 16px;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-name {
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--text-dark);
+}
+
+.product-variant {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.product-quantity {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin: 0 20px;
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-orange);
+    min-width: 120px;
+    text-align: right;
+}
+
+/* ==================== ORDER SUMMARY ==================== */
+
+.order-summary {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px dashed var(--border-color);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 15px;
+}
+
+.summary-row.total {
+    font-size: 20px;
+    font-weight: 700;
+    padding-top: 12px;
+    margin-top: 12px;
+    border-top: 2px solid var(--border-color);
+}
+
+/* ==================== ACTION BUTTONS ==================== */
+
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.action-buttons .btn {
+    padding: 12px 32px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+
+.btn-primary:hover {
+    background: #d73211;
+    border-color: #d73211;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(238, 77, 45, 0.3);
+}
+
+.btn-outline-primary {
+    color: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-orange);
+    border-color: var(--primary-orange);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==================== DELIVERY INFO ==================== */
+
+.delivery-info {
+    text-align: center;
+    padding: 16px;
+    background: #e8f5e9;
+    border-radius: 8px;
+    color: var(--success-green);
+    font-size: 15px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .success-card {
+        padding: 40px 20px 30px;
+    }
+
+    .success-title {
+        font-size: 24px;
+    }
+
+    .order-info-box {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+    }
+
+    .product-item .d-flex {
+        flex-wrap: wrap;
+    }
+
+    .product-quantity {
+        margin: 8px 0;
+    }
+}
