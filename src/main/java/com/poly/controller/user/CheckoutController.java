@@ -1,11 +1,13 @@
 package com.poly.controller.user;
 
 import com.poly.dto.CheckoutRequest;
+import com.poly.dto.MoMoPaymentResponse;
 import com.poly.entity.DiaChi;
 import com.poly.entity.HoaDon;
 import com.poly.entity.KhachHang;
 import com.poly.service.CheckoutService;
 import com.poly.service.DiaChiService;
+import com.poly.service.MoMoService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +21,6 @@ import java.util.stream.Collectors;
 
 /**
  * CheckoutController - Xử lý thanh toán
- *
- * Chức năng:
- * - Hiển thị trang thanh toán với thông tin sản phẩm
- * - Quản lý địa chỉ giao hàng
- * - Xử lý đặt hàng
- * - Hiển thị trang đặt hàng thành công
- *
- * @author Nhóm 132
  */
 @Controller
 @RequestMapping("/checkout")
@@ -36,17 +30,10 @@ public class CheckoutController {
 
     private final CheckoutService checkoutService;
     private final DiaChiService diaChiService;
+    private final MoMoService moMoService;
 
     /**
      * HIỂN THỊ TRANG THANH TOÁN
-     *
-     * URL: GET /checkout?items=1,2,3
-     *
-     * Luồng xử lý:
-     * 1. Kiểm tra đăng nhập
-     * 2. Parse danh sách ID giỏ hàng từ query parameter
-     * 3. Chuẩn bị dữ liệu checkout (sản phẩm, địa chỉ, phí ship)
-     * 4. Trả về trang checkout
      */
     @GetMapping
     public String viewCheckout(
@@ -56,7 +43,6 @@ public class CheckoutController {
 
         log.info("=== BẮT ĐẦU XỬ LÝ CHECKOUT ===");
 
-        // Bước 1: Kiểm tra đăng nhập
         KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
         if (khachHang == null) {
             log.warn("Khách hàng chưa đăng nhập, chuyển hướng đến trang login");
@@ -64,7 +50,6 @@ public class CheckoutController {
         }
 
         try {
-            // Bước 2: Parse danh sách ID giỏ hàng
             List<Integer> cartItemIds = null;
             if (items != null && !items.isEmpty()) {
                 cartItemIds = Arrays.stream(items.split(","))
@@ -75,20 +60,14 @@ public class CheckoutController {
                 log.info("Số sản phẩm được chọn: {}", cartItemIds.size());
             }
 
-            // Bước 3: Chuẩn bị dữ liệu checkout
             var checkoutData = checkoutService.prepareCheckout(khachHang, cartItemIds);
-
-            // Lấy danh sách địa chỉ của khách hàng
             List<DiaChi> addresses = diaChiService.getAddressesByCustomer(khachHang.getKhachHangId());
 
-
-            // Tìm địa chỉ mặc định
             DiaChi defaultAddress = addresses.stream()
                     .filter(DiaChi::getMacDinh)
                     .findFirst()
                     .orElse(addresses.isEmpty() ? null : addresses.get(0));
 
-            // Đưa dữ liệu vào model
             model.addAttribute("checkoutItems", checkoutData.getItems());
             model.addAttribute("subtotal", checkoutData.getSubtotal());
             model.addAttribute("shippingFee", checkoutData.getShippingFee());
@@ -100,8 +79,6 @@ public class CheckoutController {
             model.addAttribute("khachHangId", khachHang.getKhachHangId());
 
             log.info("Checkout page loaded successfully");
-            log.info("Tổng tiền: {}", checkoutData.getFinalAmount());
-
             return "user/checkout";
 
         } catch (Exception e) {
@@ -112,18 +89,7 @@ public class CheckoutController {
     }
 
     /**
-     * XỬ LÝ ĐẶT HÀNG
-     *
-     * URL: POST /checkout/process
-     *
-     * Luồng xử lý:
-     * 1. Validate thông tin đặt hàng
-     * 2. Kiểm tra tồn kho
-     * 3. Tạo đơn hàng (HoaDon)
-     * 4. Tạo chi tiết đơn hàng (HoaDonChiTiet)
-     * 5. Cập nhật tồn kho
-     * 6. Xóa sản phẩm khỏi giỏ hàng
-     * 7. Chuyển hướng đến trang thành công
+     * XỬ LÝ ĐẶT HÀNG (CÓ HỖ TRỢ MOMO)
      */
     @PostMapping("/process")
     public String processCheckout(
@@ -133,7 +99,6 @@ public class CheckoutController {
 
         log.info("=== BẮT ĐẦU XỬ LÝ ĐẶT HÀNG ===");
 
-        // Kiểm tra đăng nhập
         KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
         if (khachHang == null) {
             log.warn("Khách hàng chưa đăng nhập");
@@ -152,7 +117,33 @@ public class CheckoutController {
             log.info("Mã đơn hàng: {}", hoaDon.getMaHoaDon());
             log.info("Tổng tiền: {}", hoaDon.getTongThanhToan());
 
-            // Chuyển hướng đến trang thành công
+            // **KIỂM TRA PHƯƠNG THỨC THANH TOÁN**
+            if ("MOMO".equalsIgnoreCase(request.getPaymentMethod())) {
+                log.info("=== CHUYỂN HƯỚNG ĐẾN THANH TOÁN MOMO ===");
+
+                String orderInfo = "Thanh toán đơn hàng " + hoaDon.getMaHoaDon();
+                long amount = hoaDon.getTongThanhToan().longValue();
+
+                MoMoPaymentResponse momoResponse = moMoService.createPayment(
+                        hoaDon.getMaHoaDon(),
+                        amount,
+                        orderInfo
+                );
+
+                if (momoResponse.getResultCode() == 0) {
+                    session.setAttribute("pendingOrderId", hoaDon.getHoaDonId());
+                    session.setAttribute("pendingOrderCode", hoaDon.getMaHoaDon());
+
+                    log.info("✅ Chuyển hướng đến MoMo: {}", momoResponse.getPayUrl());
+                    return "redirect:" + momoResponse.getPayUrl();
+                } else {
+                    log.error("❌ Lỗi tạo thanh toán MoMo: {}", momoResponse.getMessage());
+                    model.addAttribute("error", "Không thể tạo thanh toán MoMo: " + momoResponse.getMessage());
+                    return "user/checkout";
+                }
+            }
+
+            // Nếu COD hoặc phương thức khác
             return "redirect:/checkout/success?orderId=" + hoaDon.getHoaDonId();
 
         } catch (IllegalArgumentException e) {
@@ -168,9 +159,79 @@ public class CheckoutController {
     }
 
     /**
+     * XỬ LÝ CALLBACK TỪ MOMO
+     */
+    @GetMapping("/momo/callback")
+    public String momoCallback(
+            @RequestParam(required = false) String partnerCode,
+            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) String requestId,
+            @RequestParam(required = false) Integer resultCode,
+            @RequestParam(required = false) String message,
+            @RequestParam(required = false) Long amount,
+            @RequestParam(required = false) String orderInfo,
+            @RequestParam(required = false) String responseTime,
+            @RequestParam(required = false) String extraData,
+            @RequestParam(required = false) String signature,
+            HttpSession session,
+            Model model) {
+
+        log.info("=== MOMO CALLBACK ===");
+        log.info("Result Code: {}", resultCode);
+        log.info("Order ID: {}", orderId);
+        log.info("Message: {}", message);
+        log.info("Amount: {}", amount);
+
+        try {
+            Integer hoaDonId = (Integer) session.getAttribute("pendingOrderId");
+
+            if (hoaDonId == null) {
+                log.error("❌ Không tìm thấy order ID trong session");
+                model.addAttribute("error", "Không tìm thấy thông tin đơn hàng");
+                return "user/payment-error";
+            }
+
+            if (resultCode != null && resultCode == 0) {
+                log.info("✅ Thanh toán MoMo thành công!");
+
+                checkoutService.updatePaymentStatus(hoaDonId, "PAID");
+
+                session.removeAttribute("pendingOrderId");
+                session.removeAttribute("pendingOrderCode");
+
+                return "redirect:/checkout/success?orderId=" + hoaDonId;
+
+            } else {
+                log.error("❌ Thanh toán MoMo thất bại: {}", message);
+
+                checkoutService.updatePaymentStatus(hoaDonId, "FAILED");
+
+                model.addAttribute("error", "Thanh toán thất bại: " + message);
+                model.addAttribute("orderId", orderId);
+
+                return "user/payment-error";
+            }
+
+        } catch (Exception e) {
+            log.error("❌ Lỗi khi xử lý callback MoMo", e);
+            model.addAttribute("error", "Có lỗi xảy ra khi xử lý thanh toán");
+            return "user/payment-error";
+        }
+    }
+
+    /**
+     * XỬ LÝ IPN TỪ MOMO
+     */
+    @PostMapping("/momo/ipn")
+    @ResponseBody
+    public String momoIPN(@RequestBody String requestBody) {
+        log.info("=== MOMO IPN ===");
+        log.info("Request Body: {}", requestBody);
+        return "{\"status\": \"success\"}";
+    }
+
+    /**
      * HIỂN THỊ TRANG ĐẶT HÀNG THÀNH CÔNG
-     *
-     * URL: GET /checkout/success?orderId=123
      */
     @GetMapping("/success")
     public String orderSuccess(
@@ -180,19 +241,15 @@ public class CheckoutController {
 
         log.info("=== HIỂN THỊ TRANG ĐẶT HÀNG THÀNH CÔNG ===");
 
-        // Kiểm tra đăng nhập
         KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
         if (khachHang == null) {
             return "redirect:/login";
         }
 
         try {
-            // Lấy thông tin đơn hàng
             HoaDon hoaDon = checkoutService.getOrderById(orderId, khachHang);
-
             model.addAttribute("order", hoaDon);
             log.info("Hiển thị đơn hàng: {}", hoaDon.getMaHoaDon());
-
             return "user/order-success";
 
         } catch (Exception e) {

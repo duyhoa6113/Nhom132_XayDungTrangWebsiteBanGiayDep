@@ -7,12 +7,14 @@ import com.poly.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CheckoutService {
 
     private final GioHangRepository gioHangRepository;
@@ -206,6 +208,22 @@ public class CheckoutService {
         }
 
         return hoaDon;
+    }
+
+    /**
+     * Cập nhật trạng thái thanh toán
+     */
+    @Transactional
+    public void updatePaymentStatus(Integer hoaDonId, String status) {
+        log.info("=== CẬP NHẬT TRẠNG THÁI THANH TOÁN ===");
+
+        HoaDon hoaDon = hoaDonRepository.findById(hoaDonId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+
+        hoaDon.setTrangThaiThanhToan(status);
+        hoaDonRepository.save(hoaDon);
+
+        log.info("✅ Cập nhật trạng thái thanh toán: {} - {}", hoaDonId, status);
     }
 
 }

@@ -25,10 +25,9 @@ public class AdminController {
         return "admin/products/index";
     }
 
-    @GetMapping("/categories")
+    @GetMapping("/admin/categories")
     public String categories(Model model) {
-        model.addAttribute("page", "categories");
-        return "admin/categories/index";
+        return "/admin/categories/index";
     }
 
     @GetMapping("/orders")

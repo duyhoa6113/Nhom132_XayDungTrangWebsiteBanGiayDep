@@ -61,6 +61,10 @@ public class HoaDon {
     @Column(name = "TrangThai", length = 50, nullable = false)
     private String trangThai;
 
+    // ✅ THÊM TRƯỜNG MỚI NÀY
+    @Column(name = "TrangThaiThanhToan", length = 50)
+    private String trangThaiThanhToan; // UNPAID, PAID, FAILED
+
     @Column(name = "TongTien", precision = 18, scale = 2, nullable = false)
     private BigDecimal tongTien;
 
@@ -91,6 +95,10 @@ public class HoaDon {
         updatedAt = LocalDateTime.now();
         if (trangThai == null) {
             trangThai = "ChoXuLy";
+        }
+        // ✅ THÊM DÒNG NÀY
+        if (trangThaiThanhToan == null) {
+            trangThaiThanhToan = "UNPAID"; // Mặc định chưa thanh toán
         }
         if (giamGia == null) {
             giamGia = BigDecimal.ZERO;

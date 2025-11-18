@@ -426,6 +426,10 @@ DECLARE @ThuongHieuBitis INT = (SELECT ThuongHieuId FROM dbo.ThuongHieu WHERE Te
 DECLARE @ChatLieuDaTongHop INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Da tổng hợp');
 DECLARE @ChatLieuVaiLuoi INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Vải lưới');
 DECLARE @ChatLieuVaiCanvas INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Vải canvas');
+DECLARE @ChatLieuDa INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Da thật');
+DECLARE @ChatLieuCanvas INT = (SELECT ChatLieuId FROM dbo.ChatLieu WHERE Ten = N'Vải canvas');
+
+
 
 INSERT INTO dbo.SanPham (DanhMucId, ThuongHieuId, ChatLieuId, Ten, MoTa, TrangThai) VALUES
 -- Nike
@@ -476,7 +480,6 @@ INSERT INTO dbo.SanPham (DanhMucId, ThuongHieuId, ChatLieuId, Ten, MoTa, TrangTh
 GO
 
 GO
-
 -- ==================== CHI TIẾT SẢN PHẨM ====================
 PRINT N'Đang thêm Chi Tiết Sản Phẩm (Variants)...';
 
@@ -493,6 +496,10 @@ DECLARE @VansOSId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Old
 DECLARE @ConverseCTId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Chuck Taylor All Star%');
 DECLARE @NewBalance990Id INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%990v6%');
 DECLARE @BitisStreetId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Biti''s Hunter Street%');
+DECLARE @VansAuthenticId INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Vans Authentic%');
+DECLARE @ConverseChuck70Id INT = (SELECT SanPhamId FROM dbo.SanPham WHERE Ten LIKE N'%Chuck 70%');
+
+
 
 -- Lấy ID màu sắc
 DECLARE @MauDen INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Đen');
@@ -502,8 +509,12 @@ DECLARE @MauXanhDuong INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xanh 
 DECLARE @MauDo INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Đỏ');
 DECLARE @MauXanhLa INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Xanh Lá');
 DECLARE @MauCam INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Cam');
+DECLARE @MauVang INT = (SELECT MauSacId FROM dbo.MauSac WHERE Ten = N'Vàng');
+
 
 -- Lấy ID kích thước
+DECLARE @Size38 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = '38');
+DECLARE @Size39 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'39');
 DECLARE @Size40 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'40');
 DECLARE @Size41 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'41');
 DECLARE @Size42 INT = (SELECT KichThuocId FROM dbo.KichThuoc WHERE Ten = N'42');
@@ -640,10 +651,77 @@ BEGIN
     (@BitisStreetId, @MauTrang, @Size40, N'BITIS-ST-WHT-40', N'8015000003', 850000, 1000000, 90, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
     (@BitisStreetId, @MauDo, @Size40, N'BITIS-ST-RED-40', N'8015000004', 850000, 1000000, 85, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1);
 END
+
+IF @VansAuthenticId IS NOT NULL
+BEGIN
+    PRINT N'Đang thêm Vans Authentic...';
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    -- Đen
+    (@VansAuthenticId, @MauDen, @Size38, N'VANS-ATH-BLK-38', N'9001', 1200, 1500, 60, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1),
+    (@VansAuthenticId, @MauDen, @Size39, N'VANS-ATH-BLK-39', N'9002', 1200000, 1500000, 55, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1),
+    (@VansAuthenticId, @MauDen, @Size40, N'VANS-ATH-BLK-40', N'9003', 1200000, 1500000, 50, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1),
+    (@VansAuthenticId, @MauDen, @Size41, N'VANS-ATH-BLK-41', N'9004', 1200000, 1500000, 45, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1),
+    (@VansAuthenticId, @MauDen, @Size42, N'VANS-ATH-BLK-42', N'9005', 1200000, 1500000, 40, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1),
+    (@VansAuthenticId, @MauDen, @Size43, N'VANS-ATH-BLK-43', N'9006', 1200000, 1500000, 30, N'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600', 1),
+    -- Trắng
+    (@VansAuthenticId, @MauTrang, @Size38, N'VANS-ATH-WHT-38', N'9011', 1200000, 1500000, 65, N'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600', 1),
+    (@VansAuthenticId, @MauTrang, @Size39, N'VANS-ATH-WHT-39', N'9012', 1200000, 1500000, 60, N'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600', 1),
+    (@VansAuthenticId, @MauTrang, @Size40, N'VANS-ATH-WHT-40', N'9013', 1200000, 1500000, 55, N'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600', 1),
+    (@VansAuthenticId, @MauTrang, @Size41, N'VANS-ATH-WHT-41', N'9014', 1200000, 1500000, 50, N'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600', 1),
+    (@VansAuthenticId, @MauTrang, @Size42, N'VANS-ATH-WHT-42', N'9015', 1200000, 1500000, 45, N'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600', 1),
+    (@VansAuthenticId, @MauTrang, @Size43, N'VANS-ATH-WHT-43', N'9016', 1200000, 1500000, 35, N'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600', 1),
+    -- Đỏ
+    (@VansAuthenticId, @MauDo, @Size39, N'VANS-ATH-RED-39', N'9021', 1200000, 1500000, 40, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@VansAuthenticId, @MauDo, @Size40, N'VANS-ATH-RED-40', N'9022', 1200000, 1500000, 35, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@VansAuthenticId, @MauDo, @Size41, N'VANS-ATH-RED-41', N'9023', 1200000, 1500000, 30, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    (@VansAuthenticId, @MauDo, @Size42, N'VANS-ATH-RED-42', N'9024', 1200000, 1500000, 25, N'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', 1),
+    -- Xanh
+    (@VansAuthenticId, @MauXanh, @Size39, N'VANS-ATH-BLU-39', N'9031', 1200000, 1500000, 35, N'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600', 1),
+    (@VansAuthenticId, @MauXanh, @Size40, N'VANS-ATH-BLU-40', N'9032', 1200000, 1500000, 30, N'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600', 1),
+    (@VansAuthenticId, @MauXanh, @Size41, N'VANS-ATH-BLU-41', N'9033', 1200000, 1500000, 28, N'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600', 1),
+    (@VansAuthenticId, @MauXanh, @Size42, N'VANS-ATH-BLU-42', N'9034', 1200000, 1500000, 25, N'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600', 1);
+    PRINT N'✅ Đã thêm ' + CAST(@@ROWCOUNT AS NVARCHAR) + N' variants cho Vans Authentic';
+END
+
+-- ===== CONVERSE CHUCK 70 =====
+IF @ConverseChuck70Id IS NOT NULL
+BEGIN
+    PRINT N'Đang thêm Converse Chuck 70...';
+    INSERT INTO dbo.SanPhamChiTiet (SanPhamId, MauSacId, KichThuocId, SKU, Barcode, GiaBan, GiaGoc, SoLuongTon, HinhAnh, TrangThai) VALUES
+    -- Đen
+    (@ConverseChuck70Id, @MauDen, @Size38, N'CONV-70-BLK-38', N'9101', 2100000, 2500000, 50, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@ConverseChuck70Id, @MauDen, @Size39, N'CONV-70-BLK-39', N'9102', 2100000, 2500000, 48, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@ConverseChuck70Id, @MauDen, @Size40, N'CONV-70-BLK-40', N'9103', 2100000, 2500000, 45, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@ConverseChuck70Id, @MauDen, @Size41, N'CONV-70-BLK-41', N'9104', 2100000, 2500000, 42, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@ConverseChuck70Id, @MauDen, @Size42, N'CONV-70-BLK-42', N'9105', 2100000, 2500000, 40, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@ConverseChuck70Id, @MauDen, @Size43, N'CONV-70-BLK-43', N'9106', 2100000, 2500000, 35, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    (@ConverseChuck70Id, @MauDen, @Size44, N'CONV-70-BLK-44', N'9107', 2100000, 2500000, 30, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1),
+    -- Trắng
+    (@ConverseChuck70Id, @MauTrang, @Size38, N'CONV-70-WHT-38', N'9111', 2100, 2500, 55, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@ConverseChuck70Id, @MauTrang, @Size39, N'CONV-70-WHT-39', N'9112', 2100000, 2500000, 52, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@ConverseChuck70Id, @MauTrang, @Size40, N'CONV-70-WHT-40', N'9113', 2100000, 2500000, 50, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@ConverseChuck70Id, @MauTrang, @Size41, N'CONV-70-WHT-41', N'9114', 2100000, 2500000, 48, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@ConverseChuck70Id, @MauTrang, @Size42, N'CONV-70-WHT-42', N'9115', 2100000, 2500000, 45, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@ConverseChuck70Id, @MauTrang, @Size43, N'CONV-70-WHT-43', N'9116', 2100000, 2500000, 40, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    (@ConverseChuck70Id, @MauTrang, @Size44, N'CONV-70-WHT-44', N'9117', 2100000, 2500000, 35, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
+    -- Vàng
+    (@ConverseChuck70Id, @MauVang, @Size39, N'CONV-70-YLW-39', N'9121', 2100000, 2500000, 38, N'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600', 1),
+    (@ConverseChuck70Id, @MauVang, @Size40, N'CONV-70-YLW-40', N'9122', 2100000, 2500000, 35, N'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600', 1),
+    (@ConverseChuck70Id, @MauVang, @Size41, N'CONV-70-YLW-41', N'9123', 2100000, 2500000, 32, N'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600', 1),
+    (@ConverseChuck70Id, @MauVang, @Size42, N'CONV-70-YLW-42', N'9124', 2100000, 2500000, 30, N'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600', 1),
+    (@ConverseChuck70Id, @MauVang, @Size43, N'CONV-70-YLW-43', N'9125', 2100000, 2500000, 28, N'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600', 1),
+    -- Xanh
+    (@ConverseChuck70Id, @MauXanh, @Size39, N'CONV-70-NVY-39', N'9131', 2100000, 2500000, 40, N'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600', 1),
+    (@ConverseChuck70Id, @MauXanh, @Size40, N'CONV-70-NVY-40', N'9132', 2100000, 2500000, 38, N'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600', 1),
+    (@ConverseChuck70Id, @MauXanh, @Size41, N'CONV-70-NVY-41', N'9133', 2100000, 2500000, 35, N'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600', 1),
+    (@ConverseChuck70Id, @MauXanh, @Size42, N'CONV-70-NVY-42', N'9134', 2100000, 2500000, 32, N'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600', 1),
+    (@ConverseChuck70Id, @MauXanh, @Size43, N'CONV-70-NVY-43', N'9135', 2100000, 2500000, 30, N'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600', 1);
+    PRINT N'✅ Đã thêm ' + CAST(@@ROWCOUNT AS NVARCHAR) + N' variants cho Converse Chuck 70';
+END
 GO
 
-GO
 
+GO
 -- ==================== KHÁCH HÀNG ====================
 PRINT N'Đang thêm Khách Hàng...';
 
@@ -750,3 +828,16 @@ GO
 
 ALTER TABLE SanPham
 ADD soLuongDaBan INT DEFAULT 0;
+-- Thêm cột TrangThaiThanhToan vào bảng HoaDon
+ALTER TABLE HoaDon 
+ADD TrangThaiThanhToan NVARCHAR(50) NULL;
+
+-- Cập nhật giá trị mặc định cho các đơn hàng cũ
+UPDATE HoaDon 
+SET TrangThaiThanhToan = 
+    CASE 
+        WHEN PhuongThucThanhToan = 'COD' THEN 'UNPAID'
+        ELSE 'UNPAID'
+    END
+WHERE TrangThaiThanhToan IS NULL;
+

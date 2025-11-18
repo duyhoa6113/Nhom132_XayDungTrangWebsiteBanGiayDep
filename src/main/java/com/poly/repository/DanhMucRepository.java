@@ -40,7 +40,24 @@ public interface DanhMucRepository extends JpaRepository<DanhMuc, Integer> {
     Optional<DanhMuc> findByDanhMucIdAndTrangThai(Integer danhMucId, int trangThai);
 
     /**
-     * ✅ THÊM MỚI: Lấy tất cả danh mục kèm số lượng sản phẩm
+     * Kiểm tra tên danh mục đã tồn tại chưa
+     * @param ten - Tên danh mục cần kiểm tra
+     * @return true nếu tồn tại, false nếu chưa
+     */
+    boolean existsByTen(String ten);
+
+    /**
+     * Kiểm tra tên danh mục đã tồn tại (trừ ID hiện tại)
+     * @param ten - Tên danh mục cần kiểm tra
+     * @param danhMucId - ID danh mục hiện tại (để loại trừ khi update)
+     * @return true nếu tồn tại, false nếu chưa
+     */
+    @Query("SELECT CASE WHEN COUNT(dm) > 0 THEN true ELSE false END " +
+            "FROM DanhMuc dm WHERE dm.ten = :ten AND dm.danhMucId != :id")
+    boolean existsByTenAndNotId(@Param("ten") String ten, @Param("id") Integer danhMucId);
+
+    /**
+     * Lấy tất cả danh mục kèm số lượng sản phẩm
      * Dùng cho sidebar và trang category
      */
     @Query("""
@@ -57,14 +74,14 @@ public interface DanhMucRepository extends JpaRepository<DanhMuc, Integer> {
     List<CategoryWithCount> findAllCategoriesWithProductCount();
 
     /**
-     * ✅ THÊM MỚI: Tìm danh mục theo ID và trạng thái (cho category page)
+     * Tìm danh mục theo ID và trạng thái (cho category page)
      * Alternative method với query rõ ràng hơn
      */
     @Query("SELECT dm FROM DanhMuc dm WHERE dm.danhMucId = :id AND dm.trangThai = 1")
     DanhMuc findByIdAndActive(@Param("id") Integer id);
 
     /**
-     * ✅ THÊM MỚI: Đếm số sản phẩm trong danh mục
+     * Đếm số sản phẩm trong danh mục
      */
     @Query("SELECT COUNT(sp) FROM SanPham sp " +
             "WHERE sp.danhMuc.danhMucId = :danhMucId " +
@@ -72,7 +89,7 @@ public interface DanhMucRepository extends JpaRepository<DanhMuc, Integer> {
     long countProductsInCategory(@Param("danhMucId") Integer danhMucId);
 
     /**
-     * ✅ THÊM MỚI: Lấy danh mục có sản phẩm (không lấy danh mục rỗng)
+     * Lấy danh mục có sản phẩm (không lấy danh mục rỗng)
      */
     @Query("SELECT DISTINCT dm FROM DanhMuc dm " +
             "INNER JOIN SanPham sp ON dm.danhMucId = sp.danhMuc.danhMucId " +
@@ -82,10 +99,49 @@ public interface DanhMucRepository extends JpaRepository<DanhMuc, Integer> {
     List<DanhMuc> findCategoriesWithProducts();
 
     /**
-     * ✅ THÊM MỚI: Tìm danh mục theo tên (cho search)
+     * Tìm danh mục theo tên (cho search)
      */
     @Query("SELECT dm FROM DanhMuc dm " +
             "WHERE LOWER(dm.ten) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "AND dm.trangThai = 1")
     List<DanhMuc> searchCategories(@Param("keyword") String keyword);
+
+    /**
+     * Lấy top danh mục theo số lượng sản phẩm
+     * @param limit - Số lượng danh mục cần lấy
+     */
+    @Query(value = """
+        SELECT TOP(:limit) dm.* 
+        FROM DanhMuc dm
+        LEFT JOIN SanPham sp ON dm.DanhMucId = sp.DanhMucId AND sp.TrangThai = 1
+        WHERE dm.TrangThai = 1
+        GROUP BY dm.DanhMucId, dm.Ten, dm.MoTa, dm.TrangThai, dm.CreatedAt
+        ORDER BY COUNT(sp.SanPhamId) DESC
+        """, nativeQuery = true)
+    List<DanhMuc> findTopCategoriesByProductCount(@Param("limit") int limit);
+
+    /**
+     * Đếm tổng số danh mục theo trạng thái
+     */
+    long countByTrangThai(int trangThai);
+
+    /**
+     * Lấy danh sách danh mục với thông tin chi tiết (native query)
+     */
+    @Query(value = """
+        SELECT 
+            dm.DanhMucId,
+            dm.Ten,
+            dm.MoTa,
+            dm.TrangThai,
+            dm.CreatedAt,
+            COUNT(DISTINCT sp.SanPhamId) as SoLuongSanPham,
+            ISNULL(SUM(sp.SoLuongDaBan), 0) as TongSanPhamDaBan
+        FROM DanhMuc dm
+        LEFT JOIN SanPham sp ON dm.DanhMucId = sp.DanhMucId AND sp.TrangThai = 1
+        WHERE dm.TrangThai = :trangThai
+        GROUP BY dm.DanhMucId, dm.Ten, dm.MoTa, dm.TrangThai, dm.CreatedAt
+        ORDER BY dm.Ten ASC
+        """, nativeQuery = true)
+    List<Object[]> findCategoriesWithDetails(@Param("trangThai") int trangThai);
 }
