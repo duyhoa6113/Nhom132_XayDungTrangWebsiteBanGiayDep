@@ -329,13 +329,13 @@ CREATE INDEX IX_ThongBao_KhachHang ON dbo.ThongBao(KhachHangId);
 CREATE INDEX IX_ThongBao_NhanVien ON dbo.ThongBao(NhanVienId);
 CREATE INDEX IX_ThongBao_DaDoc ON dbo.ThongBao(DaDoc);
 
+
 -- ==================== VAI TRÒ ====================
 PRINT N'Đang thêm Vai Trò...';
 
 INSERT INTO dbo.VaiTro (VaiTroId, TenVaiTro, MoTa) VALUES
 (1, N'Admin', N'Quản trị viên hệ thống'),
-(2, N'NhanVien', N'Nhân viên bán hàng'),
-(3, N'QuanLy', N'Quản lý cửa hàng');
+(2, N'NhanVien', N'Nhân viên bán hàng');
 GO
 
 -- ==================== DANH MỤC ====================

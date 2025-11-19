@@ -20,7 +20,7 @@ import java.util.Map;
  * @author Nhóm 132
  */
 @Controller
-@RequestMapping("/admin/categories")  // ✅ PHẢI LÀ /admin/categories
+@RequestMapping("/admin/categories")
 public class CategoriesManagerController {
 
     @Autowired

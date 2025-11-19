@@ -2,6 +2,8 @@ package com.poly.repository;
 
 import com.poly.entity.KhachHang;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -62,7 +64,7 @@ public interface KhachHangRepository extends JpaRepository<KhachHang, Integer> {
      * @param trangThai Trạng thái (1 = active)
      * @return List khách hàng
      */
-    List<KhachHang> findByTrangThai(Byte trangThai);
+    List<KhachHang> findByTrangThai(Integer trangThai);
 
     /**
      * Đếm số khách hàng đang hoạt động
@@ -79,4 +81,11 @@ public interface KhachHangRepository extends JpaRepository<KhachHang, Integer> {
      * @return Optional chứa khách hàng
      */
     Optional<KhachHang> findByResetToken(String resetToken);
+
+    @Query("SELECT k FROM KhachHang k WHERE " +
+            "LOWER(k.hoTen) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(k.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(k.sdt) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<KhachHang> searchByKeyword(@Param("keyword") String keyword);
+
 }

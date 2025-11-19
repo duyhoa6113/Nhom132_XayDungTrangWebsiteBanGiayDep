@@ -68,7 +68,7 @@ public class LoginService {
                 .sdt(sdt)
                 .matKhauHash(matKhauHash)
                 .createdAt(LocalDateTime.now())
-                .trangThai((byte) 1) // 1 = active, 0 = inactive
+                .trangThai(1)
                 .build();
 
         // Lưu vào database

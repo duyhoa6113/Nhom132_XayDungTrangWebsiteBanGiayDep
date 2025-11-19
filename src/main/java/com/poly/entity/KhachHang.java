@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "KhachHang")
@@ -51,33 +50,13 @@ public class KhachHang {
     private LocalDateTime resetTokenExpiry;
 
     @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai;
+    private Integer trangThai = 1;
 
     @Column(name = "CreatedAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<DiaChi> diaChis = new java.util.ArrayList<>();
-
-    @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<HoaDon> hoaDons = new java.util.ArrayList<>();
-
-    @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<GioHang> gioHangs = new java.util.ArrayList<>();
-
-    @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<DanhGia> danhGias = new java.util.ArrayList<>();
-
-    @OneToMany(mappedBy = "khachHang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<ThongBao> thongBaos = new java.util.ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
@@ -92,30 +71,5 @@ public class KhachHang {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    // Các transient methods giữ nguyên...
-    @Transient
-    public String getNgaySinhFormatted() {
-        if (ngaySinh != null) {
-            java.time.format.DateTimeFormatter formatter =
-                    java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            return ngaySinh.format(formatter);
-        }
-        return "";
-    }
-
-    @Transient
-    public String getAvatarOrDefault() {
-        if (avatar != null && !avatar.isEmpty()) {
-            return avatar;
-        }
-        return "/images/default-avatar.png";
-    }
-
-    @Transient
-    public boolean isResetTokenValid() {
-        return resetToken != null && resetTokenExpiry != null &&
-                LocalDateTime.now().isBefore(resetTokenExpiry);
     }
 }

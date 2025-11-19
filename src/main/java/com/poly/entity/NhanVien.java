@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "NhanVien")
@@ -21,7 +20,7 @@ public class NhanVien {
     @Column(name = "NhanVienId")
     private Integer nhanVienId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "VaiTroId", nullable = false)
     private VaiTro vaiTro;
 
@@ -53,7 +52,7 @@ public class NhanVien {
     private String avatar;
 
     @Column(name = "TrangThai", nullable = false)
-    private Byte trangThai;
+    private Integer trangThai = 1;
 
     @Column(name = "CreatedAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -63,12 +62,6 @@ public class NhanVien {
 
     @Column(name = "LanDangNhapCuoi")
     private LocalDateTime lanDangNhapCuoi;
-
-    @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<HoaDon> hoaDons;
-
-    @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LichSuTrangThai> lichSuTrangThais;
 
     @PrePersist
     protected void onCreate() {
@@ -83,10 +76,5 @@ public class NhanVien {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    @Transient
-    public String getTenVaiTro() {
-        return vaiTro != null ? vaiTro.getTenVaiTro() : "";
     }
 }

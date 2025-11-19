@@ -42,9 +42,4 @@ public class AdminController {
         return "admin/account/index";
     }
 
-    @GetMapping("/role")
-    public String role(Model model) {
-        model.addAttribute("page", "role");
-        return "admin/role/index";
-    }
 }
