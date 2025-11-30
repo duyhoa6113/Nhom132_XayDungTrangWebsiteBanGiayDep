@@ -1,11 +1,17 @@
 package com.poly.controller.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poly.entity.*;
-import com.poly.repository.SanPhamChiTietRepository;
-import com.poly.repository.SanPhamRepository;
-import com.poly.service.CartService;
-import jakarta.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -13,9 +19,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poly.entity.KhachHang;
+import com.poly.entity.KichThuoc;
+import com.poly.entity.MauSac;
+import com.poly.entity.SanPham;
+import com.poly.entity.SanPhamChiTiet;
+import com.poly.repository.SanPhamChiTietRepository;
+import com.poly.repository.SanPhamRepository;
+import com.poly.service.CartService;
+
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Controller cho trang chi tiết sản phẩm
@@ -53,17 +67,60 @@ public class ProductDetailController {
         KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
 
         // ============================================
-        // LẤY VARIANTS
+        // LẤY VARIANTS - Fetch từ repository để tránh lazy loading
         // ============================================
 
-        // Lọc variant active
-        List<SanPhamChiTiet> activeVariants = sanPham.getVariants().stream()
-                .filter(v -> v.isActive())
+        // Fetch variants từ repository (tránh lazy loading issue)
+        List<SanPhamChiTiet> allVariants;
+        try {
+            allVariants = sanPhamChiTietRepository.findBySanPham(sanPham);
+            if (allVariants == null) {
+                allVariants = Collections.emptyList();
+            }
+            // Set variants vào entity để các @Transient methods hoạt động đúng
+            sanPham.setVariants(allVariants);
+        } catch (Exception e) {
+            allVariants = Collections.emptyList();
+            sanPham.setVariants(Collections.emptyList());
+        }
+        
+        // Lọc variant active (trangThai là int, không cần check null)
+        List<SanPhamChiTiet> activeVariants = allVariants.stream()
+                .filter(v -> v.getTrangThai() == 1)
                 .sorted(Comparator.comparing(SanPhamChiTiet::getSoLuongTon).reversed())
                 .collect(Collectors.toList());
 
+        // ✅ QUAN TRỌNG: Luôn set product vào model trước khi return
+        model.addAttribute("product", sanPham);
+        
+        // Set cart count
+        try {
+            if (khachHang != null) {
+                Integer cartCount = cartService.getCartCount(khachHang);
+                model.addAttribute("cartCount", cartCount != null ? cartCount : 0);
+            } else {
+                model.addAttribute("cartCount", 0);
+            }
+        } catch (Exception e) {
+            model.addAttribute("cartCount", 0);
+        }
+
         if (activeVariants.isEmpty()) {
-            model.addAttribute("error", "Sản phẩm hiện không có phiên bản nào");
+            model.addAttribute("error", "Sản phẩm hiện không có phiên bản nào. Vui lòng thêm variant cho sản phẩm.");
+            model.addAttribute("hasVariants", false);
+            model.addAttribute("pageTitle", sanPham.getTen() + " - NiceSport");
+            model.addAttribute("uniqueColors", Collections.emptySet());
+            model.addAttribute("uniqueSizes", Collections.emptySet());
+            model.addAttribute("activeVariants", Collections.emptyList());
+            model.addAttribute("imagesByColor", Collections.emptyMap());
+            model.addAttribute("variantsData", Collections.emptyList());
+            model.addAttribute("relatedProducts", Collections.emptyList());
+            model.addAttribute("minPrice", BigDecimal.ZERO);
+            model.addAttribute("maxPrice", BigDecimal.ZERO);
+            model.addAttribute("totalStock", 0);
+            model.addAttribute("hasStock", false);
+            model.addAttribute("imagesByColorJson", "{}");
+            model.addAttribute("variantsDataJson", "[]");
             return "user/product-detail";
         }
 

@@ -1,15 +1,16 @@
 package com.poly.repository;
 
-import com.poly.entity.SanPhamChiTiet;
-import com.poly.entity.SanPham;
-import com.poly.entity.MauSac;
-import com.poly.entity.KichThuoc;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.poly.entity.KichThuoc;
+import com.poly.entity.MauSac;
+import com.poly.entity.SanPham;
+import com.poly.entity.SanPhamChiTiet;
 
 @Repository
 public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, Integer> {
@@ -32,4 +33,10 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     @Query("SELECT DISTINCT v.kichThuoc FROM SanPhamChiTiet v " +
             "WHERE v.sanPham = :sanPham AND v.mauSac = :mauSac AND v.trangThai = 1")
     List<KichThuoc> findDistinctSizesBySanPhamAndMauSac(SanPham sanPham, MauSac mauSac);
+
+    /**
+     * Tìm variant theo SKU
+     */
+    @Query("SELECT v FROM SanPhamChiTiet v WHERE v.sku = :sku")
+    Optional<SanPhamChiTiet> findBySku(String sku);
 }

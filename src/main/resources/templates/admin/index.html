@@ -120,12 +120,13 @@
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
                                                 <div class="label">Tổng doanh thu (tháng)</div>
-                                                <div class="value">₫125,430,000</div>
-                                                <div class="text-muted small mt-1">So với tháng trước:
-                                                    <strong>+12.4%</strong></div>
+                                                <div class="value" id="totalRevenue">₫0</div>
+                                                <div class="text-muted small mt-1" id="revenueComparison">
+                                                    <span>Đang tải...</span>
+                                                </div>
                                             </div>
                                             <div class="text-end">
-                                                <div class="badge bg-success rounded-pill">Tốt</div>
+                                                <div class="badge bg-success rounded-pill" id="revenueBadge">Tốt</div>
                                             </div>
                                         </div>
                                     </div>
@@ -136,7 +137,7 @@
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
                                                 <div class="label">Tổng đơn hàng</div>
-                                                <div class="value">1,234</div>
+                                                <div class="value" id="totalOrders">0</div>
                                                 <div class="text-muted small mt-1">Đơn hàng trong tháng</div>
                                             </div>
                                             <div class="text-end">
@@ -151,7 +152,7 @@
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
                                                 <div class="label">Tổng sản phẩm</div>
-                                                <div class="value">542</div>
+                                                <div class="value" id="totalProducts">0</div>
                                                 <div class="text-muted small mt-1">Sản phẩm đang bán</div>
                                             </div>
                                             <div class="text-end">
@@ -171,7 +172,7 @@
                                                 <h6 class="mb-0">Biểu đồ doanh thu (12 tháng gần nhất)</h6>
                                                 <div class="small text-muted">Doanh thu theo tháng (₫)</div>
                                             </div>
-                                            <div class="small text-muted">Tổng: <strong>₫125,430,000</strong></div>
+                                            <div class="small text-muted">Tổng: <strong id="chartTotal">₫0</strong></div>
                                         </div>
                                         <canvas id="revenueChart" height="180"></canvas>
                                     </div>
@@ -197,56 +198,12 @@
                                                         <th class="text-end">Đã bán</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="topProductsBody">
                                                     <tr>
-                                                        <td><span class="rank-badge">1</span></td>
-                                                        <td>Giày Nike Air Zoom Pegasus 38</td>
-                                                        <td class="text-end">512</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">2</span></td>
-                                                        <td>Adidas Ultraboost 21</td>
-                                                        <td class="text-end">461</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">3</span></td>
-                                                        <td>Puma Velocity Nitro</td>
-                                                        <td class="text-end">389</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">4</span></td>
-                                                        <td>New Balance 1080v11</td>
-                                                        <td class="text-end">342</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">5</span></td>
-                                                        <td>Asics Gel-Kayano 28</td>
-                                                        <td class="text-end">320</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">6</span></td>
-                                                        <td>Nike React Infinity Run</td>
-                                                        <td class="text-end">312</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">7</span></td>
-                                                        <td>Adidas SolarBoost</td>
-                                                        <td class="text-end">295</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">8</span></td>
-                                                        <td>Puma Speed 600</td>
-                                                        <td class="text-end">240</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">9</span></td>
-                                                        <td>Reebok Floatride</td>
-                                                        <td class="text-end">188</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span class="rank-badge">10</span></td>
-                                                        <td>Skechers GOrun MaxRoad</td>
-                                                        <td class="text-end">150</td>
+                                                        <td colspan="3" class="text-center text-muted py-3">
+                                                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                                            Đang tải...
+                                                        </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -280,42 +237,12 @@
                                                         <th>Trạng thái</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="recentOrdersBody">
                                                     <tr>
-                                                        <td>#ORD-10234</td>
-                                                        <td>Nguyễn Văn A</td>
-                                                        <td>₫1,250,000</td>
-                                                        <td>2025-11-10</td>
-                                                        <td><span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                                        <td colspan="5" class="text-center text-muted py-3">
+                                                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                                            Đang tải...
                                                         </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>#ORD-10233</td>
-                                                        <td>Trần Thị B</td>
-                                                        <td>₫899,000</td>
-                                                        <td>2025-11-09</td>
-                                                        <td><span class="badge bg-success">Hoàn tất</span></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>#ORD-10232</td>
-                                                        <td>Phạm C</td>
-                                                        <td>₫2,350,000</td>
-                                                        <td>2025-11-09</td>
-                                                        <td><span class="badge bg-danger">Hủy</span></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>#ORD-10231</td>
-                                                        <td>Ngô D</td>
-                                                        <td>₫499,000</td>
-                                                        <td>2025-11-08</td>
-                                                        <td><span class="badge bg-primary">Đang vận chuyển</span></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>#ORD-10230</td>
-                                                        <td>Võ E</td>
-                                                        <td>₫1,120,000</td>
-                                                        <td>2025-11-07</td>
-                                                        <td><span class="badge bg-success">Hoàn tất</span></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -350,11 +277,102 @@
             index: `/admin/${m}/index.html`
         });
 
-        function initDashboard() {
-            // Hard-coded monthly revenue data (₫)
-            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const data = [8500000, 9200000, 12500000, 9800000, 14300000, 13200000, 15200000, 16200000, 14100000, 17200000, 12300000, 10500000];
+        // Format số tiền VNĐ
+        function formatVND(amount) {
+            if (amount == null) return '₫0';
+            return '₫' + Number(amount).toLocaleString('vi-VN');
+        }
 
+        // Format số
+        function formatNumber(num) {
+            if (num == null) return '0';
+            return Number(num).toLocaleString('vi-VN');
+        }
+
+        // Format ngày tháng
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        // Tính phần trăm thay đổi
+        function calculatePercentageChange(current, previous) {
+            if (previous == null || previous == 0) return 0;
+            return ((current - previous) / previous * 100).toFixed(1);
+        }
+
+        // Lấy badge trạng thái
+        function getStatusBadge(status) {
+            const statusMap = {
+                'ChoXuLy': '<span class="badge bg-warning text-dark">Chờ xử lý</span>',
+                'DangXuLy': '<span class="badge bg-info">Đang xử lý</span>',
+                'DangVanChuyen': '<span class="badge bg-primary">Đang vận chuyển</span>',
+                'HoanThanh': '<span class="badge bg-success">Hoàn tất</span>',
+                'Huy': '<span class="badge bg-danger">Hủy</span>',
+                'DaHuy': '<span class="badge bg-danger">Đã hủy</span>'
+            };
+            return statusMap[status] || '<span class="badge bg-secondary">' + status + '</span>';
+        }
+
+        // Tải dữ liệu dashboard từ API
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/admin/api/dashboard/stats');
+                if (!response.ok) throw new Error('Failed to fetch dashboard data');
+                
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showError('Không thể tải dữ liệu dashboard. Vui lòng thử lại sau.');
+            }
+        }
+
+        // Cập nhật dashboard với dữ liệu từ API
+        function updateDashboard(stats) {
+            // Cập nhật tổng doanh thu
+            const totalRevenue = stats.totalRevenue || 0;
+            document.getElementById('totalRevenue').textContent = formatVND(totalRevenue);
+            
+            // Cập nhật so sánh với tháng trước
+            const prevRevenue = stats.previousMonthRevenue || 0;
+            const percentage = calculatePercentageChange(Number(totalRevenue), Number(prevRevenue));
+            const comparisonEl = document.getElementById('revenueComparison');
+            const badgeEl = document.getElementById('revenueBadge');
+            
+            if (percentage > 0) {
+                comparisonEl.innerHTML = `So với tháng trước: <strong class="text-success">+${percentage}%</strong>`;
+                badgeEl.className = 'badge bg-success rounded-pill';
+                badgeEl.textContent = 'Tốt';
+            } else if (percentage < 0) {
+                comparisonEl.innerHTML = `So với tháng trước: <strong class="text-danger">${percentage}%</strong>`;
+                badgeEl.className = 'badge bg-warning rounded-pill';
+                badgeEl.textContent = 'Giảm';
+            } else {
+                comparisonEl.innerHTML = 'So với tháng trước: <strong>Không đổi</strong>';
+                badgeEl.className = 'badge bg-secondary rounded-pill';
+                badgeEl.textContent = 'Ổn định';
+            }
+
+            // Cập nhật tổng đơn hàng
+            document.getElementById('totalOrders').textContent = formatNumber(stats.totalOrders || 0);
+
+            // Cập nhật tổng sản phẩm
+            document.getElementById('totalProducts').textContent = formatNumber(stats.totalProducts || 0);
+
+            // Cập nhật biểu đồ
+            initRevenueChart(stats.revenueChart || []);
+
+            // Cập nhật top products
+            updateTopProducts(stats.topProducts || []);
+
+            // Cập nhật recent orders
+            updateRecentOrders(stats.recentOrders || []);
+        }
+
+        // Khởi tạo biểu đồ doanh thu
+        function initRevenueChart(chartData) {
             const ctx = document.getElementById('revenueChart');
             if (!ctx) return;
 
@@ -362,6 +380,13 @@
             if (ctx._chartInstance) {
                 ctx._chartInstance.destroy();
             }
+
+            const labels = chartData.map(item => item.month || '');
+            const data = chartData.map(item => Number(item.revenue || 0));
+            
+            // Tính tổng doanh thu cho biểu đồ
+            const chartTotal = data.reduce((sum, val) => sum + val, 0);
+            document.getElementById('chartTotal').textContent = formatVND(chartTotal);
 
             ctx._chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -374,7 +399,6 @@
                         tension: 0.3,
                         fill: true,
                         backgroundColor: (ctx) => {
-                            // gradient
                             const gradient = ctx.createLinearGradient(0, 0, 0, 200);
                             gradient.addColorStop(0, 'rgba(37,99,235,0.18)');
                             gradient.addColorStop(1, 'rgba(37,99,235,0.02)');
@@ -407,13 +431,83 @@
                         y: {
                             grid: { color: 'rgba(0,0,0,0.05)' },
                             ticks: {
-                                callback: function (value) { return '₫' + value / 1000000 + 'M'; },
+                                callback: function (value) { 
+                                    if (value >= 1000000) {
+                                        return '₫' + (value / 1000000).toFixed(1) + 'M';
+                                    }
+                                    return '₫' + value / 1000 + 'K';
+                                },
                                 color: '#6b7280'
                             }
                         }
                     }
                 }
             });
+        }
+
+        // Cập nhật bảng top products
+        function updateTopProducts(products) {
+            const tbody = document.getElementById('topProductsBody');
+            if (!tbody) return;
+
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">Chưa có dữ liệu</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = products.map(product => {
+                if (!product.sanPhamId) {
+                    return `<tr>
+                        <td><span class="rank-badge">${product.rank}</span></td>
+                        <td class="text-muted">N/A</td>
+                        <td class="text-end text-muted">0</td>
+                    </tr>`;
+                }
+                return `<tr>
+                    <td><span class="rank-badge">${product.rank}</span></td>
+                    <td>${product.ten || 'N/A'}</td>
+                    <td class="text-end">${formatNumber(product.soLuongBan || 0)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Cập nhật bảng recent orders
+        function updateRecentOrders(orders) {
+            const tbody = document.getElementById('recentOrdersBody');
+            if (!tbody) return;
+
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Chưa có đơn hàng nào</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => {
+                return `<tr>
+                    <td>#${order.maHoaDon || 'N/A'}</td>
+                    <td>${order.hoTenKhachHang || 'N/A'}</td>
+                    <td>${formatVND(order.tongThanhToan || 0)}</td>
+                    <td>${formatDate(order.createdAt)}</td>
+                    <td>${getStatusBadge(order.trangThai || '')}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Hiển thị lỗi
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+            errorDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            const contentCard = document.querySelector('.content-card');
+            if (contentCard) {
+                contentCard.insertBefore(errorDiv, contentCard.firstChild);
+            }
+        }
+
+        function initDashboard() {
+            loadDashboardData();
         }
 
         async function renderModule() {
@@ -426,7 +520,9 @@
 
                 // initialize chart and any dashboard-specific JS
                 // Defer slightly to ensure canvas in DOM
-                setTimeout(() => initDashboard(), 50);
+                setTimeout(() => {
+                    initDashboard();
+                }, 100);
                 return;
             }
 

@@ -1,9 +1,16 @@
 package com.poly.controller.admin;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.poly.dto.DashboardStatsDTO;
+import com.poly.service.DashboardService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Router cơ bản cho các trang admin. Mỗi method set attribute "page" để sidebar
@@ -11,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
+
+    private final DashboardService dashboardService;
 
     @GetMapping({"", "/", "/index", "/dashboard"})
     public String index(Model model) {
@@ -19,11 +29,16 @@ public class AdminController {
         return "admin/index";
     }
 
-    @GetMapping("/products")
-    public String products(Model model) {
-        model.addAttribute("page", "products");
-        return "admin/products/index";
+    /**
+     * API endpoint để lấy dữ liệu dashboard (JSON)
+     */
+    @GetMapping("/api/dashboard/stats")
+    @ResponseBody
+    public ResponseEntity<DashboardStatsDTO> getDashboardStats() {
+        DashboardStatsDTO stats = dashboardService.getDashboardStats();
+        return ResponseEntity.ok(stats);
     }
+
 
     @GetMapping("/admin/categories")
     public String categories(Model model) {
