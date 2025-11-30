@@ -1,15 +1,8 @@
 package com.poly.controller.user;
 
-import com.poly.entity.DanhMuc;
-import com.poly.entity.KhachHang;
-import com.poly.entity.SanPham;
-import com.poly.entity.ThuongHieu;
-import com.poly.repository.DanhMucRepository;
-import com.poly.repository.SanPhamRepository;
-import com.poly.repository.ThuongHieuRepository;
-import com.poly.service.CartService;
-import com.poly.service.SanPhamService;
-import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,8 +12,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.poly.entity.DanhMuc;
+import com.poly.entity.KhachHang;
+import com.poly.entity.SanPham;
+import com.poly.entity.ThuongHieu;
+import com.poly.repository.DanhMucRepository;
+import com.poly.repository.SanPhamRepository;
+import com.poly.repository.ThuongHieuRepository;
+import com.poly.service.CartService;
+import com.poly.service.SanPhamService;
+
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Controller xử lý trang chủ
@@ -45,7 +47,7 @@ public class IndexController {
     @Autowired
     private CartService cartService;
 
-    @GetMapping({"/Index"})
+    @GetMapping({"/","/Index"})
     public String index(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
