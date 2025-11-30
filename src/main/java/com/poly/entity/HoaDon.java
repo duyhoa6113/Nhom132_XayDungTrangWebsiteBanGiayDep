@@ -62,7 +62,9 @@ public class HoaDon {
     private String trangThai;
 
     // ✅ THÊM TRƯỜNG MỚI NÀY
-    @Column(name = "TrangThaiThanhToan", length = 50)
+    // Lưu ý: Cần chạy script SQL để thêm cột này vào database (xem file add_trangthai_thanhtoan.sql)
+    // Nếu cột chưa có trong database, sẽ báo lỗi. Hãy chạy script SQL trước.
+    @Column(name = "TrangThaiThanhToan", length = 50, nullable = true)
     private String trangThaiThanhToan; // UNPAID, PAID, FAILED
 
     @Column(name = "TongTien", precision = 18, scale = 2, nullable = false)

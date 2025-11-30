@@ -21,14 +21,16 @@ public class RoleController {
 
     /**
      * Hiển thị danh sách vai trò
+     * NOTE: Route này đã bị vô hiệu hóa vì /admin/role hiện đang được sử dụng cho quản lý tài khoản
+     * Nếu cần quản lý vai trò, có thể đổi route thành /admin/roles
      */
-    @GetMapping
-    public String index(Model model) {
-        List<VaiTroDTO> roles = vaiTroService.getAllVaiTro();
-        model.addAttribute("roles", roles);
-        model.addAttribute("title", "Quản Lý Vai Trò");
-        return "admin/role/index";
-    }
+    // @GetMapping
+    // public String index(Model model) {
+    //     List<VaiTroDTO> roles = vaiTroService.getAllVaiTro();
+    //     model.addAttribute("roles", roles);
+    //     model.addAttribute("title", "Quản Lý Vai Trò");
+    //     return "admin/role/index";
+    // }
 
     /**
      * Hiển thị form thêm vai trò mới

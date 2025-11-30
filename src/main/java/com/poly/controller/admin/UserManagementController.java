@@ -23,7 +23,16 @@ public class UserManagementController {
      */
     @GetMapping
     public String index(Model model) {
+        model.addAttribute("page", "role");
         model.addAttribute("title", "Quản Lý Người Dùng & Vai Trò");
+        
+        // Lấy thống kê
+        Map<String, Long> stats = userManagementService.getStatistics();
+        model.addAttribute("totalUsers", stats.getOrDefault("totalUsers", 0L));
+        model.addAttribute("totalAdmins", stats.getOrDefault("totalAdmins", 0L));
+        model.addAttribute("totalEmployees", stats.getOrDefault("totalEmployees", 0L));
+        model.addAttribute("totalCustomers", stats.getOrDefault("totalCustomers", 0L));
+        
         return "admin/role/index";
     }
 
@@ -88,6 +97,22 @@ public class UserManagementController {
     public ResponseEntity<Map<String, Long>> getStatistics() {
         Map<String, Long> stats = userManagementService.getStatistics();
         return ResponseEntity.ok(stats);
+    }
+
+    /**
+     * API: Lấy người dùng theo ID và role
+     */
+    @GetMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getUserById(
+            @PathVariable Integer id,
+            @RequestParam String role) {
+        try {
+            UserDTO user = userManagementService.getUserById(id, role);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**

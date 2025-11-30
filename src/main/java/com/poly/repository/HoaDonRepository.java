@@ -67,6 +67,16 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Integer> {
     List<HoaDon> findByTrangThaiOrderByCreatedAtDesc(String trangThai);
 
     /**
+     * Tìm đơn hàng theo trạng thái (có phân trang) - cho admin
+     */
+    Page<HoaDon> findByTrangThai(String trangThai, Pageable pageable);
+
+    /**
+     * Đếm số đơn hàng theo trạng thái - cho admin
+     */
+    Long countByTrangThai(String trangThai);
+
+    /**
      * Tìm tất cả đơn hàng (có phân trang) - cho admin
      */
     Page<HoaDon> findAll(Pageable pageable);

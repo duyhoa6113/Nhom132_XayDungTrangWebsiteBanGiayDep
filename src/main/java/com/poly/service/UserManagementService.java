@@ -285,6 +285,21 @@ public class UserManagementService {
     }
 
     /**
+     * Lấy người dùng theo ID và role
+     */
+    public UserDTO getUserById(Integer id, String role) {
+        if ("customer".equals(role)) {
+            KhachHang kh = khachHangRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng với ID: " + id));
+            return convertKhachHangToDTO(kh);
+        } else {
+            NhanVien nv = nhanVienRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + id));
+            return convertNhanVienToDTO(nv);
+        }
+    }
+
+    /**
      * Xóa người dùng
      */
     @Transactional
