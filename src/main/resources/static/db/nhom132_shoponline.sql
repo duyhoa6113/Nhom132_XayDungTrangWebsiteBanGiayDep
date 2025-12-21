@@ -764,11 +764,11 @@ PRINT N'Đang thêm Khách Hàng...';
 
 -- Password mẫu: 123456 (đã hash với BCrypt)
 INSERT INTO dbo.KhachHang (HoTen, Email, Sdt, MatKhauHash, NgaySinh, GioiTinh, TrangThai) VALUES
-(N'Nguyễn Văn An', N'nguyenvanan@gmail.com', N'0901234567', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1990-01-15', N'Nam', 1),
-(N'Trần Thị Bình', N'tranthibinh@gmail.com', N'0902345678', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1992-05-20', N'Nữ', 1),
-(N'Lê Văn Cường', N'levancuong@gmail.com', N'0903456789', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1988-08-10', N'Nam', 1),
-(N'Phạm Thị Dung', N'phamthidung@gmail.com', N'0904567890', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1995-12-25', N'Nữ', 1),
-(N'Hoàng Văn Em', N'hoangvanem@gmail.com', N'0905678901', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1998-07-08', N'Nam', 1);
+(N'Nguyễn Văn An', N'nguyenvanan@gmail.com', N'0901234567', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', '1990-01-15', N'Nam', 1),
+(N'Trần Thị Bình', N'tranthibinh@gmail.com', N'0902345678', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', '1992-05-20', N'Nữ', 1),
+(N'Lê Văn Cường', N'levancuong@gmail.com', N'0903456789', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', '1988-08-10', N'Nam', 1),
+(N'Phạm Thị Dung', N'phamthidung@gmail.com', N'0904567890', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', '1995-12-25', N'Nữ', 1),
+(N'Hoàng Văn Em', N'hoangvanem@gmail.com', N'0905678901', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', '1998-07-08', N'Nam', 1);
 GO
 
 GO
@@ -778,9 +778,9 @@ PRINT N'Đang thêm Nhân Viên...';
 
 -- Password mẫu: admin123 (đã hash)
 INSERT INTO dbo.NhanVien (VaiTroId, HoTen, Email, MatKhauHash, Sdt, ChucVu, TrangThai) VALUES
-(1, N'Admin System', N'admin@gmail.com', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', N'0909999999', N'Quản trị viên', 1),
-(2, N'Đào Duy Hòa', N'duyhoa6113@gmail.com', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', N'0905555555', N'Nhân viên bán hàng', 1),
-(3, N'Nguyễn Văn A', N'nguyenvana@gmail.com', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', N'0906666666', N'Quản lý kho', 1);
+(1, N'Admin System', N'admin@gmail.com', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', N'0909999999', N'Quản trị viên', 1),
+(2, N'Amin 2', N'admin2@gmail.com', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', N'0905555555', N'Nhân viên bán hàng', 1),
+(3, N'Nguyễn Văn A', N'nguyenvana@gmail.com', N'$2a$12$KI9NT.AlzAzTGLNVtyRfyuQiYH7TRnPtASEqcDYL7MHv4Ou6odvSO', N'0906666666', N'Quản lý kho', 1);
 GO
 
 GO
