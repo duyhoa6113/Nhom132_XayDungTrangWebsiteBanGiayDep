@@ -72,6 +72,18 @@
             border: 1px solid rgba(0, 0, 0, 0.04);
         }
 
+        /* Chart container với max height */
+        .chart-card canvas {
+            max-height: 300px !important;
+            height: 300px !important;
+        }
+
+        /* Container cho chart */
+        #revenueChart {
+            max-height: 300px !important;
+            height: 300px !important;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 767px) {
             .stat-card {
@@ -95,8 +107,8 @@
             <div class="content-header">
                 <div class="title" id="pageTitle">Dashboard</div>
                 <div class="d-flex gap-2">
-                    <a th:href="@{/Index}" class="btn btn-outline-dark btn-sm"><i
-                            class="fa-solid fa-house me-2"></i>Trang chính</a>
+                    <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm"><i
+                            class="fa-solid fa-sign-out-alt me-2"></i>Đăng xuất</a>
                 </div>
             </div>
 
@@ -174,7 +186,9 @@
                                             </div>
                                             <div class="small text-muted">Tổng: <strong id="chartTotal">₫0</strong></div>
                                         </div>
-                                        <canvas id="revenueChart" height="180"></canvas>
+                                        <div style="position: relative; height: 300px; max-height: 300px;">
+                                            <canvas id="revenueChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -269,7 +283,7 @@
 
         const pageTitle = document.getElementById('pageTitle');
         const tabContainer = document.getElementById('tabContainer');
-        const tabHint = document.getElementById('tabHint');
+        const tabHint = document.getElementById('tabHint'); // May be null if commented out
 
         const partials = (m) => ({
             list: `/admin/${m}/_list.html`,
@@ -319,13 +333,19 @@
         async function loadDashboardData() {
             try {
                 const response = await fetch('/admin/api/dashboard/stats');
-                if (!response.ok) throw new Error('Failed to fetch dashboard data');
-                
                 const data = await response.json();
+                
+                if (!response.ok) {
+                    console.error('API Error:', data);
+                    showError('Không thể tải dữ liệu dashboard: ' + (data.message || 'Lỗi không xác định'));
+                    return;
+                }
+                
+                console.log('Dashboard data loaded:', data);
                 updateDashboard(data);
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
-                showError('Không thể tải dữ liệu dashboard. Vui lòng thử lại sau.');
+                showError('Không thể tải dữ liệu dashboard. Vui lòng thử lại sau. Chi tiết: ' + error.message);
             }
         }
 
@@ -373,12 +393,12 @@
 
         // Khởi tạo biểu đồ doanh thu
         function initRevenueChart(chartData) {
-            const ctx = document.getElementById('revenueChart');
-            if (!ctx) return;
+            const canvas = document.getElementById('revenueChart');
+            if (!canvas) return;
 
             // Destroy previous instance if exists
-            if (ctx._chartInstance) {
-                ctx._chartInstance.destroy();
+            if (canvas._chartInstance) {
+                canvas._chartInstance.destroy();
             }
 
             const labels = chartData.map(item => item.month || '');
@@ -386,9 +406,21 @@
             
             // Tính tổng doanh thu cho biểu đồ
             const chartTotal = data.reduce((sum, val) => sum + val, 0);
-            document.getElementById('chartTotal').textContent = formatVND(chartTotal);
+            const chartTotalEl = document.getElementById('chartTotal');
+            if (chartTotalEl) {
+                chartTotalEl.textContent = formatVND(chartTotal);
+            }
 
-            ctx._chartInstance = new Chart(ctx, {
+            // Lấy canvas context
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            // Tạo gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(37,99,235,0.18)');
+            gradient.addColorStop(1, 'rgba(37,99,235,0.02)');
+
+            canvas._chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -398,12 +430,7 @@
                         borderWidth: 2,
                         tension: 0.3,
                         fill: true,
-                        backgroundColor: (ctx) => {
-                            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                            gradient.addColorStop(0, 'rgba(37,99,235,0.18)');
-                            gradient.addColorStop(1, 'rgba(37,99,235,0.02)');
-                            return gradient;
-                        },
+                        backgroundColor: gradient,
                         borderColor: '#2563eb',
                         pointRadius: 3,
                         pointBackgroundColor: '#fff',
@@ -411,7 +438,9 @@
                     }]
                 },
                 options: {
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2.5,
+                    responsive: true,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -511,12 +540,19 @@
         }
 
         async function renderModule() {
-            tabHint.textContent = '';
-            pageTitle.textContent = titleOf(state.module);
+            if (!tabContainer) {
+                console.error('tabContainer not found');
+                return;
+            }
+            if (tabHint) tabHint.textContent = '';
+            if (pageTitle) pageTitle.textContent = titleOf(state.module);
 
             if (state.module === 'dashboard') {
                 // set dashboard markup (we keep the template from initial DOM)
-                tabContainer.innerHTML = document.getElementById('pane-dashboard').outerHTML;
+                const paneDashboard = document.getElementById('pane-dashboard');
+                if (paneDashboard) {
+                    tabContainer.innerHTML = paneDashboard.outerHTML;
+                }
 
                 // initialize chart and any dashboard-specific JS
                 // Defer slightly to ensure canvas in DOM
@@ -571,26 +607,32 @@
         });
 
         // Toolbar: đổi tab
-        document.getElementById('tabToolbar').addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-tab]');
-            if (!btn) return;
-            state.tab = btn.getAttribute('data-tab');
-            const listPane = document.getElementById('pane-list');
-            const formPane = document.getElementById('pane-form');
-            if (listPane && formPane) {
-                listPane.classList.toggle('hidden', state.tab !== 'list');
-                formPane.classList.toggle('hidden', state.tab !== 'form');
-            }
-            document.querySelectorAll('#tabToolbar [data-tab]').forEach(b => {
-                if (b.getAttribute('data-tab') === state.tab) b.classList.replace('btn-outline-secondary', 'btn-primary');
-                else b.classList.replace('btn-primary', 'btn-outline-secondary');
+        const tabToolbar = document.getElementById('tabToolbar');
+        if (tabToolbar) {
+            tabToolbar.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-tab]');
+                if (!btn) return;
+                state.tab = btn.getAttribute('data-tab');
+                const listPane = document.getElementById('pane-list');
+                const formPane = document.getElementById('pane-form');
+                if (listPane && formPane) {
+                    listPane.classList.toggle('hidden', state.tab !== 'list');
+                    formPane.classList.toggle('hidden', state.tab !== 'form');
+                }
+                document.querySelectorAll('#tabToolbar [data-tab]').forEach(b => {
+                    if (b.getAttribute('data-tab') === state.tab) b.classList.replace('btn-outline-secondary', 'btn-primary');
+                    else b.classList.replace('btn-primary', 'btn-outline-secondary');
+                });
             });
-        });
+        }
 
         window.addEventListener('admin:edit', (e) => {
             state.tab = 'form';
             state.payload = e.detail;
-            document.querySelector('#tabToolbar [data-tab="form"]').click();
+            const formTabBtn = document.querySelector('#tabToolbar [data-tab="form"]');
+            if (formTabBtn) {
+                formTabBtn.click();
+            }
             const isFormReady = !!document.getElementById('pane-form');
             if (isFormReady) {
                 window.dispatchEvent(new CustomEvent('admin:form:load', { detail: state.payload }));

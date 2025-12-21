@@ -1,7 +1,8 @@
 package com.poly.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.poly.dto.LoginDTO;
 import com.poly.dto.RegisterDTO;
 import com.poly.entity.KhachHang;
+import com.poly.entity.NhanVien;
 import com.poly.repository.KhachHangRepository;
+import com.poly.repository.NhanVienRepository;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ import java.util.Optional;
 public class LoginService {
 
     private final KhachHangRepository khachHangRepository;
+    private final NhanVienRepository nhanVienRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
     // ============================================
@@ -115,6 +119,46 @@ public class LoginService {
         // Đăng nhập thành công
         log.info("Đăng nhập thành công: {} - ID: {}", email, khachHang.getKhachHangId());
         return Optional.of(khachHang);
+    }
+
+    /**
+     * Đăng nhập cho nhân viên (admin/employee)
+     *
+     * @param loginDTO Thông tin đăng nhập
+     * @return Optional<NhanVien> nếu đăng nhập thành công
+     */
+    public Optional<NhanVien> loginNhanVien(LoginDTO loginDTO) {
+        String email = loginDTO.getEmail().toLowerCase().trim();
+        log.info("Đang xử lý đăng nhập nhân viên cho: {}", email);
+
+        // Tìm nhân viên theo email
+        Optional<NhanVien> nhanVienOpt = nhanVienRepository.findByEmail(email);
+
+        // Kiểm tra email có tồn tại không
+        if (nhanVienOpt.isEmpty()) {
+            log.warn("Đăng nhập thất bại: Email không tồn tại - {}", email);
+            return Optional.empty();
+        }
+
+        NhanVien nhanVien = nhanVienOpt.get();
+
+        // Kiểm tra trạng thái (chỉ cho phép đăng nhập nếu trạng thái = 1)
+        if (nhanVien.getTrangThai() == null || nhanVien.getTrangThai() != 1) {
+            log.warn("Đăng nhập thất bại: Tài khoản bị khóa - {}", email);
+            return Optional.empty();
+        }
+
+        // Kiểm tra mật khẩu
+        if (!passwordEncoder.matches(loginDTO.getMatKhau(), nhanVien.getMatKhauHash())) {
+            log.warn("Đăng nhập thất bại: Sai mật khẩu - {}", email);
+            return Optional.empty();
+        }
+
+        // Đăng nhập thành công
+        log.info("Đăng nhập nhân viên thành công: {} - ID: {} - VaiTro: {}", 
+                email, nhanVien.getNhanVienId(), 
+                nhanVien.getVaiTro() != null ? nhanVien.getVaiTro().getVaiTroId() : "null");
+        return Optional.of(nhanVien);
     }
 
     // ============================================

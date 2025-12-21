@@ -27,9 +27,15 @@
         .stat-card.dangGiao { border-left: 4px solid #007bff; }
         .stat-card.hoanThanh { border-left: 4px solid #28a745; }
         .stat-card.daHuy { border-left: 4px solid #dc3545; }
-        .filter-bar { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .filter-bar > div { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-bar select, .filter-bar input { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+        .status-tabs-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .status-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        .status-tab { padding: 12px 24px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; transition: all 0.3s; text-decoration: none; color: #333; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+        .status-tab:hover { background: #f8f9fa; border-color: #ff6b35; }
+        .status-tab.active { background: #ff6b35; color: white; border-color: #ff6b35; }
+        .status-tab i { font-size: 16px; }
+        .page-size-control { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 15px; }
+        .page-size-control label { font-size: 14px; color: #666; }
+        .page-size-control select { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
         .table-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
         thead { background: #f8f9fa; }
@@ -78,7 +84,9 @@
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .form-row { grid-template-columns: 1fr; }
-            .filter-bar { flex-direction: column; align-items: stretch; }
+            .status-tabs { flex-direction: column; }
+            .status-tab { width: 100%; justify-content: center; }
+            .page-size-control { justify-content: center; }
         }
     </style>
     <link th:href="@{/css/index.css}" rel="stylesheet">
@@ -123,21 +131,36 @@
             </div>
         </div>
 
-        <div class="filter-bar">
-            <div>
-                <label>Lọc theo trạng thái:</label>
-                <select id="filterStatus" onchange="loadOrders()" class="form-control" style="width: auto; min-width: 180px;">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="ChoXuLy">Chờ xử lý</option>
-                    <option value="DaXacNhan">Đã xác nhận</option>
-                    <option value="DangChuanBi">Đang chuẩn bị</option>
-                    <option value="DangGiao">Đang giao</option>
-                    <option value="DaGiao">Đã giao</option>
-                    <option value="HoanThanh">Hoàn thành</option>
-                    <option value="DaHuy">Đã hủy</option>
-                </select>
+        <!-- Status Tabs -->
+        <div class="status-tabs-container">
+            <div class="status-tabs">
+                <a th:href="@{/admin/orders(page=0, size=${size})}"
+                   th:class="${selectedTrangThai == null or selectedTrangThai == '' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-list"></i>
+                    <span>Tất cả</span>
+                </a>
+                <a th:href="@{/admin/orders(trangThai='ChoXuLy', page=0, size=${size})}"
+                   th:class="${selectedTrangThai == 'ChoXuLy' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-clock"></i>
+                    <span>Chờ xử lý</span>
+                </a>
+                <a th:href="@{/admin/orders(trangThai='DangGiao', page=0, size=${size})}"
+                   th:class="${selectedTrangThai == 'DangGiao' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-truck"></i>
+                    <span>Đang giao</span>
+                </a>
+                <a th:href="@{/admin/orders(trangThai='HoanThanh', page=0, size=${size})}"
+                   th:class="${selectedTrangThai == 'HoanThanh' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Hoàn thành</span>
+                </a>
+                <a th:href="@{/admin/orders(trangThai='DaHuy', page=0, size=${size})}"
+                   th:class="${selectedTrangThai == 'DaHuy' ? 'status-tab active' : 'status-tab'}">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Đã hủy</span>
+                </a>
             </div>
-            <div>
+            <div class="page-size-control">
                 <label>Số lượng mỗi trang:</label>
                 <select id="pageSize" onchange="changePageSize()" class="form-control" style="width: auto;">
                     <option value="5" th:selected="${size == 5}">5</option>
@@ -171,21 +194,15 @@
                     <td><strong th:text="${#numbers.formatDecimal(order.tongThanhToan, 0, 'COMMA', 0, 'POINT') + '₫'}">1,000,000₫</strong></td>
                     <td>
                         <span th:class="${'badge badge-' + order.trangThai?.toLowerCase()}" 
-                              th:text="${order.trangThai == 'ChoXuLy' ? 'Chờ xử lý' :
-                                       (order.trangThai == 'DaXacNhan' ? 'Đã xác nhận' :
-                                       (order.trangThai == 'DangChuanBi' ? 'Đang chuẩn bị' :
-                                       (order.trangThai == 'DangGiao' ? 'Đang giao' :
-                                       (order.trangThai == 'DaGiao' ? 'Đã giao' :
-                                       (order.trangThai == 'HoanThanh' ? 'Hoàn thành' :
-                                       (order.trangThai == 'DaHuy' ? 'Đã hủy' : order.trangThai)))))})">
+                              th:text="${order.trangThaiText}">
                         </span>
                     </td>
                     <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">30/11/2025 10:30</td>
                     <td>
-                        <button class="btn-action btn-view" th:onclick="'viewOrder(' + ${order.id} + ')'" title="Xem chi tiết">
+                        <button class="btn-action btn-view" th:data-order-id="${order.id}" onclick="viewOrder(this.getAttribute('data-order-id'))" title="Xem chi tiết">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-action btn-status" th:onclick="'changeStatus(' + ${order.id} + ', \'' + ${order.trangThai} + '\')'" title="Thay đổi trạng thái">
+                        <button class="btn-action btn-status" th:data-order-id="${order.id}" th:data-status="${order.trangThai}" onclick="changeStatus(this.getAttribute('data-order-id'), this.getAttribute('data-status'))" title="Thay đổi trạng thái">
                             <i class="fas fa-edit"></i>
                         </button>
                     </td>
@@ -291,17 +308,14 @@
         }
     }
 
-    // Load orders
-    function loadOrders() {
-        const status = document.getElementById('filterStatus')?.value || '';
-        const size = document.getElementById('pageSize')?.value || '10';
-        const url = `/admin/orders?page=0&size=${size}${status ? '&trangThai=' + status : ''}`;
-        window.location.href = url;
-    }
-
     // Change page size
     function changePageSize() {
-        loadOrders();
+        const size = document.getElementById('pageSize')?.value || '10';
+        const selectedTrangThai = /*[[${selectedTrangThai}]]*/ null;
+        const url = selectedTrangThai && selectedTrangThai !== '' 
+            ? `/admin/orders?page=0&size=${size}&trangThai=${selectedTrangThai}`
+            : `/admin/orders?page=0&size=${size}`;
+        window.location.href = url;
     }
 
     // View order detail
@@ -566,16 +580,8 @@
         if (event.target == statusModal) closeStatusModal();
     }
 
-    // Set selected filter
+    // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
-        const selectedStatus = /*[[${selectedTrangThai}]]*/ null;
-        if (selectedStatus) {
-            const filterStatus = document.getElementById('filterStatus');
-            if (filterStatus) {
-                filterStatus.value = selectedStatus;
-            }
-        }
-        
         loadStatistics();
     });
 </script>

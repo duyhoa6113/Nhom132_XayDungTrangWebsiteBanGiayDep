@@ -180,6 +180,10 @@ function selectColor(element) {
     });
     selectedSizeId = null;
     selectedVariantId = null;
+    maxStock = 0;
+    
+    // Cập nhật stock display khi reset size
+    updateStockDisplay();
 }
 
 /**
@@ -264,35 +268,7 @@ function selectSize(element) {
 // ============================================
 // VARIANT MANAGEMENT
 // ============================================
-
-/**
- * Cập nhật variant đã chọn
- */
-function updateSelectedVariant() {
-    if (!selectedColorId || !selectedSizeId) return;
-
-    const variants = window.variantsData || [];
-    const variant = variants.find(v =>
-        v.colorId === selectedColorId && v.sizeId === selectedSizeId
-    );
-
-    if (variant) {
-        selectedVariantId = variant.variantId;
-        maxStock = variant.stock;
-        currentPrice = variant.price;
-
-        const quantityInput = document.getElementById('quantity');
-        if (quantityInput) {
-            quantityInput.max = Math.min(variant.stock, 999);
-            if (parseInt(quantityInput.value) > variant.stock) {
-                quantityInput.value = variant.stock > 0 ? 1 : 0;
-            }
-        }
-    } else {
-        maxStock = 0;
-        selectedVariantId = null;
-    }
-}
+// Function updateSelectedVariant() được định nghĩa ở phần STOCK DISPLAY (dòng ~971)
 
 // ============================================
 // QUANTITY CONTROLS
@@ -312,11 +288,11 @@ function decreaseQuantity() {
 }
 
 /**
- * Tăng số lượng
+ * Tăng số lượng - sẽ được override bởi version cải tiến ở phần STOCK DISPLAY
  */
 function increaseQuantity() {
     const input = document.getElementById('quantity');
-    if (!input) return;
+    if (!input || input.disabled) return;
 
     const currentValue = parseInt(input.value) || 1;
     const max = Math.min(parseInt(input.max) || maxStock, maxStock);
@@ -329,7 +305,7 @@ function increaseQuantity() {
     if (currentValue < max) {
         input.value = currentValue + 1;
     } else {
-        showNotification('error', `Chỉ còn ${max} sản phẩm!`);
+        showNotification('error', `Chỉ còn ${max} sản phẩm trong kho!`);
     }
 }
 
@@ -846,7 +822,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Auto-select màu đầu tiên
     const firstColor = document.querySelector('.color-option');
     if (firstColor) {
-        setTimeout(() => firstColor.click(), 200);
+        setTimeout(() => {
+            firstColor.click();
+            // Sau khi chọn màu, cập nhật stock display
+            setTimeout(() => {
+                updateStockDisplay();
+            }, 100);
+        }, 200);
+    } else {
+        // Nếu không có màu nào, vẫn cập nhật stock display (sẽ hiển thị 0)
+        updateStockDisplay();
     }
 
     // Chặn nhập ký tự không phải số

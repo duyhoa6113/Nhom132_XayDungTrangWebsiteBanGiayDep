@@ -27,7 +27,7 @@
         <div class="section-wrapper">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="top-links">
-                    <a href="/seller" class="top-link">Chi tiết sản phẩm</a>
+                    <a href="/" class="top-link">Chi tiết sản phẩm</a>
                     <span class="divider">|</span>
                     <a href="/download" class="top-link">Tải ứng dụng</a>
                     <span class="divider">|</span>
@@ -78,12 +78,12 @@
                                     <span>Đơn hàng</span>
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a class="dropdown-item" href="/admin">
                                     <i class="fas fa-cog"></i>
                                     <span>Quản trị viên</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li><hr class="dropdown-divider m-0"></li>
                             <li>
                                 <a class="dropdown-item text-danger" th:href="@{/logout}">
@@ -614,12 +614,27 @@ s"></script>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-  /*   window.imagesByColor = [[${imagesByColor}]];
-    window.variantsData = [[${variantsData}]]; */
+    // Khởi tạo dữ liệu từ JSON string
+    try {
+        window.imagesByColor = /*[[${imagesByColorJson}]]*/ {};
+        window.variantsData = /*[[${variantsDataJson}]]*/ [];
+        
+        // Nếu là string, parse JSON
+        if (typeof window.imagesByColor === 'string') {
+            window.imagesByColor = JSON.parse(window.imagesByColor);
+        }
+        if (typeof window.variantsData === 'string') {
+            window.variantsData = JSON.parse(window.variantsData);
+        }
+        
+        console.log('Images by color:', window.imagesByColor);
+        console.log('Variants data:', window.variantsData);
+    } catch (e) {
+        console.error('Error parsing variants data:', e);
+        window.imagesByColor = {};
+        window.variantsData = [];
+    }
     /*]]>*/
-
-    console.log('Images by color:', window.imagesByColor);
-    console.log('Variants data:', window.variantsData);
 </script>
 
 
@@ -628,21 +643,8 @@ s"></script>
 
 <!-- Inline Script -->
 <script>
-    // Add to cart
-    function addToCart() {
-        const selectedSize = document.querySelector('.size-option.active');
-        const quantity = document.getElementById('quantity').value;
-
-        if (!selectedSize) {
-            alert('Vui lòng chọn kích thước!');
-            return;
-        }
-
-        const variantId = selectedSize.getAttribute('data-variant-id');
-
-        alert('Đã thêm ' + quantity + ' sản phẩm vào giỏ hàng!');
-        // TODO: Call API to add to cart
-    }
+    // Hàm addToCart và buyNow đã được định nghĩa trong product-detail.js
+    // Script này chỉ xử lý scroll effect cho navbar
 
     let lastScrollTop = 0;
     const navbar = document.querySelector('.navbar');

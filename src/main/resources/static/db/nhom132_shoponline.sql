@@ -1,4 +1,11 @@
-﻿-- Create database
+﻿-- Xóa rồi tạo lại db
+USE master;
+ALTER DATABASE nhom132_shoponline SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+DROP DATABASE IF EXISTS nhom132_shoponline;
+GO
+--
+
+-- Create database
 CREATE DATABASE nhom132_shoponline;
 GO
 
@@ -239,6 +246,7 @@ CREATE TABLE dbo.HoaDon
     TinhTP              NVARCHAR(150) NULL,
     PhuongThucThanhToan NVARCHAR(50) NOT NULL,
     TrangThai           NVARCHAR(50) NOT NULL DEFAULT N'ChoXuLy',
+    TrangThaiThanhToan  NVARCHAR(50) NULL DEFAULT N'UNPAID',
     TongTien            DECIMAL(18,2) NOT NULL CHECK (TongTien >= 0),
     GiamGia             DECIMAL(18,2) NOT NULL DEFAULT 0 CHECK (GiamGia >= 0),
     PhiVanChuyen        DECIMAL(18,2) NOT NULL DEFAULT 0 CHECK (PhiVanChuyen >= 0),
@@ -308,6 +316,20 @@ CREATE INDEX IX_DanhGia_SanPham ON dbo.DanhGia(SanPhamId);
 CREATE INDEX IX_DanhGia_KhachHang ON dbo.DanhGia(KhachHangId);
 CREATE INDEX IX_DanhGia_TrangThai ON dbo.DanhGia(TrangThai);
 
+-- YeuThich
+CREATE TABLE dbo.YeuThich
+(
+    YeuThichId  INT IDENTITY(1,1) PRIMARY KEY,
+    KhachHangId INT NOT NULL
+        FOREIGN KEY REFERENCES dbo.KhachHang(KhachHangId) ON DELETE CASCADE,
+    SanPhamId   INT NOT NULL
+        FOREIGN KEY REFERENCES dbo.SanPham(SanPhamId) ON DELETE CASCADE,
+    CreatedAt   DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT UQ_YeuThich_KH_SP UNIQUE (KhachHangId, SanPhamId)
+);
+CREATE INDEX IX_YeuThich_KhachHang ON dbo.YeuThich(KhachHangId);
+CREATE INDEX IX_YeuThich_SanPham ON dbo.YeuThich(SanPhamId);
+
 /* =============== NOTIFICATIONS =============== */
 
 -- ThongBao
@@ -329,13 +351,26 @@ CREATE INDEX IX_ThongBao_KhachHang ON dbo.ThongBao(KhachHangId);
 CREATE INDEX IX_ThongBao_NhanVien ON dbo.ThongBao(NhanVienId);
 CREATE INDEX IX_ThongBao_DaDoc ON dbo.ThongBao(DaDoc);
 
+-- Newsletter
+CREATE TABLE dbo.Newsletter
+(
+    NewsletterID    INT IDENTITY(1,1) PRIMARY KEY,
+    Email           NVARCHAR(255) NOT NULL UNIQUE,
+    IsActive        BIT NOT NULL DEFAULT 1,
+    SubscribedAt    DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
+    UnsubscribedAt  DATETIME2(0) NULL,
+    CreatedAt       DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME()
+);
+CREATE INDEX IX_Newsletter_Email ON dbo.Newsletter(Email);
+CREATE INDEX IX_Newsletter_IsActive ON dbo.Newsletter(IsActive);
 
 -- ==================== VAI TRÒ ====================
 PRINT N'Đang thêm Vai Trò...';
 
 INSERT INTO dbo.VaiTro (VaiTroId, TenVaiTro, MoTa) VALUES
 (1, N'Admin', N'Quản trị viên hệ thống'),
-(2, N'NhanVien', N'Nhân viên bán hàng');
+(2, N'NhanVien', N'Nhân viên bán hàng'),
+(3, N'QuanLy', N'Quản lý cửa hàng');
 GO
 
 -- ==================== DANH MỤC ====================
@@ -480,6 +515,7 @@ INSERT INTO dbo.SanPham (DanhMucId, ThuongHieuId, ChatLieuId, Ten, MoTa, TrangTh
 GO
 
 GO
+
 -- ==================== CHI TIẾT SẢN PHẨM ====================
 PRINT N'Đang thêm Chi Tiết Sản Phẩm (Variants)...';
 
@@ -651,6 +687,7 @@ BEGIN
     (@BitisStreetId, @MauTrang, @Size40, N'BITIS-ST-WHT-40', N'8015000003', 850000, 1000000, 90, N'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', 1),
     (@BitisStreetId, @MauDo, @Size40, N'BITIS-ST-RED-40', N'8015000004', 850000, 1000000, 85, N'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600', 1);
 END
+GO
 
 IF @VansAuthenticId IS NOT NULL
 BEGIN
@@ -727,11 +764,11 @@ PRINT N'Đang thêm Khách Hàng...';
 
 -- Password mẫu: 123456 (đã hash với BCrypt)
 INSERT INTO dbo.KhachHang (HoTen, Email, Sdt, MatKhauHash, NgaySinh, GioiTinh, TrangThai) VALUES
-(N'Nguyễn Văn An', N'nguyenvanan@gmail.com', N'0901234567', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1990-01-15', N'Nam', 1),
-(N'Trần Thị Bình', N'tranthibinh@gmail.com', N'0902345678', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1992-05-20', N'Nữ', 1),
-(N'Lê Văn Cường', N'levancuong@gmail.com', N'0903456789', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1988-08-10', N'Nam', 1),
-(N'Phạm Thị Dung', N'phamthidung@gmail.com', N'0904567890', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1995-12-25', N'Nữ', 1),
-(N'Hoàng Văn Em', N'hoangvanem@gmail.com', N'0905678901', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', '1998-07-08', N'Nam', 1);
+(N'Nguyễn Văn An', N'nguyenvanan@gmail.com', N'0901234567', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1990-01-15', N'Nam', 1),
+(N'Trần Thị Bình', N'tranthibinh@gmail.com', N'0902345678', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1992-05-20', N'Nữ', 1),
+(N'Lê Văn Cường', N'levancuong@gmail.com', N'0903456789', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1988-08-10', N'Nam', 1),
+(N'Phạm Thị Dung', N'phamthidung@gmail.com', N'0904567890', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1995-12-25', N'Nữ', 1),
+(N'Hoàng Văn Em', N'hoangvanem@gmail.com', N'0905678901', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', '1998-07-08', N'Nam', 1);
 GO
 
 GO
@@ -741,9 +778,9 @@ PRINT N'Đang thêm Nhân Viên...';
 
 -- Password mẫu: admin123 (đã hash)
 INSERT INTO dbo.NhanVien (VaiTroId, HoTen, Email, MatKhauHash, Sdt, ChucVu, TrangThai) VALUES
-(1, N'Admin System', N'admin@shoponline.vn', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', N'0909999999', N'Quản trị viên', 1),
-(2, N'Hoàng Văn Hùng', N'hunghoang@shoponline.vn', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', N'0905555555', N'Nhân viên bán hàng', 1),
-(3, N'Võ Thị Lan', N'lanvo@shoponline.vn', N'$2a$10$abcdefghijklmnopqrstuvwxyz123456789', N'0906666666', N'Quản lý kho', 1);
+(1, N'Admin System', N'admin@gmail.com', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', N'0909999999', N'Quản trị viên', 1),
+(2, N'Đào Duy Hòa', N'duyhoa6113@gmail.com', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', N'0905555555', N'Nhân viên bán hàng', 1),
+(3, N'Nguyễn Văn A', N'nguyenvana@gmail.com', N'$2y$10$0MFZ3GWf7JSlfFjpPQ0gke7Sq9lZ/s3yhKwCjY7z00mRAjwDnE4um', N'0906666666', N'Quản lý kho', 1);
 GO
 
 GO
@@ -795,6 +832,19 @@ INSERT INTO dbo.KhuyenMai (Ma, Ten, MoTa, Loai, GiaTri, GiamToiDa, DieuKienApDun
 (N'BLACKFRIDAY', N'Giảm 500k Black Friday', N'Giảm cố định 500k cho đơn từ 3 triệu', N'fixed', 500000, NULL, 3000000, 50, '2024-11-24', '2024-11-30', 1);
 GO
 
+GO
+
+-- ==================== NEWSLETTER ====================
+PRINT N'Đang thêm Newsletter...';
+
+INSERT INTO dbo.Newsletter (Email, IsActive) VALUES
+(N'subscriber1@gmail.com', 1),
+(N'subscriber2@gmail.com', 1),
+(N'subscriber3@gmail.com', 1);
+GO
+
+GO
+
 -- ==================== THỐNG KÊ ====================
 SELECT 'VaiTro' AS [Bảng], COUNT(*) AS [Số Lượng] FROM dbo.VaiTro
 UNION ALL
@@ -819,6 +869,8 @@ UNION ALL
 SELECT 'DiaChi', COUNT(*) FROM dbo.DiaChi
 UNION ALL
 SELECT 'KhuyenMai', COUNT(*) FROM dbo.KhuyenMai
+UNION ALL
+SELECT 'Newsletter', COUNT(*) FROM dbo.Newsletter;
 GO
 
 PRINT N'- Tài khoản khách hàng: nguyenvanan@gmail.com / 123456';
@@ -828,16 +880,3 @@ GO
 
 ALTER TABLE SanPham
 ADD soLuongDaBan INT DEFAULT 0;
--- Thêm cột TrangThaiThanhToan vào bảng HoaDon
-ALTER TABLE HoaDon 
-ADD TrangThaiThanhToan NVARCHAR(50) NULL;
-
--- Cập nhật giá trị mặc định cho các đơn hàng cũ
-UPDATE HoaDon 
-SET TrangThaiThanhToan = 
-    CASE 
-        WHEN PhuongThucThanhToan = 'COD' THEN 'UNPAID'
-        ELSE 'UNPAID'
-    END
-WHERE TrangThaiThanhToan IS NULL;
-

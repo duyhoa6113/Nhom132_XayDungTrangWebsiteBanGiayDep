@@ -70,7 +70,7 @@
     <main class="main-content">
         <div class="page-header">
             <h1>Quản lý Sản phẩm</h1>
-            <a href="/" class="btn btn-home"><i class="fas fa-home"></i> Trang chính</a>
+            <a href="/logout" class="btn btn-home" style="background: #dc3545; color: white; border-color: #dc3545;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
         </div>
 
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
@@ -160,13 +160,13 @@
                         </span>
                     </td>
                     <td>
-                        <button class="btn-action btn-edit" th:onclick="'editProduct(' + ${sp.sanPhamId} + ')'">
+                        <button class="btn-action btn-edit" th:data-product-id="${sp.sanPhamId}" onclick="editProduct(this.getAttribute('data-product-id'))">
                             <i class="fas fa-edit"></i> Sửa
                         </button>
-                        <button class="btn-action btn-variant-action" th:onclick="'manageVariants(' + ${sp.sanPhamId} + ')'">
+                        <button class="btn-action btn-variant-action" th:data-product-id="${sp.sanPhamId}" onclick="manageVariants(this.getAttribute('data-product-id'))">
                             <i class="fas fa-layer-group"></i> Biến thể
                         </button>
-                        <button class="btn-action btn-delete" th:onclick="'deleteProduct(' + ${sp.sanPhamId} + ')'">
+                        <button class="btn-action btn-delete" th:data-product-id="${sp.sanPhamId}" onclick="deleteProduct(this.getAttribute('data-product-id'))">
                             <i class="fas fa-trash"></i> Xóa
                         </button>
                     </td>
@@ -380,7 +380,8 @@
     }
 
     function editProduct(id) {
-        fetch('/admin/products/api/' + id)
+        var productId = typeof id === 'string' ? id : id.toString();
+        fetch('/admin/products/api/' + productId)
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 if (data.success && data.data) {
@@ -409,7 +410,8 @@
         if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
             return;
         }
-        fetch('/admin/products/delete/' + id, { method: 'POST' })
+        var productId = typeof id === 'string' ? id : id.toString();
+        fetch('/admin/products/delete/' + productId, { method: 'POST' })
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 alert(data.message);
@@ -422,8 +424,9 @@
     var currentProductName = '';
 
     function manageVariants(productId) {
-        currentProductId = productId;
-        fetch('/admin/products/api/' + productId)
+        var id = typeof productId === 'string' ? productId : productId.toString();
+        currentProductId = id;
+        fetch('/admin/products/api/' + id)
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 if (data.success && data.data) {
@@ -490,8 +493,8 @@
             html += '<td>' + (v.soLuongTon || 0) + '</td>';
             html += '<td><span class="badge ' + (v.trangThai == 1 ? 'badge-active' : 'badge-inactive') + '">' + (v.trangThai == 1 ? 'Hoạt động' : 'Không hoạt động') + '</span></td>';
             html += '<td>';
-            html += '<button class="btn-action btn-edit" onclick="editVariant(' + v.variantId + ')"><i class="fas fa-edit"></i></button>';
-            html += '<button class="btn-action btn-delete" onclick="deleteVariant(' + v.variantId + ')"><i class="fas fa-trash"></i></button>';
+            html += '<button class="btn-action btn-edit" data-variant-id="' + v.variantId + '" onclick="editVariant(this.getAttribute(\'data-variant-id\'))"><i class="fas fa-edit"></i></button>';
+            html += '<button class="btn-action btn-delete" data-variant-id="' + v.variantId + '" onclick="deleteVariant(this.getAttribute(\'data-variant-id\'))"><i class="fas fa-trash"></i></button>';
             html += '</td>';
             html += '</tr>';
         });
@@ -518,7 +521,8 @@
     }
 
     function editVariant(variantId) {
-        fetch('/admin/products/variants/' + variantId)
+        var id = typeof variantId === 'string' ? variantId : variantId.toString();
+        fetch('/admin/products/variants/' + id)
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 if (data.success && data.data) {
@@ -597,7 +601,8 @@
         if (!confirm('Bạn có chắc chắn muốn xóa variant này?')) {
             return;
         }
-        fetch('/admin/products/variants/delete/' + variantId, { method: 'POST' })
+        var id = typeof variantId === 'string' ? variantId : variantId.toString();
+        fetch('/admin/products/variants/delete/' + id, { method: 'POST' })
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 alert(data.message);

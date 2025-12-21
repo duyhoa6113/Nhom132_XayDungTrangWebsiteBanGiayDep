@@ -14,6 +14,7 @@ import com.poly.service.DashboardService;
 import com.poly.service.UserManagementService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Router cơ bản cho các trang admin. Mỗi method set attribute "page" để sidebar
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@Slf4j
 public class AdminController {
 
     private final DashboardService dashboardService;
@@ -38,9 +40,19 @@ public class AdminController {
      */
     @GetMapping("/api/dashboard/stats")
     @ResponseBody
-    public ResponseEntity<DashboardStatsDTO> getDashboardStats() {
-        DashboardStatsDTO stats = dashboardService.getDashboardStats();
-        return ResponseEntity.ok(stats);
+    public ResponseEntity<?> getDashboardStats() {
+        try {
+            log.info("=== API: GET /admin/api/dashboard/stats ===");
+            DashboardStatsDTO stats = dashboardService.getDashboardStats();
+            log.info("✅ Dashboard stats retrieved successfully");
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            log.error("❌ Error getting dashboard stats: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                "success", false,
+                "message", "Lỗi khi lấy dữ liệu dashboard: " + e.getMessage()
+            ));
+        }
     }
 
 

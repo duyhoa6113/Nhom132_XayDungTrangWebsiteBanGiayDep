@@ -48,40 +48,77 @@ public class DashboardService {
     public DashboardStatsDTO getDashboardStats() {
         log.info("=== LẤY DỮ LIỆU DASHBOARD ===");
 
-        // Tính tổng doanh thu
-        BigDecimal currentMonthRevenue = hoaDonRepository.getTotalRevenueCurrentMonth();
-        BigDecimal previousMonthRevenue = hoaDonRepository.getTotalRevenuePreviousMonth();
-        if (currentMonthRevenue == null) currentMonthRevenue = BigDecimal.ZERO;
-        if (previousMonthRevenue == null) previousMonthRevenue = BigDecimal.ZERO;
-
-        // Tổng số đơn hàng
-        Long totalOrders = hoaDonRepository.countOrdersCurrentMonth();
-        if (totalOrders == null) totalOrders = 0L;
-
-        // Tổng số sản phẩm
-        Long totalProducts = sanPhamRepository.countActiveProducts();
-        if (totalProducts == null) totalProducts = 0L;
-
-        // Dữ liệu biểu đồ doanh thu
-        List<RevenueChartDTO> revenueChart = getRevenueChartData();
-
-        // Top 10 sản phẩm bán chạy
-        List<TopProductDTO> topProducts = getTopProducts();
-
-        // 5 đơn hàng gần đây
-        List<RecentOrderDTO> recentOrders = getRecentOrders();
-
         DashboardStatsDTO stats = new DashboardStatsDTO();
-        stats.setTotalRevenue(currentMonthRevenue);
-        stats.setPreviousMonthRevenue(previousMonthRevenue);
-        stats.setTotalOrders(totalOrders);
-        stats.setTotalProducts(totalProducts);
-        stats.setRevenueChart(revenueChart);
-        stats.setTopProducts(topProducts);
-        stats.setRecentOrders(recentOrders);
 
-        log.info("✅ Đã lấy dữ liệu dashboard: Revenue={}, Orders={}, Products={}",
-                currentMonthRevenue, totalOrders, totalProducts);
+        try {
+            // Tính tổng doanh thu
+            BigDecimal currentMonthRevenue = hoaDonRepository.getTotalRevenueCurrentMonth();
+            BigDecimal previousMonthRevenue = hoaDonRepository.getTotalRevenuePreviousMonth();
+            if (currentMonthRevenue == null) currentMonthRevenue = BigDecimal.ZERO;
+            if (previousMonthRevenue == null) previousMonthRevenue = BigDecimal.ZERO;
+            stats.setTotalRevenue(currentMonthRevenue);
+            stats.setPreviousMonthRevenue(previousMonthRevenue);
+            log.info("✅ Revenue loaded: Current={}, Previous={}", currentMonthRevenue, previousMonthRevenue);
+        } catch (Exception e) {
+            log.error("❌ Error loading revenue: {}", e.getMessage(), e);
+            stats.setTotalRevenue(BigDecimal.ZERO);
+            stats.setPreviousMonthRevenue(BigDecimal.ZERO);
+        }
+
+        try {
+            // Tổng số đơn hàng
+            Long totalOrders = hoaDonRepository.countOrdersCurrentMonth();
+            if (totalOrders == null) totalOrders = 0L;
+            stats.setTotalOrders(totalOrders);
+            log.info("✅ Orders loaded: {}", totalOrders);
+        } catch (Exception e) {
+            log.error("❌ Error loading orders count: {}", e.getMessage(), e);
+            stats.setTotalOrders(0L);
+        }
+
+        try {
+            // Tổng số sản phẩm
+            Long totalProducts = sanPhamRepository.countActiveProducts();
+            if (totalProducts == null) totalProducts = 0L;
+            stats.setTotalProducts(totalProducts);
+            log.info("✅ Products loaded: {}", totalProducts);
+        } catch (Exception e) {
+            log.error("❌ Error loading products count: {}", e.getMessage(), e);
+            stats.setTotalProducts(0L);
+        }
+
+        try {
+            // Dữ liệu biểu đồ doanh thu
+            List<RevenueChartDTO> revenueChart = getRevenueChartData();
+            stats.setRevenueChart(revenueChart);
+            log.info("✅ Revenue chart loaded: {} months", revenueChart.size());
+        } catch (Exception e) {
+            log.error("❌ Error loading revenue chart: {}", e.getMessage(), e);
+            stats.setRevenueChart(new ArrayList<>());
+        }
+
+        try {
+            // Top 10 sản phẩm bán chạy
+            List<TopProductDTO> topProducts = getTopProducts();
+            stats.setTopProducts(topProducts);
+            log.info("✅ Top products loaded: {}", topProducts.size());
+        } catch (Exception e) {
+            log.error("❌ Error loading top products: {}", e.getMessage(), e);
+            stats.setTopProducts(new ArrayList<>());
+        }
+
+        try {
+            // 5 đơn hàng gần đây
+            List<RecentOrderDTO> recentOrders = getRecentOrders();
+            stats.setRecentOrders(recentOrders);
+            log.info("✅ Recent orders loaded: {}", recentOrders.size());
+        } catch (Exception e) {
+            log.error("❌ Error loading recent orders: {}", e.getMessage(), e);
+            stats.setRecentOrders(new ArrayList<>());
+        }
+
+        log.info("✅ Dashboard stats retrieved successfully: Revenue={}, Orders={}, Products={}",
+                stats.getTotalRevenue(), stats.getTotalOrders(), stats.getTotalProducts());
 
         return stats;
     }

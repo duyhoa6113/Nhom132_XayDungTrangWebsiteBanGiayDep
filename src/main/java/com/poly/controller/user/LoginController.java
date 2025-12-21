@@ -1,24 +1,30 @@
 package com.poly.controller.user;
 
-import com.poly.dto.ResetPasswordDTO;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poly.dto.ForgotPasswordDTO;
 import com.poly.dto.LoginDTO;
 import com.poly.dto.RegisterDTO;
+import com.poly.dto.ResetPasswordDTO;
 import com.poly.entity.KhachHang;
+import com.poly.entity.NhanVien;
 import com.poly.service.LoginService;
 
-import java.util.Map;
-import java.util.Optional;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor
@@ -88,9 +94,14 @@ public class LoginController {
      */
     @GetMapping("/login")
     public String showLoginPage(Model model, HttpSession session) {
-        // Nếu đã đăng nhập, redirect về trang chủ
+        // Nếu đã đăng nhập (KhachHang), redirect về trang chủ
         if (session.getAttribute("khachHang") != null) {
             return "redirect:/Index";
+        }
+        
+        // Nếu đã đăng nhập (NhanVien - Admin), redirect về admin dashboard
+        if (session.getAttribute("nhanVien") != null) {
+            return "redirect:/admin";
         }
 
         model.addAttribute("loginDTO", new LoginDTO());
@@ -114,34 +125,65 @@ public class LoginController {
         }
 
         try {
-            // Thực hiện đăng nhập
+            // Thử đăng nhập với KhachHang trước
             Optional<KhachHang> khachHangOpt = loginService.login(loginDTO);
+            
+            if (khachHangOpt.isPresent()) {
+                // Đăng nhập thành công với KhachHang
+                KhachHang khachHang = khachHangOpt.get();
+                session.setAttribute("khachHang", khachHang);
+                session.setAttribute("khachHangId", khachHang.getKhachHangId());
+                session.setAttribute("khachHangTen", khachHang.getHoTen());
+                session.setAttribute("khachHangEmail", khachHang.getEmail());
 
-            if (khachHangOpt.isEmpty()) {
-                // Đăng nhập thất bại
-                model.addAttribute("errorMessage", "Email hoặc mật khẩu không chính xác");
-                return "user/login";
+                log.info("Khách hàng {} đăng nhập thành công", khachHang.getEmail());
+
+                // Redirect về trang chủ hoặc trang trước đó
+                String redirectUrl = (String) session.getAttribute("redirectUrl");
+                if (redirectUrl != null) {
+                    session.removeAttribute("redirectUrl");
+                    return "redirect:" + redirectUrl;
+                }
+
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Đăng nhập thành công! Chào mừng " + khachHang.getHoTen());
+                return "redirect:/Index";
             }
 
-            // Đăng nhập thành công - lưu thông tin vào session
-            KhachHang khachHang = khachHangOpt.get();
-            session.setAttribute("khachHang", khachHang);
-            session.setAttribute("khachHangId", khachHang.getKhachHangId());
-            session.setAttribute("khachHangTen", khachHang.getHoTen());
-            session.setAttribute("khachHangEmail", khachHang.getEmail());
+            // Nếu không phải KhachHang, thử đăng nhập với NhanVien
+            Optional<NhanVien> nhanVienOpt = loginService.loginNhanVien(loginDTO);
+            
+            if (nhanVienOpt.isPresent()) {
+                // Đăng nhập thành công với NhanVien
+                NhanVien nhanVien = nhanVienOpt.get();
+                session.setAttribute("nhanVien", nhanVien);
+                session.setAttribute("nhanVienId", nhanVien.getNhanVienId());
+                session.setAttribute("nhanVienTen", nhanVien.getHoTen());
+                session.setAttribute("nhanVienEmail", nhanVien.getEmail());
+                
+                // Kiểm tra vai trò Admin (VaiTroId = 1)
+                boolean isAdmin = nhanVien.getVaiTro() != null && 
+                                 nhanVien.getVaiTro().getVaiTroId() == 1;
+                session.setAttribute("isAdmin", isAdmin);
 
-            log.info("Khách hàng {} đăng nhập thành công", khachHang.getEmail());
+                log.info("Nhân viên {} đăng nhập thành công - Admin: {}", 
+                        nhanVien.getEmail(), isAdmin);
 
-            // Redirect về trang chủ hoặc trang trước đó
-            String redirectUrl = (String) session.getAttribute("redirectUrl");
-            if (redirectUrl != null) {
-                session.removeAttribute("redirectUrl");
-                return "redirect:" + redirectUrl;
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Đăng nhập thành công! Chào mừng " + nhanVien.getHoTen());
+                
+                // Nếu là Admin, redirect về admin dashboard
+                if (isAdmin) {
+                    return "redirect:/admin";
+                }
+                
+                // Nếu là nhân viên thường, có thể redirect về trang khác (tùy yêu cầu)
+                return "redirect:/Index";
             }
 
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Đăng nhập thành công! Chào mừng " + khachHang.getHoTen());
-            return "redirect:/Index";
+            // Cả hai đều thất bại
+            model.addAttribute("errorMessage", "Email hoặc mật khẩu không chính xác");
+            return "user/login";
 
         } catch (Exception e) {
             log.error("Lỗi khi đăng nhập: {}", e.getMessage());
@@ -160,16 +202,28 @@ public class LoginController {
      */
     @GetMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
-        // Xóa thông tin khách hàng khỏi session
+        // Xóa thông tin khách hàng và nhân viên khỏi session
         String tenKhachHang = (String) session.getAttribute("khachHangTen");
+        String tenNhanVien = (String) session.getAttribute("nhanVienTen");
 
         session.removeAttribute("khachHang");
         session.removeAttribute("khachHangId");
         session.removeAttribute("khachHangTen");
         session.removeAttribute("khachHangEmail");
+        
+        session.removeAttribute("nhanVien");
+        session.removeAttribute("nhanVienId");
+        session.removeAttribute("nhanVienTen");
+        session.removeAttribute("nhanVienEmail");
+        session.removeAttribute("isAdmin");
+        
         session.invalidate();
 
-        log.info("Khách hàng {} đã đăng xuất", tenKhachHang);
+        if (tenNhanVien != null) {
+            log.info("Nhân viên {} đã đăng xuất", tenNhanVien);
+        } else if (tenKhachHang != null) {
+            log.info("Khách hàng {} đã đăng xuất", tenKhachHang);
+        }
 
         redirectAttributes.addFlashAttribute("successMessage", "Đã đăng xuất thành công");
         return "redirect:/Index";

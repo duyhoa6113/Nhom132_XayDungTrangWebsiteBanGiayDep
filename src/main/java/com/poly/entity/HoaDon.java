@@ -1,14 +1,25 @@
 package com.poly.entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "HoaDon")
@@ -63,8 +74,10 @@ public class HoaDon {
 
     // ✅ THÊM TRƯỜNG MỚI NÀY
     // Lưu ý: Cần chạy script SQL để thêm cột này vào database (xem file add_trangthai_thanhtoan.sql)
-    // Nếu cột chưa có trong database, sẽ báo lỗi. Hãy chạy script SQL trước.
-    @Column(name = "TrangThaiThanhToan", length = 50, nullable = true)
+    // File script: src/main/resources/static/db/add_trangthai_thanhtoan.sql
+    // SAU KHI CHẠY SCRIPT SQL, sửa lại thành: @Column(name = "TrangThaiThanhToan", length = 50, nullable = true)
+    // (bỏ insertable = false, updatable = false)
+    @Column(name = "TrangThaiThanhToan", length = 50, nullable = true, insertable = false, updatable = false)
     private String trangThaiThanhToan; // UNPAID, PAID, FAILED
 
     @Column(name = "TongTien", precision = 18, scale = 2, nullable = false)

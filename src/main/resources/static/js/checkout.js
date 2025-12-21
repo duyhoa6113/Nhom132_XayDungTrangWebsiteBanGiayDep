@@ -232,6 +232,12 @@ function deleteAddress(event, addressId) {
 // ==================== THANH TOÁN ====================
 
 function selectPaymentMethod(element) {
+    // Kiểm tra nếu phương thức thanh toán bị disabled
+    if (element.classList.contains('disabled')) {
+        console.warn('⚠️ Phương thức thanh toán này đã bị vô hiệu hóa');
+        return;
+    }
+
     document.querySelectorAll('.payment-method').forEach(item => {
         item.classList.remove('active');
     });

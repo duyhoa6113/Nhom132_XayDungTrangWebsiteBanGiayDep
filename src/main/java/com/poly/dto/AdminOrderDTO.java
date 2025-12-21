@@ -1,12 +1,12 @@
 package com.poly.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * DTO cho quản lý đơn hàng trong admin
@@ -36,5 +36,22 @@ public class AdminOrderDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<OrderItemDTO> chiTietList;
+
+    /**
+     * Helper method để convert trạng thái sang tiếng Việt
+     */
+    public String getTrangThaiText() {
+        if (trangThai == null) return "";
+        return switch (trangThai) {
+            case "ChoXuLy" -> "Chờ xử lý";
+            case "DaXacNhan" -> "Đã xác nhận";
+            case "DangChuanBi" -> "Đang chuẩn bị";
+            case "DangGiao" -> "Đang giao";
+            case "DaGiao" -> "Đã giao";
+            case "HoanThanh" -> "Hoàn thành";
+            case "DaHuy" -> "Đã hủy";
+            default -> trangThai;
+        };
+    }
 }
 

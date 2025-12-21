@@ -230,13 +230,15 @@ public class ProductDetailController {
 
         List<SanPham> relatedProducts = new ArrayList<>();
         if (sanPham.getDanhMuc() != null) {
-            relatedProducts = sanPhamRepository
+            // Tạo ArrayList mới từ getContent() để tránh UnsupportedOperationException
+            List<SanPham> categoryProducts = sanPhamRepository
                     .findByDanhMuc_DanhMucIdAndSanPhamIdNotAndTrangThai(
                             sanPham.getDanhMuc().getDanhMucId(),
                             id,
                             1,
                             PageRequest.of(0, 6)
                     ).getContent();
+            relatedProducts.addAll(categoryProducts);
         }
 
         // Nếu không đủ sản phẩm liên quan, lấy thêm sản phẩm khác
